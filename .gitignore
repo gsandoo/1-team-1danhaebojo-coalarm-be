@@ -38,3 +38,7 @@ out/
 
 ### application.yml ###
 application-*.yml
+
+/node_modules
+
+gradle/wrapper/gradle-wrapper.jar
