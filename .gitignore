@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### application.yml ###
-application-*.yml
+application*.yml
 
 /node_modules
 
