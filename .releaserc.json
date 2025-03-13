@@ -1,5 +1,6 @@
 {
-  "branches": ["main"],
+  "branches": ["develop", "main"],
+  "repositoryUrl": "https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be.git",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
