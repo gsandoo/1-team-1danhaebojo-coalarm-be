@@ -1,7 +1,8 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.DashboardResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.MacdDTO;
 
 public interface CoinMarketService {
-    MacdDTO getMacdForCoin(Long coinId);
+    DashboardResponse getDashboardIndicators(Long coinId);
 }

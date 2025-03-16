@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller;
 
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.DashboardResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.ResponseKimchiPremium;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.service.KimchiPremiumService;
 import jakarta.validation.constraints.Min;
@@ -25,9 +26,9 @@ public class DashboardController {
     private final KimchiPremiumService kimchiPremiumService;
 
     @GetMapping("/{coinId}/index")
-    public ResponseEntity<MacdDTO> getDashboardIndicators(@PathVariable("coinId") Long coinId) {
-        MacdDTO macdData = coinMarketService.getMacdForCoin(coinId);
-        return ResponseEntity.ok(macdData);
+    public ResponseEntity<DashboardResponse> getDashboardIndicators(@PathVariable("coinId") Long coinId) {
+        DashboardResponse response = coinMarketService.getDashboardIndicators(coinId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/kimchi")

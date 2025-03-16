@@ -1,7 +1,9 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.DashboardResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.MacdDTO;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.RsiDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerTestRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerTestEntity;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +20,17 @@ public class CoinMarketServiceImpl implements CoinMarketService {
 
     private final TickerTestRepository tickerTestRepository;
 
-    @Override
-    public MacdDTO getMacdForCoin(Long coinId) {
+    public DashboardResponse getDashboardIndicators(Long coinId) {
         List<Double> prices = getClosingPrices(coinId);
 
         if (prices.size() < 26) {
-            throw new IllegalArgumentException("데이터 부족: MACD 계산을 위해 최소 26일 이상의 가격 데이터가 필요합니다.");
+            throw new IllegalArgumentException("데이터 부족: MACD 계산을 위해 최소 26개 이상의 가격 데이터가 필요합니다.");
         }
 
-        return calculateMACD(prices);
+        MacdDTO macdData = calculateMACD(prices);
+        RsiDTO rsiData = calculateRSI(prices, 14);
+
+        return new DashboardResponse(macdData, rsiData);
     }
 
     private List<Double> getClosingPrices(Long coinId) {
@@ -95,5 +99,36 @@ public class CoinMarketServiceImpl implements CoinMarketService {
         }
 
         return emaList;
+    }
+
+    private RsiDTO calculateRSI(List<Double> prices, int period) {
+        Collections.reverse(prices);
+
+        List<Double> gains = new ArrayList<>();
+        List<Double> losses = new ArrayList<>();
+
+        for (int i = 1; i < prices.size(); i++) {
+            double change = prices.get(i) - prices.get(i - 1);
+            if (change > 0) {
+                gains.add(change);
+                losses.add(0.0);
+            } else {
+                gains.add(0.0);
+                losses.add(-change);
+            }
+        }
+
+        double avgGain = gains.subList(0, period).stream().mapToDouble(Double::doubleValue).sum() / period;
+        double avgLoss = losses.subList(0, period).stream().mapToDouble(Double::doubleValue).sum() / period;
+
+        for (int i = period; i < gains.size(); i++) {
+            avgGain = ((avgGain * (period - 1)) + gains.get(i)) / period;
+            avgLoss = ((avgLoss * (period - 1)) + losses.get(i)) / period;
+        }
+
+        double rs = avgGain / (avgLoss == 0 ? 1 : avgLoss);
+        double rsi = 100 - (100 / (1 + rs));
+
+        return new RsiDTO(rsi);
     }
 }
