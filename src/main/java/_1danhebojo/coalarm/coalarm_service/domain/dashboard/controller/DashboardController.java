@@ -24,10 +24,10 @@ public class DashboardController {
     private final CoinMarketService coinMarketService;
     private final KimchiPremiumService kimchiPremiumService;
 
-    @GetMapping("/{symbol}/macd")
-    public ResponseEntity<MacdDTO> getMacd(@PathVariable("symbol") String symbol) {
-        MacdDTO response = coinMarketService.getMacdForSymbol(symbol);
-        return ResponseEntity.ok(response);
+    @GetMapping("/{coinId}/index")
+    public ResponseEntity<MacdDTO> getDashboardIndicators(@PathVariable("coinId") Long coinId) {
+        MacdDTO macdData = coinMarketService.getMacdForCoin(coinId);
+        return ResponseEntity.ok(macdData);
     }
 
     @GetMapping("/kimchi")

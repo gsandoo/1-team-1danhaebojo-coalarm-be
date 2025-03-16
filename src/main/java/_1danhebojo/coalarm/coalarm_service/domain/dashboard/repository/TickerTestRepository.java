@@ -5,5 +5,5 @@ import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.Ti
 import java.util.List;
 
 public interface TickerTestRepository {
-    List<TickerTestEntity> findByCodeOrderedByUtcDateTime(String code);
+    List<TickerTestEntity> findByCoinIdOrderedByUtcDateTime(Long coinId);
 }

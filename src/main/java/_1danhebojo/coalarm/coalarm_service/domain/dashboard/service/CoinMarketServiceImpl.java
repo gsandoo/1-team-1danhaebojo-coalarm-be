@@ -18,11 +18,9 @@ public class CoinMarketServiceImpl implements CoinMarketService {
 
     private final TickerTestRepository tickerTestRepository;
 
-    public MacdDTO getMacdForSymbol(String symbol) {
-        List<Double> prices = getClosingPrices(symbol);
-
-        System.out.println("Closing Prices Count: " + prices.size());
-        System.out.println("Prices: " + prices);
+    @Override
+    public MacdDTO getMacdForCoin(Long coinId) {
+        List<Double> prices = getClosingPrices(coinId);
 
         if (prices.size() < 26) {
             throw new IllegalArgumentException("데이터 부족: MACD 계산을 위해 최소 26일 이상의 가격 데이터가 필요합니다.");
@@ -31,8 +29,10 @@ public class CoinMarketServiceImpl implements CoinMarketService {
         return calculateMACD(prices);
     }
 
-    private List<Double> getClosingPrices(String symbol) {
-        List<TickerTestEntity> tickers = tickerTestRepository.findByCodeOrderedByUtcDateTime(symbol);
+    private List<Double> getClosingPrices(Long coinId) {
+        List<TickerTestEntity> tickers = tickerTestRepository.findByCoinIdOrderedByUtcDateTime(coinId);
+        System.out.println("Fetched Data Count: " + tickers.size());
+        System.out.println("Fetched Data: " + tickers);
         return tickers.stream()
                 .map(ticker -> ticker.getTradePrice().doubleValue())
                 .collect(Collectors.toList());
