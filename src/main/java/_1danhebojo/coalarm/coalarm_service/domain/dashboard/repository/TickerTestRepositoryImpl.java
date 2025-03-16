@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class TickerTestRepositoryImpl {
+public class TickerTestRepositoryImpl implements TickerTestRepository {
 
     private final JPAQueryFactory queryFactory;
 
