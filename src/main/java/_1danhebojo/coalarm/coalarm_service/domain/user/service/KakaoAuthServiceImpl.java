@@ -4,11 +4,10 @@ import _1danhebojo.coalarm.coalarm_service.global.config.KakaoProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -26,15 +25,20 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
     public String getAccessToken(String code) {
         String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
-        Map<String, String> params = new HashMap<>();
-        params.put("grant_type", "authorization_code");
-        params.put("client_id", kakaoProperties.getClientId());
-        params.put("redirect_uri", kakaoProperties.getRedirectUri());
-        params.put("code", code);
-        params.put("client_secret", kakaoProperties.getClientSecret());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, params, String.class);
-        ObjectMapper objectMapper = new ObjectMapper();
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", kakaoProperties.getClientId());
+        params.add("redirect_uri", kakaoProperties.getRedirectUri());
+        params.add("code", code);
+        params.add("client_secret", kakaoProperties.getClientSecret());
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
+
         try {
             JsonNode rootNode = objectMapper.readTree(response.getBody());
             return rootNode.get("access_token").asText();
