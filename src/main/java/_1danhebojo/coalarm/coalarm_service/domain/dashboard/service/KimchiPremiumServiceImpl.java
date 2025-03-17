@@ -2,11 +2,12 @@ package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.ResponseKimchiPremium;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.KimchiPremiumRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerTestRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.KimchiPremiumEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerTestEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.TickerJpaRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class KimchiPremiumServiceImpl implements KimchiPremiumService{
     private final KimchiPremiumRepository kimchiPremiumRepository;
-    private final TickerTestRepository tickerTestRepository;
+    private final TickerJpaRepository tickerJpaRepository;
     private final CoinJpaRepository coinJpaRepository;
     private static final String EXCHANGE_RATE_API_URL = "https://api.exchangerate-api.com/v4/latest/USD";
     @Override
@@ -38,16 +39,16 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
 
     @Override
     public void calculateAndSaveKimchiPremium() {
-        Optional<TickerTestEntity> krwBtc = tickerTestRepository.findLatestByCode("KRW-BTC");
-        Optional<TickerTestEntity> usdtBtc = tickerTestRepository.findLatestByCode("USDT-BTC");
+        Optional<TickerEntity> krwBtc = tickerJpaRepository.findFirstByIdSymbolOrderByIdTimestampDesc("KRW/BTC");
+        Optional<TickerEntity> usdtBtc = tickerJpaRepository.findFirstByIdSymbolOrderByIdTimestampDesc("USDT/BTC");
 
         if (krwBtc.isEmpty() || usdtBtc.isEmpty()) {
             log.warn("가격 데이터를 찾을 수 없습니다.");
             return;
         }
 
-        BigDecimal krwPrice = krwBtc.get().getTradePrice();
-        BigDecimal usdtPrice = usdtBtc.get().getTradePrice();
+        BigDecimal krwPrice = krwBtc.get().getClose();
+        BigDecimal usdtPrice = usdtBtc.get().getClose();
 
         BigDecimal exchangeRate = getUsdToKrwExchangeRate();
         if (exchangeRate.compareTo(BigDecimal.ZERO) == 0) {

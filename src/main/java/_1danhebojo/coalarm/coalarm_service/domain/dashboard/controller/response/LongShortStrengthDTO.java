@@ -10,14 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LongShortStrengthDTO {
-    private Ratio ratio;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Ratio {
-        private double longRatio;
-        private double shortRatio;
-    }
+    private double longRatio;
+    private double shortRatio;
 }

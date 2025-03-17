@@ -1,12 +1,15 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinIndicatorResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.LongShortStrengthDTO;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.MacdDTO;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.RsiDTO;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerTestRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerTestEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.*;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinIndicatorEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinIndicatorJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,16 +18,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
-    private final TickerTestRepository tickerTestRepository;
+    private final TickerRepository tickerRepository;
+    private final CoinJpaRepository coinJpaRepository;
+    private final CoinIndicatorJpaRepository coinIndicatorJpaRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String BINANCE_BASE_URL = "https://fapi.binance.com";
@@ -41,19 +48,16 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
         // JSON 형식으로 출력
         LongShortStrengthDTO result = calculateLongShortStrength("BTCUSDT");
-        System.out.println("\n롱/숏 비율 JSON 형식:");
-        System.out.println("{\n  \"ratio\": {\n    \"long\": " + result.getRatio().getLongRatio() +
-                ",\n    \"short\": " + result.getRatio().getShortRatio() + "\n  }\n}");
+        Optional<CoinEntity> btcCoin = coinJpaRepository.findBySymbol("BTC");
+        CoinDTO coinDTO = btcCoin.map(CoinDTO::new).orElse(null);
 
-        return new CoinIndicatorResponse(macdData, rsiData);
+        return new CoinIndicatorResponse(macdData, rsiData,result,coinDTO);
     }
 
     private List<Double> getClosingPrices(Long coinId) {
-        List<TickerTestEntity> tickers = tickerTestRepository.findByCoinIdOrderedByUtcDateTime(coinId);
-        System.out.println("Fetched Data Count: " + tickers.size());
-        System.out.println("Fetched Data: " + tickers);
+        List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(coinId);
         return tickers.stream()
-                .map(ticker -> ticker.getTradePrice().doubleValue())
+                .map(ticker -> ticker.getClose().doubleValue())
                 .collect(Collectors.toList());
     }
 
@@ -147,6 +151,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         return new RsiDTO(rsi);
     }
 
+    //NOTE: 공매수/공매도 계산
     private LongShortStrengthDTO calculateLongShortStrength(String symbol){
         try{
             // 1. 롱/숏 비율 데이터 가져오기
@@ -192,13 +197,9 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
             String status = longShortStrength > 0 ? "LONG_DOMINANCE" : "SHORT_DOMINANCE";
 
-            LongShortStrengthDTO.Ratio ratio = LongShortStrengthDTO.Ratio.builder()
+            LongShortStrengthDTO result = LongShortStrengthDTO.builder()
                     .longRatio(longRatio * 100)  // 퍼센트로 변환 (예: 0.555 → 55.5%)
                     .shortRatio(shortRatio * 100) // 퍼센트로 변환 (예: 0.445 → 44.5%)
-                    .build();
-
-            LongShortStrengthDTO result = LongShortStrengthDTO.builder()
-                    .ratio(ratio)
                     .build();
 
             return result;
@@ -208,6 +209,45 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             return null;
         }
     }
+
+    public void saveIndicators(Long coinId) {
+        // 1. 코인 엔티티 조회
+        CoinEntity coinEntity = coinJpaRepository.findById(coinId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
+
+        // 2. 가격 데이터 조회
+        List<Double> prices = getClosingPrices(coinId);
+
+        if (prices.size() < 26) {
+            throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // 3. MACD 계산
+        MacdDTO macdDTO = calculateMACD(prices);
+
+        // 4. RSI 계산
+        RsiDTO rsiDTO = calculateRSI(prices, 14);
+
+        // 5. 롱숏 강도 계산
+        // 코인 코드 매핑 (coinId -> 바이낸스 심볼)
+        LongShortStrengthDTO longShortDTO = calculateLongShortStrength("BTCUSDT");
+
+        // 6. CoinIndicatorEntity 생성 및 저장
+        CoinIndicatorEntity indicatorEntity = CoinIndicatorEntity.builder()
+                .coin(coinEntity)
+                .macd(BigDecimal.valueOf(macdDTO.getValue()))
+                .signal(BigDecimal.valueOf(macdDTO.getSignal()))
+                .histogram(BigDecimal.valueOf(macdDTO.getHistogram()))
+                .trend(macdDTO.getTrend())
+                .rsi(BigDecimal.valueOf(rsiDTO.getValue()))
+                .longShortStrength(longShortDTO != null
+                        ? BigDecimal.valueOf((longShortDTO.getLongRatio() - longShortDTO.getShortRatio()) / 100.0)
+                        : null)
+                .build();
+
+        coinIndicatorJpaRepository.save(indicatorEntity);
+    }
+
 
     // NOTE:새로 추가된 함수: 롱/숏 비율 데이터 가져오기
     private JsonNode getLongShortRatioData(String symbol) throws JsonProcessingException {

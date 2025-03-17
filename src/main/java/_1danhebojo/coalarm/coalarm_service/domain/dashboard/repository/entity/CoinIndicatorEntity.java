@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "coin_indicators")
+@Table(name = "coin_indicator")
 @Getter
 @NoArgsConstructor
 public class CoinIndicatorEntity {

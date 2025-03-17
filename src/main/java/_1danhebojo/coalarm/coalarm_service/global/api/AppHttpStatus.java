@@ -43,7 +43,6 @@ public enum AppHttpStatus {
      * 500 : 서버 내부에서 에러가 발생함
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에 에러가 발생했습니다.");
-
     private final HttpStatus httpStatus;
     private final String message;
 }
