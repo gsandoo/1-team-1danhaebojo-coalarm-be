@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserD
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.KakaoAuthService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
+import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,10 @@ import java.util.Map;
 public class OAuthController {
     private final KakaoAuthService kakaoAuthService;
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/callback")
-    public ResponseEntity<BaseResponse<UserDTO>> kakaoCallback(@RequestParam("code") String code) {
+    public ResponseEntity<BaseResponse<Map<String, Object>>> kakaoCallback(@RequestParam("code") String code) {
         // 카카오 액세스 토큰 요청
         String accessToken = kakaoAuthService.getAccessToken(code);
 
@@ -31,8 +33,18 @@ public class OAuthController {
                 userInfo.get("email")
         );
 
+        // JWT 토큰 발급
+        String jwtToken = jwtTokenProvider.generateToken(userDTO.getKakaoId());
+
+        System.out.println("Generated JWT Token: " + jwtToken);
+
+        Map<String, Object> response = Map.of(
+                "user", userDTO,
+                "token", jwtToken
+        );
+
         // 클라이언트에게 유저 정보 반환
-        return ResponseEntity.ok(BaseResponse.success(userDTO));
+        return ResponseEntity.ok(BaseResponse.success(response));
     }
 
     @GetMapping("/userinfo")
