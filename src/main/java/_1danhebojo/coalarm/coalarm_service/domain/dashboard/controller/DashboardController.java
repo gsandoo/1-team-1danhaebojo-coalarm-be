@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller;
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.DashboardResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinIndicatorResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.ResponseKimchiPremium;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.service.KimchiPremiumService;
 import jakarta.validation.constraints.Min;
@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.MacdDTO;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.service.CoinMarketService;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.service.CoinIndicatorService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/dashboard")
 @RequiredArgsConstructor
 public class DashboardController {
-    private final CoinMarketService coinMarketService;
+    private final CoinIndicatorService coinIndicatorService;
     private final KimchiPremiumService kimchiPremiumService;
 
     @GetMapping("/{coinId}/index")
-    public ResponseEntity<DashboardResponse> getDashboardIndicators(@PathVariable("coinId") Long coinId) {
-        DashboardResponse response = coinMarketService.getDashboardIndicators(coinId);
+    public ResponseEntity<CoinIndicatorResponse> getDashboardIndicators(@PathVariable("coinId") Long coinId) {
+        CoinIndicatorResponse response = coinIndicatorService.getDashboardIndicators(coinId);
         return ResponseEntity.ok(response);
     }
 

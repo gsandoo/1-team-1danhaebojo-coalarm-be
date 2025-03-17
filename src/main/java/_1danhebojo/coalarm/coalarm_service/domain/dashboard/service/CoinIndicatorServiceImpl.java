@@ -1,7 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.DashboardResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinIndicatorResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.MacdDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.RsiDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerTestRepository;
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CoinMarketServiceImpl implements CoinMarketService {
+public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
     private final TickerTestRepository tickerTestRepository;
 
-    public DashboardResponse getDashboardIndicators(Long coinId) {
+    public CoinIndicatorResponse getDashboardIndicators(Long coinId) {
         List<Double> prices = getClosingPrices(coinId);
 
         if (prices.size() < 26) {
@@ -30,7 +30,7 @@ public class CoinMarketServiceImpl implements CoinMarketService {
         MacdDTO macdData = calculateMACD(prices);
         RsiDTO rsiData = calculateRSI(prices, 14);
 
-        return new DashboardResponse(macdData, rsiData);
+        return new CoinIndicatorResponse(macdData, rsiData);
     }
 
     private List<Double> getClosingPrices(Long coinId) {
