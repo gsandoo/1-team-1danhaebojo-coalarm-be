@@ -57,9 +57,12 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
 
         // 김치 프리미엄 계산
         BigDecimal globalPriceInKrw = usdtPrice.multiply(exchangeRate);
-        BigDecimal kimchiPremium = krwPrice.subtract(globalPriceInKrw)
-                .divide(globalPriceInKrw, 8, BigDecimal.ROUND_HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
+
+        BigDecimal kimchiPremium = krwPrice
+                .divide(globalPriceInKrw, 8, BigDecimal.ROUND_HALF_UP) // (국내 가격 / 해외 가격(원화 환산))
+                .subtract(BigDecimal.ONE) // -1
+                .multiply(BigDecimal.valueOf(100)); // * 100
+
 
         // BTC 코인 엔티티 가져오기
         Optional<CoinEntity> btcCoin = coinJpaRepository.findBySymbol("BTC");

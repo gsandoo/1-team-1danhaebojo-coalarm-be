@@ -2,12 +2,18 @@ package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinIndicatorResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.LongShortStrengthDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.MacdDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.RsiDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerTestRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerTestEntity;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +25,9 @@ import java.util.stream.Collectors;
 public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
     private final TickerTestRepository tickerTestRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String BINANCE_BASE_URL = "https://fapi.binance.com";
 
     public CoinIndicatorResponse getDashboardIndicators(Long coinId) {
         List<Double> prices = getClosingPrices(coinId);
@@ -29,6 +38,12 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
         MacdDTO macdData = calculateMACD(prices);
         RsiDTO rsiData = calculateRSI(prices, 14);
+
+        // JSON 형식으로 출력
+        LongShortStrengthDTO result = calculateLongShortStrength("BTCUSDT");
+        System.out.println("\n롱/숏 비율 JSON 형식:");
+        System.out.println("{\n  \"ratio\": {\n    \"long\": " + result.getRatio().getLongRatio() +
+                ",\n    \"short\": " + result.getRatio().getShortRatio() + "\n  }\n}");
 
         return new CoinIndicatorResponse(macdData, rsiData);
     }
@@ -130,5 +145,109 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         double rsi = 100 - (100 / (1 + rs));
 
         return new RsiDTO(rsi);
+    }
+
+    private LongShortStrengthDTO calculateLongShortStrength(String symbol){
+        try{
+            // 1. 롱/숏 비율 데이터 가져오기
+            JsonNode longShortData = getLongShortRatioData(symbol);
+            if (longShortData == null || longShortData.isEmpty()) {
+                System.out.println("롱/숏 비율 데이터를 가져오는데 실패했습니다.");
+                return null;
+            }
+
+            JsonNode latestLsData = longShortData.get(0);
+            double longRatio = latestLsData.get("longAccount").asDouble();
+            double shortRatio = latestLsData.get("shortAccount").asDouble();
+
+            // 2. 미결제약정 데이터 가져오기
+            JsonNode openInterestData = getOpenInterestData(symbol);
+            if (openInterestData == null) {
+                System.out.println("미결제약정 데이터를 가져오는데 실패했습니다.");
+                return null;
+            }
+
+            double openInterest = openInterestData.get("openInterest").asDouble();
+
+            // 3. 펀딩 비율 데이터 가져오기
+            JsonNode fundingRateData = getFundingRateData(symbol);
+            if (fundingRateData == null || fundingRateData.isEmpty()) {
+                System.out.println("펀딩 비율 데이터를 가져오는데 실패했습니다.");
+                return null;
+            }
+
+            JsonNode latestFrData = fundingRateData.get(0);
+            double fundingRate = latestFrData.get("fundingRate").asDouble();
+
+            // 4. 공매수/공매도 강도 계산
+            double longStrength = longRatio * openInterest * (1 + fundingRate);
+            double shortStrength = shortRatio * openInterest * (1 - fundingRate);
+
+            double longShortStrength;
+            if (shortStrength == 0) {
+                longShortStrength = Double.POSITIVE_INFINITY;  // 숏 비율이 0인 경우 무한대 반환
+            } else {
+                longShortStrength = (longStrength / shortStrength) - 1;
+            }
+
+            String status = longShortStrength > 0 ? "LONG_DOMINANCE" : "SHORT_DOMINANCE";
+
+            LongShortStrengthDTO.Ratio ratio = LongShortStrengthDTO.Ratio.builder()
+                    .longRatio(longRatio * 100)  // 퍼센트로 변환 (예: 0.555 → 55.5%)
+                    .shortRatio(shortRatio * 100) // 퍼센트로 변환 (예: 0.445 → 44.5%)
+                    .build();
+
+            LongShortStrengthDTO result = LongShortStrengthDTO.builder()
+                    .ratio(ratio)
+                    .build();
+
+            return result;
+        }catch(Exception e){
+            System.err.println("공매수/공매도 강도 계산 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // NOTE:새로 추가된 함수: 롱/숏 비율 데이터 가져오기
+    private JsonNode getLongShortRatioData(String symbol) throws JsonProcessingException {
+        String endpoint = "/futures/data/globalLongShortAccountRatio";
+        String url = BINANCE_BASE_URL + endpoint + "?symbol=" + symbol + "&period=1h&limit=1";
+
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return objectMapper.readTree(response.getBody());
+        } else {
+            System.err.println("롱/숏 비율 데이터 요청 실패: " + response.getStatusCode());
+            return null;
+        }
+    }
+
+    // NOTE:새로 추가된 함수: 미결제약정 데이터 가져오기
+    private JsonNode getOpenInterestData(String symbol) throws JsonProcessingException {
+        String endpoint = "/fapi/v1/openInterest";
+        String url = BINANCE_BASE_URL + endpoint + "?symbol=" + symbol;
+
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return objectMapper.readTree(response.getBody());
+        } else {
+            System.err.println("미결제약정 데이터 요청 실패: " + response.getStatusCode());
+            return null;
+        }
+    }
+
+    // NOTE:펀딩 비율 데이터 가져오기
+    private JsonNode getFundingRateData(String symbol) throws JsonProcessingException {
+        String endpoint = "/fapi/v1/fundingRate";
+        String url = BINANCE_BASE_URL + endpoint + "?symbol=" + symbol + "&limit=1";
+
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return objectMapper.readTree(response.getBody());
+        } else {
+            System.err.println("펀딩 비율 데이터 요청 실패: " + response.getStatusCode());
+            return null;
+        }
     }
 }
