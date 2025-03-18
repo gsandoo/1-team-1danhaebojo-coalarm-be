@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 public class KimchiPremiumScheduler {
     private final KimchiPremiumService kimchiPremiumService;
 
-    @Scheduled(fixedRate = 300000)
-    public void calculateAndSaveKimchiPremiumTask(){
-        log.info("김치 프리미엄 계산 시작...");
-        kimchiPremiumService.calculateAndSaveKimchiPremium();
-        log.info("김치 프리미엄 계산 완료.");
-    }
+//    @Scheduled(fixedRate = 300000)
+//    public void calculateAndSaveKimchiPremiumTask(){
+//        log.info("김치 프리미엄 계산 시작...");
+//        kimchiPremiumService.calculateAndSaveKimchiPremium();
+//        log.info("김치 프리미엄 계산 완료.");
+//    }
 }

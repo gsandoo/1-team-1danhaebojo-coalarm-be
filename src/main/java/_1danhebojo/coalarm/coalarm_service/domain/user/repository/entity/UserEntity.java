@@ -41,4 +41,12 @@ public class UserEntity {
 
     @Column(name = "chg_dt")
     private Instant chgDt;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImage(String profileImg) {
+        this.profileImg = profileImg;
+    }
 }
