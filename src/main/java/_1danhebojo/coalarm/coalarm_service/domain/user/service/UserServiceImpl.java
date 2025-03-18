@@ -36,4 +36,12 @@ public class UserServiceImpl implements UserService {
         UserEntity savedUser = userRepository.save(newUser);
         return UserDTO.fromEntity(savedUser);
     }
+
+    @Override
+    public UserDTO findByKakaoId(String kakaoId) {
+        UserEntity user = userRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new RuntimeException("User not found with kakaoId: " + kakaoId));
+
+        return UserDTO.fromEntity(user); // Entity → DTO 변환
+    }
 }

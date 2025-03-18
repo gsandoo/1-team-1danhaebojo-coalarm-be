@@ -5,4 +5,5 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.entity.UserEntity;
 
 public interface UserService {
     UserDTO registerOrLogin(String kakaoId, String email);
+    UserDTO findByKakaoId(String kakaoId);
 }
