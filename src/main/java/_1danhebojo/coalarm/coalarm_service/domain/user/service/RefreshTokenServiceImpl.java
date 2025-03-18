@@ -31,7 +31,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
                 .token(refreshToken)
                 .expiryDate(expiryDate)
                 .build();
-                refreshTokenJpaRepository.save(refreshTokenEntity);
+            refreshTokenJpaRepository.save(refreshTokenEntity);
 
         return refreshToken;
     }
