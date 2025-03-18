@@ -37,123 +37,146 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
     private static final String BINANCE_BASE_URL = "https://fapi.binance.com";
 
     public CoinIndicatorResponse getDashboardIndicators(Long coinId) {
-        List<Double> prices = getClosingPrices(coinId);
+        Optional<CoinIndicatorEntity> latestIndicator = coinIndicatorJpaRepository.findTopByCoinCoinIdOrderByCreatedAtDesc(coinId);
+        Optional<CoinEntity> coinEntity = coinJpaRepository.findByCoinId(coinId);
 
-        if (prices.size() < 26) {
-            throw new IllegalArgumentException("데이터 부족: MACD 계산을 위해 최소 26개 이상의 가격 데이터가 필요합니다.");
-        }
+        if(latestIndicator.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
+        if(coinEntity.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
 
-        MacdDTO macdData = calculateMACD(prices);
-        RsiDTO rsiData = calculateRSI(prices, 14);
+        CoinIndicatorEntity indicator = latestIndicator.get();
+        CoinEntity coin = coinEntity.get();
 
-        // JSON 형식으로 출력
-        LongShortStrengthDTO result = calculateLongShortStrength("BTCUSDT");
-        Optional<CoinEntity> btcCoin = coinJpaRepository.findBySymbol("BTC");
-        CoinDTO coinDTO = btcCoin.map(CoinDTO::new).orElse(null);
+        CoinDTO coinDTO = new CoinDTO(coin);
+        MacdDTO macdDTO = new MacdDTO(
+                indicator.getMacd(),
+                indicator.getSignal(),
+                indicator.getHistogram(),
+                indicator.getTrend()
+        );
+        RsiDTO rsiDTO = new RsiDTO(indicator.getRsi());
+        LongShortStrengthDTO longShortStrengthDTO = new LongShortStrengthDTO(indicator.getLongShortStrength(), BigDecimal.valueOf(1.0).subtract(indicator.getLongShortStrength()));
 
-        return new CoinIndicatorResponse(macdData, rsiData,result,coinDTO);
+        return new CoinIndicatorResponse(macdDTO, rsiDTO, longShortStrengthDTO, coinDTO);
     }
 
-    private List<Double> getClosingPrices(Long coinId) {
+    private List<BigDecimal> getClosingPrices(Long coinId) {
         List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(coinId);
         return tickers.stream()
-                .map(ticker -> ticker.getClose().doubleValue())
+                .map(TickerEntity::getClose)
                 .collect(Collectors.toList());
     }
 
-    private MacdDTO calculateMACD(List<Double> prices) {
+    private MacdDTO calculateMACD(List<BigDecimal> prices) {
         Collections.reverse(prices);
 
         // 12일 EMA 계산
-        List<Double> ema12 = calculateEMAList(prices, 12);
+        List<BigDecimal> ema12 = calculateEMAList(prices, 12);
 
         // 26일 EMA 계산
-        List<Double> ema26 = calculateEMAList(prices, 26);
+        List<BigDecimal> ema26 = calculateEMAList(prices, 26);
 
         // MACD Line 계산 (12일 EMA - 26일 EMA)
-        List<Double> macdLine = new ArrayList<>();
+        List<BigDecimal> macdLine = new ArrayList<>();
         for (int i = 0; i < ema12.size() && i < ema26.size(); i++) {
-            macdLine.add(ema12.get(i) - ema26.get(i));
+            macdLine.add(ema12.get(i).subtract(ema26.get(i)));
         }
 
         if (macdLine.size() < 9) {
-            throw new IllegalArgumentException("MACD 데이터 부족: 최소 9개 이상의 MACD 데이터가 필요합니다.");
+            throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // Signal Line (MACD Line의 9일 EMA)
-        List<Double> signalLine = calculateEMAList(macdLine, 9);
+        List<BigDecimal> signalLine = calculateEMAList(macdLine, 9);
 
         // 최신 MACD 값
-        double macd = macdLine.get(macdLine.size() - 1);
-        double signal = signalLine.get(signalLine.size() - 1);
-        double histogram = macd - signal;
-        String trend = histogram > 0 ? "RISE" : "FALL";
+        BigDecimal macd = macdLine.get(macdLine.size() - 1);
+        BigDecimal signal = signalLine.get(signalLine.size() - 1);
+        BigDecimal histogram = macd.subtract(signal);
+        String trend = histogram.compareTo(BigDecimal.ZERO) > 0 ? "RISE" : "FALL";
 
         return new MacdDTO(macd, signal, histogram, trend);
     }
 
-    private List<Double> calculateEMAList(List<Double> prices, int period) {
-        List<Double> emaList = new ArrayList<>();
+    private List<BigDecimal> calculateEMAList(List<BigDecimal> prices, int period) {
+        List<BigDecimal> emaList = new ArrayList<>();
 
         // 첫 번째 EMA는 해당 기간의 SMA(단순 이동평균)로 계산
-        double sma = 0;
+        BigDecimal sma = BigDecimal.ZERO;
         for (int i = 0; i < period; i++) {
-            sma += prices.get(i);
+            sma = sma.add(prices.get(i));
         }
-        sma /= period;
+        sma = sma.divide(BigDecimal.valueOf(period), 8, BigDecimal.ROUND_HALF_UP);
 
         // 첫 번째 EMA 값 추가
         emaList.add(sma);
 
         // EMA 계산 공식: EMA(today) = Price(today) * k + EMA(yesterday) * (1-k)
         // k = 2/(period+1)
-        double multiplier = 2.0 / (period + 1);
+        BigDecimal multiplier = BigDecimal.valueOf(2.0).divide(BigDecimal.valueOf(period + 1), 8, BigDecimal.ROUND_HALF_UP);
+        BigDecimal oneMinusMultiplier = BigDecimal.ONE.subtract(multiplier);
 
         // 나머지 EMA 계산
         for (int i = period; i < prices.size(); i++) {
-            double currentPrice = prices.get(i);
-            double previousEma = emaList.get(emaList.size() - 1);
-            double currentEma = (currentPrice * multiplier) + (previousEma * (1 - multiplier));
+            BigDecimal currentPrice = prices.get(i);
+            BigDecimal previousEma = emaList.get(emaList.size() - 1);
+            BigDecimal currentEma = currentPrice.multiply(multiplier).add(previousEma.multiply(oneMinusMultiplier));
             emaList.add(currentEma);
         }
 
         return emaList;
     }
 
-    private RsiDTO calculateRSI(List<Double> prices, int period) {
+    private RsiDTO calculateRSI(List<BigDecimal> prices, int period) {
         Collections.reverse(prices);
 
-        List<Double> gains = new ArrayList<>();
-        List<Double> losses = new ArrayList<>();
+        List<BigDecimal> gains = new ArrayList<>();
+        List<BigDecimal> losses = new ArrayList<>();
 
         for (int i = 1; i < prices.size(); i++) {
-            double change = prices.get(i) - prices.get(i - 1);
-            if (change > 0) {
+            BigDecimal change = prices.get(i).subtract(prices.get(i - 1));
+            if (change.compareTo(BigDecimal.ZERO) > 0) {
                 gains.add(change);
-                losses.add(0.0);
+                losses.add(BigDecimal.ZERO);
             } else {
-                gains.add(0.0);
-                losses.add(-change);
+                gains.add(BigDecimal.ZERO);
+                losses.add(change.abs());
             }
         }
 
-        double avgGain = gains.subList(0, period).stream().mapToDouble(Double::doubleValue).sum() / period;
-        double avgLoss = losses.subList(0, period).stream().mapToDouble(Double::doubleValue).sum() / period;
+        BigDecimal avgGain = BigDecimal.ZERO;
+        BigDecimal avgLoss = BigDecimal.ZERO;
 
-        for (int i = period; i < gains.size(); i++) {
-            avgGain = ((avgGain * (period - 1)) + gains.get(i)) / period;
-            avgLoss = ((avgLoss * (period - 1)) + losses.get(i)) / period;
+        for (int i = 0; i < period; i++) {
+            avgGain = avgGain.add(gains.get(i));
+            avgLoss = avgLoss.add(losses.get(i));
         }
 
-        double rs = avgGain / (avgLoss == 0 ? 1 : avgLoss);
-        double rsi = 100 - (100 / (1 + rs));
+        avgGain = avgGain.divide(BigDecimal.valueOf(period), 8, BigDecimal.ROUND_HALF_UP);
+        avgLoss = avgLoss.divide(BigDecimal.valueOf(period), 8, BigDecimal.ROUND_HALF_UP);
+
+        for (int i = period; i < gains.size(); i++) {
+            avgGain = (avgGain.multiply(BigDecimal.valueOf(period - 1)).add(gains.get(i)))
+                    .divide(BigDecimal.valueOf(period), 8, BigDecimal.ROUND_HALF_UP);
+            avgLoss = (avgLoss.multiply(BigDecimal.valueOf(period - 1)).add(losses.get(i)))
+                    .divide(BigDecimal.valueOf(period), 8, BigDecimal.ROUND_HALF_UP);
+        }
+
+        BigDecimal rs;
+        if (avgLoss.compareTo(BigDecimal.ZERO) == 0) {
+            rs = BigDecimal.valueOf(100); // 손실이 없는 경우 큰 값 할당
+        } else {
+            rs = avgGain.divide(avgLoss, 8, BigDecimal.ROUND_HALF_UP);
+        }
+
+        BigDecimal rsi = BigDecimal.valueOf(100).subtract(
+                BigDecimal.valueOf(100).divide(BigDecimal.ONE.add(rs), 8, BigDecimal.ROUND_HALF_UP)
+        );
 
         return new RsiDTO(rsi);
     }
 
-    //NOTE: 공매수/공매도 계산
-    private LongShortStrengthDTO calculateLongShortStrength(String symbol){
-        try{
+    private LongShortStrengthDTO calculateLongShortStrength(String symbol) {
+        try {
             // 1. 롱/숏 비율 데이터 가져오기
             JsonNode longShortData = getLongShortRatioData(symbol);
             if (longShortData == null || longShortData.isEmpty()) {
@@ -162,8 +185,8 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             }
 
             JsonNode latestLsData = longShortData.get(0);
-            double longRatio = latestLsData.get("longAccount").asDouble();
-            double shortRatio = latestLsData.get("shortAccount").asDouble();
+            BigDecimal longRatio = BigDecimal.valueOf(latestLsData.get("longAccount").asDouble());
+            BigDecimal shortRatio = BigDecimal.valueOf(latestLsData.get("shortAccount").asDouble());
 
             // 2. 미결제약정 데이터 가져오기
             JsonNode openInterestData = getOpenInterestData(symbol);
@@ -172,7 +195,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 return null;
             }
 
-            double openInterest = openInterestData.get("openInterest").asDouble();
+            BigDecimal openInterest = BigDecimal.valueOf(openInterestData.get("openInterest").asDouble());
 
             // 3. 펀딩 비율 데이터 가져오기
             JsonNode fundingRateData = getFundingRateData(symbol);
@@ -182,28 +205,28 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             }
 
             JsonNode latestFrData = fundingRateData.get(0);
-            double fundingRate = latestFrData.get("fundingRate").asDouble();
+            BigDecimal fundingRate = BigDecimal.valueOf(latestFrData.get("fundingRate").asDouble());
 
             // 4. 공매수/공매도 강도 계산
-            double longStrength = longRatio * openInterest * (1 + fundingRate);
-            double shortStrength = shortRatio * openInterest * (1 - fundingRate);
+            BigDecimal longStrength = longRatio.multiply(openInterest).multiply(BigDecimal.ONE.add(fundingRate));
+            BigDecimal shortStrength = shortRatio.multiply(openInterest).multiply(BigDecimal.ONE.subtract(fundingRate));
 
-            double longShortStrength;
-            if (shortStrength == 0) {
-                longShortStrength = Double.POSITIVE_INFINITY;  // 숏 비율이 0인 경우 무한대 반환
+            BigDecimal longShortStrength;
+            if (shortStrength.compareTo(BigDecimal.ZERO) == 0) {
+                longShortStrength = BigDecimal.valueOf(1000); // 무한대 대신 큰 값 사용
             } else {
-                longShortStrength = (longStrength / shortStrength) - 1;
+                longShortStrength = longStrength.divide(shortStrength, 8, BigDecimal.ROUND_HALF_UP).subtract(BigDecimal.ONE);
             }
 
-            String status = longShortStrength > 0 ? "LONG_DOMINANCE" : "SHORT_DOMINANCE";
+            String status = longShortStrength.compareTo(BigDecimal.ZERO) > 0 ? "LONG_DOMINANCE" : "SHORT_DOMINANCE";
 
             LongShortStrengthDTO result = LongShortStrengthDTO.builder()
-                    .longRatio(longRatio * 100)  // 퍼센트로 변환 (예: 0.555 → 55.5%)
-                    .shortRatio(shortRatio * 100) // 퍼센트로 변환 (예: 0.445 → 44.5%)
+                    .longRatio(longRatio.multiply(BigDecimal.valueOf(100))) // 퍼센트로 변환
+                    .shortRatio(shortRatio.multiply(BigDecimal.valueOf(100))) // 퍼센트로 변환
                     .build();
 
             return result;
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("공매수/공매도 강도 계산 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             return null;
@@ -216,7 +239,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
 
         // 2. 가격 데이터 조회
-        List<Double> prices = getClosingPrices(coinId);
+        List<BigDecimal> prices = getClosingPrices(coinId);
 
         if (prices.size() < 26) {
             throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
@@ -229,19 +252,19 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         RsiDTO rsiDTO = calculateRSI(prices, 14);
 
         // 5. 롱숏 강도 계산
-        // 코인 코드 매핑 (coinId -> 바이낸스 심볼)
         LongShortStrengthDTO longShortDTO = calculateLongShortStrength("BTCUSDT");
 
         // 6. CoinIndicatorEntity 생성 및 저장
         CoinIndicatorEntity indicatorEntity = CoinIndicatorEntity.builder()
                 .coin(coinEntity)
-                .macd(BigDecimal.valueOf(macdDTO.getValue()))
-                .signal(BigDecimal.valueOf(macdDTO.getSignal()))
-                .histogram(BigDecimal.valueOf(macdDTO.getHistogram()))
+                .macd(macdDTO.getValue())
+                .signal(macdDTO.getSignal())
+                .histogram(macdDTO.getHistogram())
                 .trend(macdDTO.getTrend())
-                .rsi(BigDecimal.valueOf(rsiDTO.getValue()))
+                .rsi(rsiDTO.getValue())
                 .longShortStrength(longShortDTO != null
-                        ? BigDecimal.valueOf((longShortDTO.getLongRatio() - longShortDTO.getShortRatio()) / 100.0)
+                        ? (longShortDTO.getLongRatio().subtract(longShortDTO.getShortRatio()))
+                        .divide(BigDecimal.valueOf(100), 8, BigDecimal.ROUND_HALF_UP)
                         : null)
                 .build();
 
