@@ -44,8 +44,4 @@ public class TickerRepositoryImpl implements TickerRepository{
                 .fetch();
     }
 
-    @Override
-    public Optional<TickerEntity> findLatestByCode(String code) {
-        return null;
-    }
 }

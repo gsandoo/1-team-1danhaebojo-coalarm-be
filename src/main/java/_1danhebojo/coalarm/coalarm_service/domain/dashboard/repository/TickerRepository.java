@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface TickerRepository {
     List<TickerEntity> findByCoinIdOrderedByUtcDateTime(Long coinId);
-    Optional<TickerEntity> findLatestByCode(String code);
 }

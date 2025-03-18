@@ -12,10 +12,10 @@ public class DashboardScheduler {
     private final KimchiPremiumService kimchiPremiumService;
     private final CoinIndicatorService coinIndicatorService;
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 3000000)
     public void calculateAndSaveKimchiPremiumTask(){
         log.info("대시보드 데이터 계산 시작...");
-//        kimchiPremiumService.calculateAndSaveKimchiPremium();
+        kimchiPremiumService.calculateAndSaveKimchiPremium();
         coinIndicatorService.saveIndicators(1L);
         log.info("대시보드 데이터 계산 완료.");
     }

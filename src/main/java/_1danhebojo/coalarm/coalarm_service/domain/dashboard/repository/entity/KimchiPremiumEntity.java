@@ -29,7 +29,7 @@ public class KimchiPremiumEntity {
     private BigDecimal globalPrice;
 
     @Column(name = "exchange_rate", nullable = false)
-    private Integer exchangeRate;
+    private BigDecimal exchangeRate;
 
     @Column(name = "kimchi_premium", nullable = false)
     private BigDecimal kimchiPremium;
@@ -40,7 +40,7 @@ public class KimchiPremiumEntity {
     @Column(name = "reg_dt", nullable = false)
     private Instant regDt;
 
-    public KimchiPremiumEntity(CoinEntity coin, BigDecimal domesticPrice, BigDecimal globalPrice, Integer exchangeRate,
+    public KimchiPremiumEntity(CoinEntity coin, BigDecimal domesticPrice, BigDecimal globalPrice, BigDecimal exchangeRate,
                                BigDecimal kimchiPremium, BigDecimal dailyChange) {
         this.coin = coin;
         this.domesticPrice = domesticPrice;
