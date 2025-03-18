@@ -4,6 +4,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserD
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
+import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByKakaoId(String kakaoId) {
         UserEntity user = userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new RuntimeException("User not found with kakaoId: " + kakaoId));
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
 
         return UserDTO.fromEntity(user); // Entity → DTO 변환
     }

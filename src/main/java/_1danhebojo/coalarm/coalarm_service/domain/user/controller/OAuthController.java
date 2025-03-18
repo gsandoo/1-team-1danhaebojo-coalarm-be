@@ -1,7 +1,9 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.controller;
 
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserLoginResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.KakaoAuthService;
+import _1danhebojo.coalarm.coalarm_service.domain.user.service.RefreshTokenService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
@@ -18,9 +20,10 @@ public class OAuthController {
     private final KakaoAuthService kakaoAuthService;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @GetMapping("/callback")
-    public ResponseEntity<BaseResponse<Map<String, Object>>> kakaoCallback(@RequestParam("code") String code) {
+    public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoCallback(@RequestParam("code") String code) {
         // 카카오 액세스 토큰 요청
         String accessToken = kakaoAuthService.getAccessToken(code);
 
@@ -35,11 +38,9 @@ public class OAuthController {
 
         // JWT 토큰 발급
         String jwtToken = jwtTokenProvider.generateToken(userDTO.getKakaoId());
+        String refreshToken = refreshTokenService.createRefreshToken(userDTO.getUserId());
 
-        Map<String, Object> response = Map.of(
-                "user", userDTO,
-                "token", jwtToken
-        );
+        UserLoginResponse response = UserLoginResponse.of(userDTO.getUserId(), jwtToken, refreshToken);
 
         // 클라이언트에게 유저 정보 반환
         return ResponseEntity.ok(BaseResponse.success(response));
