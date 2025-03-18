@@ -35,12 +35,15 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         params.add("redirect_uri", kakaoProperties.getRedirectUri());
         params.add("code", code);
         params.add("client_secret", kakaoProperties.getClientSecret());
+
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
-
         try {
+            ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
+
             JsonNode rootNode = objectMapper.readTree(response.getBody());
+
+
             return rootNode.get("access_token").asText();
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve access token from Kakao API", e);

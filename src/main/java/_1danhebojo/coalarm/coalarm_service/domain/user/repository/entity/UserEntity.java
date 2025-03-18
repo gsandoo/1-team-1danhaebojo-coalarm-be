@@ -1,4 +1,4 @@
-package _1danhebojo.coalarm.coalarm_service.domain.user.entity;
+package _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity;
 
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import jakarta.persistence.*;

@@ -36,8 +36,6 @@ public class OAuthController {
         // JWT 토큰 발급
         String jwtToken = jwtTokenProvider.generateToken(userDTO.getKakaoId());
 
-        System.out.println("Generated JWT Token: " + jwtToken);
-
         Map<String, Object> response = Map.of(
                 "user", userDTO,
                 "token", jwtToken

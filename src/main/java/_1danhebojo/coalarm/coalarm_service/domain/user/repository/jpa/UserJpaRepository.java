@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.repository.jpa;
 
-import _1danhebojo.coalarm.coalarm_service.domain.user.entity.UserEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
