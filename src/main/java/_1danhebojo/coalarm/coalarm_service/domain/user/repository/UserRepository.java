@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.repository;
 
-import _1danhebojo.coalarm.coalarm_service.domain.user.entity.UserEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 
 import java.util.Optional;
 

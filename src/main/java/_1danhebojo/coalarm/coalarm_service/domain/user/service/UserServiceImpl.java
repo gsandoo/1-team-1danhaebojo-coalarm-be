@@ -1,7 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
-import _1danhebojo.coalarm.coalarm_service.domain.user.entity.UserEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
 import jakarta.transaction.Transactional;
