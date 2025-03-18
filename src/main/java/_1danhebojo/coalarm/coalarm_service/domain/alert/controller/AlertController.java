@@ -86,6 +86,38 @@ public class AlertController {
     }
     // </editor-fold>
 
+    // <editor-fold desc="알람 히스토리 관련 메서드">
+    @GetMapping("/history")
+    public ResponseEntity<BaseResponse<?>> getAlertHistoryList(
+            @RequestParam int offset,
+            @RequestParam int limit
+    ) {
+        //Long userId = AuthUtil.getCurrentUserId();
+        Long userId = 1L;
+
+        PaginationRequest paginationRequest = new PaginationRequest();
+        paginationRequest.setOffset(offset);
+        paginationRequest.setLimit(limit);
+
+        AlertHistoryListResponse alertHistoryList = alertHistoryService.getAlertHistoryList(userId, paginationRequest);
+        return ResponseEntity.ok(BaseResponse.success(alertHistoryList));
+    }
+
+    @GetMapping("/history/{alertHistoryId}")
+    public ResponseEntity<BaseResponse<?>>  getAlertHistoryDetail(
+            @PathVariable Long alertHistoryId) {
+        AlertHistoryResponse alertHistory = alertHistoryService.getAlertHistory(alertHistoryId);
+        return ResponseEntity.ok(BaseResponse.success(alertHistory));
+    }
+
+    @PostMapping("/history/{alert_id}")
+    public ResponseEntity<?> addAlertHistory(@PathVariable("alert_id") Long alertId) {
+        //Long userId = AuthUtil.getCurrentUserId();
+        Long userId = 1L;
+
+        alertHistoryService.addAlertHistory(alertId, userId);
+        return ResponseEntity.ok(BaseResponse.success());
+    }
     // </editor-fold>
 
 }
