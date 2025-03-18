@@ -2,11 +2,16 @@ package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.ResponseKimchiPremium;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.KimchiPremiumRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerTestRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.KimchiPremiumEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerTestEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.KimchiPreminumJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.TickerJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
+import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,47 +30,60 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class KimchiPremiumServiceImpl implements KimchiPremiumService{
     private final KimchiPremiumRepository kimchiPremiumRepository;
-    private final TickerTestRepository tickerTestRepository;
+    private final KimchiPreminumJpaRepository kimchiPreminumJpaRepository;
+    private final TickerJpaRepository tickerJpaRepository;
     private final CoinJpaRepository coinJpaRepository;
     private static final String EXCHANGE_RATE_API_URL = "https://api.exchangerate-api.com/v4/latest/USD";
     @Override
-    public List<ResponseKimchiPremium> getKimchiPremiums(int offset, int limit) {
-        return kimchiPremiumRepository.findAllKimchiPremiums(offset,limit)
+    public OffsetResponse<ResponseKimchiPremium> getKimchiPremiums(int offset, int limit) {
+        List<ResponseKimchiPremium> premiums = kimchiPremiumRepository.findAllKimchiPremiums(offset, limit)
                 .stream()
                 .map(ResponseKimchiPremium::fromEntity)
                 .toList();
+
+        long totalElements = kimchiPremiumRepository.countAllKimchiPremiums();
+
+        return OffsetResponse.of(
+                premiums,
+                offset,
+                limit,
+                totalElements
+        );
     }
 
     @Override
     public void calculateAndSaveKimchiPremium() {
-        Optional<TickerTestEntity> krwBtc = tickerTestRepository.findLatestByCode("KRW-BTC");
-        Optional<TickerTestEntity> usdtBtc = tickerTestRepository.findLatestByCode("USDT-BTC");
+        Optional<TickerEntity> krwBtc = tickerJpaRepository.findFirstByIdSymbolOrderByIdTimestampDesc("BTC/KRW");
+        Optional<TickerEntity> usdtBtc = tickerJpaRepository.findFirstByIdSymbolOrderByIdTimestampDesc("BTC/USDT");
 
         if (krwBtc.isEmpty() || usdtBtc.isEmpty()) {
             log.warn("가격 데이터를 찾을 수 없습니다.");
-            return;
+            throw new ApiException(AppHttpStatus.NOT_FOUND);
         }
 
-        BigDecimal krwPrice = krwBtc.get().getTradePrice();
-        BigDecimal usdtPrice = usdtBtc.get().getTradePrice();
+        BigDecimal krwPrice = krwBtc.get().getClose();
+        BigDecimal usdtPrice = usdtBtc.get().getClose();
 
         BigDecimal exchangeRate = getUsdToKrwExchangeRate();
         if (exchangeRate.compareTo(BigDecimal.ZERO) == 0) {
             log.warn("환율 데이터를 가져올 수 없습니다.");
-            return;
+            throw new ApiException(AppHttpStatus.NOT_FOUND);
         }
 
         // 김치 프리미엄 계산
         BigDecimal globalPriceInKrw = usdtPrice.multiply(exchangeRate);
-        BigDecimal kimchiPremium = krwPrice.subtract(globalPriceInKrw)
-                .divide(globalPriceInKrw, 8, BigDecimal.ROUND_HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
+
+        BigDecimal kimchiPremium = krwPrice
+                .divide(globalPriceInKrw, 8, BigDecimal.ROUND_HALF_UP) // (국내 가격 / 해외 가격(원화 환산))
+                .subtract(BigDecimal.ONE) // -1
+                .multiply(BigDecimal.valueOf(100)); // * 100
+
 
         // BTC 코인 엔티티 가져오기
         Optional<CoinEntity> btcCoin = coinJpaRepository.findBySymbol("BTC");
         if (btcCoin.isEmpty()) {
             log.warn("BTC 코인 정보를 찾을 수 없습니다.");
-            return;
+            throw new ApiException(AppHttpStatus.NOT_FOUND);
         }
 
         // 어제 자정 시간 계산
@@ -100,12 +118,12 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
                 btcCoin.get(),
                 krwPrice,
                 usdtPrice,
-                exchangeRate.intValue(),
+                exchangeRate,
                 kimchiPremium,
                 dailyChange
         );
 
-        kimchiPremiumRepository.saveKimchiPremium(kimchiPremiumEntity);
+        kimchiPreminumJpaRepository.save(kimchiPremiumEntity);
         log.info("김치 프리미엄 저장 완료: {}, 일별 변동률: {}%", kimchiPremium, dailyChange);
     }
 

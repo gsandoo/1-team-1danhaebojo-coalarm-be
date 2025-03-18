@@ -21,7 +21,6 @@ import java.util.Optional;
 public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
 
     private final JPAQueryFactory queryFactory;
-    private final EntityManager entityManager;
 
     @Override
     public List<KimchiPremiumEntity> findAllKimchiPremiums(int offset, int limit) {
@@ -47,13 +46,6 @@ public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
     }
 
     @Override
-    @Transactional
-    public void saveKimchiPremium(KimchiPremiumEntity kimchiPremiumEntity) {
-        entityManager.persist(kimchiPremiumEntity);
-        entityManager.flush();
-    }
-
-    @Override
     public Optional<KimchiPremiumEntity> findTopByCoinAndRegDtBetweenOrderByRegDtDesc(
             CoinEntity coin,
             LocalDateTime fromDateTime,
@@ -75,5 +67,18 @@ public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
                 .fetchFirst();
 
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public long countAllKimchiPremiums() {
+        QKimchiPremiumEntity kp = QKimchiPremiumEntity.kimchiPremiumEntity;
+
+        // 중복 없이 코인 ID의 종류 수 카운트
+        Long count = queryFactory
+                .select(kp.coin.coinId.countDistinct())
+                .from(kp)
+                .fetchOne();
+        // (null 처리 추가)
+        return count != null ? count : 0L;
     }
 }
