@@ -37,8 +37,13 @@ out/
 .vscode/
 
 ### application.yml ###
-application-*.yml
+application*.yml
 
 /node_modules
 
 gradle/wrapper/gradle-wrapper.jar
+
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
