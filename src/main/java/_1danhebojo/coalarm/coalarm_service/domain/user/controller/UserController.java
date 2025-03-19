@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.controller;
 
+import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.UserUpdateRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.RefreshTokenService;
@@ -7,8 +8,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserService;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
+import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,12 +20,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtBlacklistService jwtBlacklistService;
 
 
     @GetMapping()
@@ -48,7 +53,8 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<Void>> logout(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<BaseResponse<Void>> logout(@AuthenticationPrincipal UserDetails userDetails,
+                                                     @RequestHeader("Authorization") String authorizationHeader) {
         if (userDetails == null) {
             throw new ApiException(AppHttpStatus.UNAUTHORIZED);
         }
@@ -56,7 +62,19 @@ public class UserController {
         String kakaoId = userDetails.getUsername();
         Long userId = userService.findByKakaoId(kakaoId).getUserId();
 
+        // 리프레시 토큰 삭제
         refreshTokenService.deleteRefreshToken(userId);
+
+        // 액세스 토큰을 블랙리스트에 추가
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String accessToken = authorizationHeader.substring(7).trim();
+            Instant expiryInstant = jwtTokenProvider.getExpirationInstant(accessToken);
+
+            // 블랙리스트에 등록
+            if (expiryInstant != null) {
+                jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
+            }
+        }
 
         return ResponseEntity.ok(BaseResponse.success());
     }

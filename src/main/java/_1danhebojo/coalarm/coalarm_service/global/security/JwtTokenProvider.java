@@ -12,6 +12,7 @@ import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 
 @Component
@@ -73,5 +74,22 @@ public class JwtTokenProvider {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    /**
+     * JWT 토큰에서 만료 시간 추출
+     */
+    public Instant getExpirationInstant(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration()
+                    .toInstant();
+        } catch (JwtException e) {
+            return null;
+        }
     }
 }
