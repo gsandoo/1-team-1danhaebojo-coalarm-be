@@ -120,12 +120,13 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
+          APP_NAME="${{ secrets.EB_APP_NAME }}"
+          echo "Using application name: $APP_NAME"
+          aws elasticbeanstalk create-application-version --application-name "$APP_NAME" --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
           aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label ${{ env.VERSION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
           EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
           AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
