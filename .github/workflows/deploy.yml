@@ -19,15 +19,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Create yml File
+      - name: Create folder
         run: |
           mkdir -p src/main/resources
 
-      - name: Create yml File
+      - name: Create application yml File
         run: |
           echo '${{ secrets.AWS_PROPERTIES }}' > src/main/resources/application.yml
 
-      - name: Create yml File
+      - name: Create dev yml File
         run: |
           echo '${{ secrets.AWS_DEV_PROPERTIES }}' > src/main/resources/application-dev.yml
 
@@ -45,7 +45,7 @@ jobs:
 
       - name: Upload JAR to S3 (with versioning)
         run: |
-          aws s3 cp build/libs/poppin-server-0.0.1-SNAPSHOT.jar s3://coalarm-deploy-bucket/app-${{ env.VERSION }}.jar
+          aws s3 cp build/libs/coalarm-service.jar s3://coalarm-deploy-bucket/app-${{ env.VERSION }}.jar
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
