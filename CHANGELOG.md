@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.3.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.2.0...v1.3.0) (2025-03-19)
+
+### 🚀 NEW FEATURES
+
+* TargetPrice, VolumeSpike, GoldenCross를 위한 Entity, Response, JPA Repository 추가 ([f9a47e7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f9a47e739e2d0ca061590ddf89f0a499c9d47c1c))
+* 알람 추가/수정/삭제/조회 기능 구현 ([df93db8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/df93db8a805465a2368000fcf293cc45a2abfc81))
+* 알람 히스토리 조회 및 상세 조회 기능 추가 ([c470e86](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c470e865693b0a99feadfd240215f17730432b87))
+
 ## [1.2.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.1.0...v1.2.0) (2025-03-18)
 
 ### 📚 DOCUMENTATION
