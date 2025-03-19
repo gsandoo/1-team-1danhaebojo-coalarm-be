@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -40,7 +41,4 @@ src/main/resources/*.yml
 
 /node_modules
 
-.DS_Store
-._.DS_Store
-**/.DS_Store
-**/._.DS_Store
+gradle/wrapper/gradle-wrapper.jar
