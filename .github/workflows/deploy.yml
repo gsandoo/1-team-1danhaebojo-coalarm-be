@@ -120,7 +120,7 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          APP_NAME="${{ secrets.EB_APP_NAME }}"
+          APP_NAME="coalarm"
           echo "Using application name: $APP_NAME"
           aws elasticbeanstalk create-application-version --application-name "$APP_NAME" --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
           aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label ${{ env.VERSION }}
