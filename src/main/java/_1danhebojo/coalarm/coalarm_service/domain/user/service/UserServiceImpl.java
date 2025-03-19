@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByKakaoId(String kakaoId) {
         UserEntity user = userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new RuntimeException("User not found with kakaoId: " + kakaoId));
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
 
         return UserDTO.fromEntity(user); // Entity → DTO 변환
     }

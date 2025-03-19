@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/oauth/kakao/**").permitAll()// ✅ 카카오 로그인 API 인증 없이 허용
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); // ✅ JWT 필터 추가
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
