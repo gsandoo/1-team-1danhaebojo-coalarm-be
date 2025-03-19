@@ -48,7 +48,7 @@ public enum AppHttpStatus {
      */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에 에러가 발생했습니다."),
     IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"S3에 이미지 업로드중 에러가 발생했습니다."),
-    IMAGE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3의 이미지 삭제중 에러가 발생했습니다.");
+    IMAGE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3의 이미지 삭제중 에러가 발생했습니다."),
 
     /**
      * 502: 게이트웨이, 프록시 역할을 하는 서버가 다른 서버로부터 유효하지 않은 응답을 받았을 때

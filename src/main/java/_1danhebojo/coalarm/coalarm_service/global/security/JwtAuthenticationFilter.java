@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.global.security;
 
+import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -25,12 +27,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = jwtTokenProvider.resolveToken(request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String kakaoId = jwtTokenProvider.getKakaoIdFromToken(token);
-            UserDetails userDetails = User.withUsername(kakaoId).password("").authorities("ROLE_USER").build();
+        if (token != null) {
+            // 블랙리스트에 등록된 토큰인지 확인
+            if (jwtBlacklistService.isBlacklisted(token)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그아웃된 토큰입니다.");
+                return;
+            }
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (jwtTokenProvider.validateToken(token)) {
+                String kakaoId = jwtTokenProvider.getKakaoIdFromToken(token);
+                UserDetails userDetails = User.withUsername(kakaoId).password("").authorities("ROLE_USER").build();
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
 
         chain.doFilter(request, response);

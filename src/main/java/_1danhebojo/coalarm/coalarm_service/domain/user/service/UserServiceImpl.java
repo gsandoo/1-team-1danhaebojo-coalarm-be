@@ -1,18 +1,21 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
-import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.UserUpdateRequest;
+import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
+import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -22,6 +25,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtBlacklistService jwtBlacklistService;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Override
+    public UserDTO getMyInfo(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
+        }
+        return findByKakaoId(userDetails.getUsername());
+    }
 
     @Override
     @Transactional
@@ -45,6 +59,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public void logout(UserDetails userDetails, String authorizationHeader) {
+        if (userDetails == null) {
+            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
+        }
+
+        Long userId = findByKakaoId(userDetails.getUsername()).getUserId();
+        refreshTokenService.deleteRefreshToken(userId);
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String accessToken = authorizationHeader.substring(7).trim();
+            Instant expiryInstant = jwtTokenProvider.getExpirationInstant(accessToken);
+            if (expiryInstant != null) {
+                jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
+            }
+        }
+    }
+
+    @Override
     public UserDTO findByKakaoId(String kakaoId) {
         UserEntity user = userRepository.findByKakaoId(kakaoId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
@@ -53,37 +86,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public UserDTO updateUser(String kakaoId, UserUpdateRequest request) {
-        UserEntity user = userRepository.findByKakaoId(kakaoId)
+    public Long updateUser(UserDetails userDetails, String nickname, MultipartFile profileImage) {
+        UserEntity user = userRepository.findByKakaoId(userDetails.getUsername())
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
         // 닉네임 업데이트
-        String nickname = request.getNickname();
         if (nickname != null && !nickname.isEmpty()) {
             validateNickname(nickname);
             user.updateNickname(nickname);
         }
 
-
-
         // 프로필 이미지 업데이트
-        MultipartFile profileImage = request.getProfileImage();
         if (profileImage != null && !profileImage.isEmpty()) {
-            // 기존 이미지가 있으면 삭제
-            String currentProfileImage = user.getProfileImg();
-            if (currentProfileImage != null && !currentProfileImage.isEmpty()) {
-                s3Service.deleteImage(currentProfileImage);
+            if (user.getProfileImg() != null) {
+                s3Service.deleteImage(user.getProfileImg());
             }
-
-            // 새 이미지 업로드
             String imageUrl = s3Service.uploadImage(profileImage);
             user.updateProfileImage(imageUrl);
         }
 
-        // 변경된 엔티티 저장
-        UserEntity updatedUser = userRepository.save(user);
-        return UserDTO.fromEntity(updatedUser);
+        userRepository.save(user);
+        return user.getUserId();
     }
 
     private void validateNickname(String nickname) {
@@ -91,5 +114,36 @@ public class UserServiceImpl implements UserService {
             throw new ApiException(AppHttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(UserDetails userDetails, String authorizationHeader) {
+        if (userDetails == null) {
+            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
+        }
+
+        UserEntity user = userRepository.findByKakaoId(userDetails.getUsername())
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        // 프로필 이미지 삭제
+        if (user.getProfileImg() != null) {
+            s3Service.deleteImage(user.getProfileImg());
+        }
+
+        // 리프레시 토큰 삭제
+        refreshTokenService.deleteRefreshToken(user.getUserId());
+
+        // 액세스 토큰 블랙리스트 추가
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String accessToken = authorizationHeader.substring(7).trim();
+            Instant expiryInstant = jwtTokenProvider.getExpirationInstant(accessToken);
+            if (expiryInstant != null) {
+                jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
+            }
+        }
+
+        // 유저 삭제
+        userRepository.delete(user);
     }
 }
