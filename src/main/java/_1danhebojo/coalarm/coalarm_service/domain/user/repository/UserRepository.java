@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface UserRepository {
     Optional<UserEntity> findByKakaoId(String kakaoId);
     UserEntity save(UserEntity userEntity);
+    Optional<UserEntity> findById(Long userId);
+    void delete(UserEntity userEntity);
 }

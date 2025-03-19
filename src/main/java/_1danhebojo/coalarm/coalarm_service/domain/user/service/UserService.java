@@ -7,4 +7,5 @@ public interface UserService {
     UserDTO registerOrLogin(String kakaoId, String email);
     UserDTO findByKakaoId(String kakaoId);
     UserDTO updateUser(String kakaoId, UserUpdateRequest request);
+    void deleteUser(Long userId, String accessToken);
 }

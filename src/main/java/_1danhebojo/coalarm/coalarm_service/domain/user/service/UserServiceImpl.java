@@ -1,18 +1,22 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.UserUpdateRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.jpa.UserJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
+import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -22,6 +26,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtBlacklistService jwtBlacklistService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
@@ -65,8 +72,6 @@ public class UserServiceImpl implements UserService {
             user.updateNickname(nickname);
         }
 
-
-
         // 프로필 이미지 업데이트
         MultipartFile profileImage = request.getProfileImage();
         if (profileImage != null && !profileImage.isEmpty()) {
@@ -91,5 +96,31 @@ public class UserServiceImpl implements UserService {
             throw new ApiException(AppHttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @Override
+    public void deleteUser(Long userId, String authorizationHeader) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        // 프로필 이미지 삭제
+        if (user.getProfileImg() != null) {
+            s3Service.deleteImage(user.getProfileImg());
+        }
+
+        // 리프레시 토큰 삭제
+        refreshTokenService.deleteRefreshToken(userId);
+
+        // 액세스 토큰 블랙리스트 추가
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String accessToken = authorizationHeader.substring(7).trim();
+            Instant expiryInstant = jwtTokenProvider.getExpirationInstant(accessToken);
+            if (expiryInstant != null) {
+                jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
+            }
+        }
+
+        // 유저 삭제
+        userRepository.delete(user);
     }
 }

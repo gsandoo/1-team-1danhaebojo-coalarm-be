@@ -78,4 +78,23 @@ public class UserController {
 
         return ResponseEntity.ok(BaseResponse.success());
     }
+
+    @DeleteMapping
+    public ResponseEntity<BaseResponse<Void>> withdraw(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader("Authorization") String authorizationHeader) {
+
+        if (userDetails == null) {
+            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
+        }
+
+        String kakaoId = userDetails.getUsername();
+        Long userId = userService.findByKakaoId(kakaoId).getUserId();
+
+        // 회원 탈퇴 서비스 실행 (리프레시 토큰 삭제, 블랙리스트 추가, 유저 삭제 포함)
+        userService.deleteUser(userId, authorizationHeader);
+
+
+        return ResponseEntity.ok(BaseResponse.success());
+    }
 }
