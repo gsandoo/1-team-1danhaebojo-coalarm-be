@@ -21,7 +21,15 @@ jobs:
 
       - name: Create yml File
         run: |
-          echo '${{ secrets.AWS_DEV_PROPERTIES }}' > src/main/resources/application-dev.yml 
+          mkdir -p src/main/resources
+
+      - name: Create yml File
+        run: |
+          echo '${{ secrets.AWS_PROPERTIES }}' > src/main/resources/application.yml
+
+      - name: Create yml File
+        run: |
+          echo '${{ secrets.AWS_DEV_PROPERTIES }}' > src/main/resources/application-dev.yml
 
       - name: Build with Gradle
         run: ./gradlew build -x test
