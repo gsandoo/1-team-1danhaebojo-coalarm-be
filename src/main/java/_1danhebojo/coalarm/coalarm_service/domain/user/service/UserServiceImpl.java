@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.DiscordWebhookRequest;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final JwtBlacklistService jwtBlacklistService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AlertSSEService alertSSEService;
+    private final AlertRepositoryImpl alertRepository;
 
     @Override
     public UserDTO getMyInfo(UserDetails userDetails) {
@@ -151,6 +153,9 @@ public class UserServiceImpl implements UserService {
                 jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
             }
         }
+
+        //유저의 알람 삭제
+        alertRepository.deleteByUserId(user.getUserId());
 
         // 유저 삭제
         userRepository.delete(user);

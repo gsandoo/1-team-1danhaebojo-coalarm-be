@@ -103,6 +103,10 @@ public class AlertRepositoryImpl {
         alertJpaRepository.deleteById(alertId);
     }
 
+    public void deleteByUserId(Long userId){
+        alertJpaRepository.deleteAlertByUserId(userId);
+    }
+
     public Alert save(Alert alert) {
         Alert savedAlert = alertJpaRepository.save(alert);
         entityManager.flush();  // ★ 즉시 DB 반영하여 ID 생성
