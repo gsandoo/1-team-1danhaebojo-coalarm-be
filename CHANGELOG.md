@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## [1.5.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.4.0...v1.5.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* aws eb cicd ([a9e427b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/a9e427b7fce132e3b660d2bf539db328109a83b1))
+* aws eb cicd test ([be0eaa1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/be0eaa1b743b5fcba368928d92712ad3b76a4506))
+* aws eb cicd test ([d4b9aea](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d4b9aea3ef66a30016d5c9cc59784addb2e1fffd))
+* aws eb cicd test ([e142561](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e1425616d9eb17219558c958af29ae873f015a3a))
+* aws eb cicd test ([9da3016](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9da30169058d4560a1ae7e158fe3814af9eaba93))
+* aws eb cicd test ([ff1455a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ff1455ac3da942a7af1f4f88831db984256b130e))
+* aws eb cicd test ([e2075e7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e2075e7fce90304bc21505985af6f2562f296a3b))
+* aws eb cicd test ([b4e48bd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b4e48bd97b4f7f5af2a079ae99620018fc767eb5))
+* aws eb cicd test ([c11924b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c11924ba347677572799666e4dcf53d451dacac1))
+* health check controller 삽입 ([826302a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/826302ac6ed90083d058c16d9eef921f584d1a5b))
+* health check controller 테스트 ([070f89a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/070f89a796e00fa1d9788299dea1e94f2c57b6c6))
+
 ## [1.4.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.3.0...v1.4.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
