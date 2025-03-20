@@ -176,6 +176,7 @@ public class AlertSSEService {
             discordService.sendDiscordAlert(alerts.get(0).getUser().getDiscordWebhook(), message);
         }
     }
+
     // 새로운 알람 추가 -> 하는 부분은 이미 구현이 되어있고
     // 알림을 추가했을 때 SseEmitter에 추가하는 부분이 필요
     public void addEmitter(Long userId, Alert alert) {
