@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.7.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.6.0...v1.7.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* 디스코드 웹훅 연동 API 추가 ([2310342](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2310342902bea9fc4952436cb8a18bf88446afc8))
+
 ## [1.6.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.5.0...v1.6.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
