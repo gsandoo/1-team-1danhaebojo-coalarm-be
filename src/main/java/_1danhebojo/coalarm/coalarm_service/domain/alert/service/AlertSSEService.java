@@ -150,7 +150,9 @@ public class AlertSSEService {
         messageBuilder.append("👤 사용자 닉네임: ").append(alert.getUser().getNickname()).append("\n");
         messageBuilder.append("📢(코인) ").append(alert.getCoin().getName());
         messageBuilder.append(", (제목) " + alert.getTitle()).append("\n");
-        discordService.sendDiscordAlert(alert.getUser().getDiscordWebhook(), messageBuilder.toString());
+        if (alert.getUser().getDiscordWebhook() != null && !alert.getUser().getDiscordWebhook().isEmpty()) {
+            discordService.sendDiscordAlert(alert.getUser().getDiscordWebhook(), messageBuilder.toString());
+        }
     }
     public void sendAlertListToUserDiscord(Long userId, List<Alert> alerts) {
         StringBuilder messageBuilder = new StringBuilder();
@@ -170,7 +172,9 @@ public class AlertSSEService {
         String message = messageBuilder.toString();
 
         // 디스코드로 메시지 전송
-        discordService.sendDiscordAlert(alerts.get(0).getUser().getDiscordWebhook(), message);
+        if (alerts.get(0).getUser().getDiscordWebhook() != null && !alerts.get(0).getUser().getDiscordWebhook().isEmpty()) {
+            discordService.sendDiscordAlert(alerts.get(0).getUser().getDiscordWebhook(), message);
+        }
     }
     // 새로운 알람 추가 -> 하는 부분은 이미 구현이 되어있고
     // 알림을 추가했을 때 SseEmitter에 추가하는 부분이 필요
@@ -186,8 +190,20 @@ public class AlertSSEService {
         log.info("📢 사용자 " + userId + " 에 대한 새로운 SSE 구독 추가됨. 활성화된 알람 개수: " + activeAlertList.get(userId).size());
     }
 
+    // SSE 구독 제거
+    public void deleteEmitter(Long userId, Alert alert) {
+        // 사용자의 알람 리스트에서 해당 알람 제거
+        activeAlertList.computeIfPresent(userId, (k, alerts) -> {
+            alerts.remove(alert);
+            return alerts.isEmpty() ? null : alerts; // 리스트가 비면 null 반환해서 map에서도 제거
+        });
+
+        log.info("사용자 " + userId + " 의 알람 제거됨. 남은 알람 개수: "
+                + (activeAlertList.containsKey(userId) ? activeAlertList.get(userId).size() : 0));
+    }
+
     // SSE 구독 취소
-    private void removeEmitter(Long userId) {
+    public void removeEmitter(Long userId) {
         List<SseEmitter> emitters = userEmitters.remove(userId); // 해당 userId의 모든 SSE 제거
         activeAlertList.remove(userId);
         if (emitters != null) {

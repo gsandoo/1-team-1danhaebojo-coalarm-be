@@ -94,12 +94,21 @@ public class AlertService {
 
         alert.setActive(active);
         Alert saveAlert = alertRepositoryImpl.save(alert);
+        if(active) {
+            alertSSEService.addEmitter(saveAlert.getUserId(), alert);
+        } else {
+            alertSSEService.deleteEmitter(saveAlert.getUserId(), alert);
+        }
         return saveAlert.getAlertId();
     }
 
     // 알람 삭제
     @Transactional
     public void deleteAlert(Long alertId) {
+        Alert alert = alertRepositoryImpl.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        alertSSEService.deleteEmitter(alert.getUserId(), alert);
         alertRepositoryImpl.deleteById(alertId);
     }
 
@@ -145,5 +154,4 @@ public class AlertService {
         alert.setUserId(request.getUserId());
         return alert;
     }
-
 }
