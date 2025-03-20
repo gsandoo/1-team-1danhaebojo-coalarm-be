@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.11.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.10.0...v1.11.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* 회원 로그인/로그아웃 시 SSE 구독/해제 추가 ([f2ebd33](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f2ebd33f86f89b14d430c94246bab86cc329dccd))
+
 ## [1.10.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.9.0...v1.10.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
