@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.8.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.8.0...v1.8.1) (2025-03-20)
+
+### 🐛 BUG FIXES
+
+* 알림 추가 시 SSE에 반영되지 않는 버그 수정 ([34fc366](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/34fc3660bc839293631a29a7a1fba42a42474c7e))
+
 ## [1.8.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.7.0...v1.8.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
