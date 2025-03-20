@@ -1,8 +1,11 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.controller;
 
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.DiscordWebhookRequest;
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.DiscordWebhookResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,5 +55,15 @@ public class UserController {
                                                        @RequestHeader("Authorization") String authorizationHeader) {
         userService.deleteUser(userDetails, authorizationHeader);
         return ResponseEntity.ok(BaseResponse.success());
+    }
+
+    // 디스코드 웹훅 URL 등록
+    @PatchMapping("/discord")
+    public ResponseEntity<BaseResponse<DiscordWebhookResponse>> updateDiscordWebhook(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid DiscordWebhookRequest request) {
+
+        DiscordWebhookResponse response = userService.updateDiscordWebhook(userDetails, request);
+        return ResponseEntity.ok(BaseResponse.success(response));
     }
 }

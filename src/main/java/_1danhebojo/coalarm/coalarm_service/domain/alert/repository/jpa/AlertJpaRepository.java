@@ -14,12 +14,31 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AlertJpaRepository extends JpaRepository<Alert, Long> {
 
-    @Query("SELECT a FROM Alert a JOIN FETCH a.coin c " +
+    @Query("SELECT a " +
+            "FROM Alert a " +
+            "JOIN FETCH a.coin c " +
+            "JOIN FETCH a.user u " +
             "WHERE (:active IS NULL OR a.active = :active) " +
             "AND (:filter IS NULL OR c.symbol = :filter)")
     Page<Alert> findAlertsByFilter(@Param("active") Boolean active, @Param("filter") String filter, Pageable pageable);
 
+    // 사용자가 등록한 모든 활성화된 알람 조회
+    @Query("SELECT a " +
+            "FROM Alert a " +
+            "JOIN FETCH a.coin c " +
+            "JOIN FETCH a.user u " +
+            "WHERE a.userId = :userId AND a.active = true")
+    List<Alert> findActiveAlertsByUserId(Long userId);
+
+    @Query("SELECT a " +
+            "FROM Alert a " +
+            "JOIN FETCH a.coin c " +
+            "JOIN FETCH a.user u " +
+            "WHERE a.active = true")
+    List<Alert> findAllActiveAlerts();
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GoldenCrossAlertRequest extends BaseAlertRequest {
-    @NotNull
+    @Null
     private Long goldenCrossId;
 
     @NotNull

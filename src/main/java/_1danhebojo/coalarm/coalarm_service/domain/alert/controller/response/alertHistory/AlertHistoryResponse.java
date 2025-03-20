@@ -17,7 +17,7 @@ public class AlertHistoryResponse {
     public AlertHistoryResponse(AlertHistory alertHistory) {
         this.alertHistoryId = alertHistory.getAlertHistoryId();
         this.userId = alertHistory.getAlert().getUserId();
-        this.alert = new AlertResponse(alertHistory.getAlert()); // ✅ Alert 정보 포함
+        this.alert = new AlertResponse(alertHistory.getAlert()); // Alert 정보 포함
         this.registeredDate = alertHistory.getRegisteredDate();
     }
 }

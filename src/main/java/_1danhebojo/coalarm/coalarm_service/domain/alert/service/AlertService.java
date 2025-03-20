@@ -7,6 +7,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,14 +25,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlertService {
 
-    private final AlertRepositoryImpl alertRepository;
+    private final AlertRepositoryImpl alertRepositoryImpl;
+    @Lazy
+    @Autowired
+    private final AlertSSEService alertSSEService;
 
     // 알람 추가
+    @Transactional
     public void addAlert(BaseAlertRequest request) {
         Alert alert = convertToAlertEntity(request);
-        Alert savedAlert = alertRepository.save(alert);
+        Alert savedAlert = alertRepositoryImpl.save(alert);
 
-        Optional<Alert> checkAlert = alertRepository.findById(alert.getAlertId());
+        Optional<Alert> checkAlert = alertRepositoryImpl.findById(alert.getAlertId());
         if (checkAlert.isEmpty()) {
             throw new RuntimeException("🚨 flush() 후에도 저장 안 됨!");
         }
@@ -46,7 +52,7 @@ public class AlertService {
                 targetPriceAlert.setIsTargetPrice(true);
                 targetPriceAlert.setAlertId(alertId);
 
-                Long target = alertRepository.saveTargetPriceAlert(targetPriceAlert);
+                Long target = alertRepositoryImpl.saveTargetPriceAlert(targetPriceAlert);
                 if (target == null) {
                     throw new RuntimeException("Target Price Alert 저장 실패");
                 }
@@ -57,7 +63,7 @@ public class AlertService {
                 goldenCrossAlert.setIsGoldenCross(true);
                 goldenCrossAlert.setAlertId(alertId);
 
-                Long goldenCrossId = alertRepository.saveGoldenCrossAlert(goldenCrossAlert);
+                Long goldenCrossId = alertRepositoryImpl.saveGoldenCrossAlert(goldenCrossAlert);
                 if (goldenCrossId == null) {
                     throw new RuntimeException("Golden Cross Alert 저장 실패");
                 }
@@ -68,7 +74,7 @@ public class AlertService {
                 volumeSpikeAlert.setAlertId(alertId);
                 volumeSpikeAlert.setIsTradingVolumeSoaring(true);
 
-                Long volumeSpikeId = alertRepository.saveVolumeSpikeAlert(volumeSpikeAlert);
+                Long volumeSpikeId = alertRepositoryImpl.saveVolumeSpikeAlert(volumeSpikeAlert);
                 if (volumeSpikeId == null) {
                     throw new RuntimeException("Volume Spike Alert 저장 실패");
                 }
@@ -77,28 +83,38 @@ public class AlertService {
             default:
                 throw new IllegalArgumentException("잘못된 알람 타입: " + request.getType());
         }
+        alertSSEService.addEmitter(request.getUserId(), checkAlert.get());
     }
 
     // 알람 활성화 수정
     @Transactional
     public Long updateAlertStatus(Long alertId, boolean active) {
-        Alert alert = alertRepository.findById(alertId)
+        Alert alert = alertRepositoryImpl.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
 
         alert.setActive(active);
-        Alert saveAlert = alertRepository.save(alert);
+        Alert saveAlert = alertRepositoryImpl.save(alert);
+        if(active) {
+            alertSSEService.addEmitter(saveAlert.getUserId(), alert);
+        } else {
+            alertSSEService.deleteEmitter(saveAlert.getUserId(), alert);
+        }
         return saveAlert.getAlertId();
     }
 
     // 알람 삭제
     @Transactional
     public void deleteAlert(Long alertId) {
-        alertRepository.deleteById(alertId);
+        Alert alert = alertRepositoryImpl.findById(alertId)
+                .orElseThrow(() -> new RuntimeException("Alert not found"));
+
+        alertSSEService.deleteEmitter(alert.getUserId(), alert);
+        alertRepositoryImpl.deleteById(alertId);
     }
 
     // 알람 목록 조회
     public AlertListResponse getAllAlerts(AlertFilterRequest request) {
-        // ✅ 정렬 방식 설정
+        // 정렬 방식 설정
         Sort sort = request.getSort().equalsIgnoreCase("LATEST")
                 ? Sort.by(Sort.Direction.DESC, "regDt")
                 : Sort.by(Sort.Direction.ASC, "regDt");
@@ -108,7 +124,7 @@ public class AlertService {
         // `active`가 null이면 전체 조회, 아니면 필터링 적용
         Boolean active = request.getActive();
 
-        Page<Alert> alerts = alertRepository.findAlertsByFilter(active, request.getFilter(), pageRequest);
+        Page<Alert> alerts = alertRepositoryImpl.findAlertsByFilter(active, request.getFilter(), pageRequest);
 
         List<AlertResponse> alertResponses = alerts.getContent().stream()
                 .map(AlertResponse::new)
@@ -138,5 +154,4 @@ public class AlertService {
         alert.setUserId(request.getUserId());
         return alert;
     }
-
 }

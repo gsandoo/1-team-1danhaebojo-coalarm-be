@@ -12,6 +12,7 @@ public class UserDTO {
     private String nickname;
     private String email;
     private String profileImg;
+    private String discordWebhook;
 
     public static UserDTO fromEntity(UserEntity user) {
         return UserDTO.builder()
@@ -20,6 +21,7 @@ public class UserDTO {
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .profileImg(user.getProfileImg())
+                .discordWebhook(user.getDiscordWebhook())
                 .build();
     }
 

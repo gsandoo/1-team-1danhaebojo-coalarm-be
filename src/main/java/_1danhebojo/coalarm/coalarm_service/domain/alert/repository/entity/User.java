@@ -1,20 +1,20 @@
-package _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity;
+package _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
 @Table(name = "users")
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+@Builder
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -41,18 +41,5 @@ public class UserEntity {
     @Column(name = "chg_dt")
     private Instant chgDt;
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void updateProfileImage(String profileImg) {
-        this.profileImg = profileImg;
-    }
-
-    public void updateDiscordWebhook(String discordWebhook) {
-        if (!discordWebhook.equals(this.discordWebhook)) {  // 기존 값과 다를 때만 변경
-            this.discordWebhook = discordWebhook;
-            this.chgDt = Instant.now();  // 변경 일시 업데이트
-        }
-    }
 }
+

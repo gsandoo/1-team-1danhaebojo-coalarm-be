@@ -114,5 +114,12 @@ public class AlertRepositoryImpl {
         return alertJpaRepository.findAlertsByFilter(active, filter, pageable);
     }
 
+    public List<Alert> findActiveAlertsByUserId(Long userId) {
+        return alertJpaRepository.findActiveAlertsByUserId(userId);
+    }
+
+    public List<Alert> findAllActiveAlerts() {
+        return alertJpaRepository.findAllActiveAlerts();
+    }
 }
 

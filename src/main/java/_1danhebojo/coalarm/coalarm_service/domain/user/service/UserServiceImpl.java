@@ -1,6 +1,9 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.DiscordWebhookRequest;
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.DiscordWebhookResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
@@ -28,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final RefreshTokenService refreshTokenService;
     private final JwtBlacklistService jwtBlacklistService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AlertSSEService alertSSEService;
 
     @Override
     public UserDTO getMyInfo(UserDetails userDetails) {
@@ -55,6 +59,9 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity savedUser = userRepository.save(newUser);
+
+        alertSSEService.subscribe(savedUser.getUserId());
+
         return UserDTO.fromEntity(savedUser);
     }
 
@@ -75,6 +82,8 @@ public class UserServiceImpl implements UserService {
                 jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
             }
         }
+
+        alertSSEService.removeEmitter(userId);
     }
 
     @Override
@@ -145,5 +154,24 @@ public class UserServiceImpl implements UserService {
 
         // 유저 삭제
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public DiscordWebhookResponse updateDiscordWebhook(UserDetails userDetails, DiscordWebhookRequest request) {
+        if (userDetails == null) {
+            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
+        }
+
+        String kakaoId = userDetails.getUsername();
+
+        UserEntity user = userRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        user.updateDiscordWebhook(request.getDiscordWebhook());
+
+        userRepository.save(user);
+
+        return new DiscordWebhookResponse(user.getUserId());
     }
 }
