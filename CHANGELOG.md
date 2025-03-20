@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.11.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.11.0...v1.11.1) (2025-03-20)
+
+### 🐛 BUG FIXES
+
+* AlertController 수정 ([84ad323](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/84ad323b7e02d182fcbbca7a7cc110dc44647714))
+* alertController 에러  수정 ([2b1df39](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2b1df39355969345446772abb1f75c92d21f1c66))
+
 ## [1.11.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.10.0...v1.11.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
