@@ -3,10 +3,15 @@ name: Deploy Coalarm Dev
 on:
   push:
     branches:
-      - feature/infra
+      - develop
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - 'docs/**'
 
 jobs:
   deploy:
+    if: github.repository == '100-hours-a-week/1-team-1danhaebojo-coalarm-be'
     runs-on: ubuntu-latest
 
     steps:
@@ -129,4 +134,3 @@ jobs:
           EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
           EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
           AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
-
