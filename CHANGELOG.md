@@ -1,5 +1,35 @@
 # CHANGELOG
 
+## [1.4.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.3.0...v1.4.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* AuthController 추가 및 Refresh Token 기능 구현 ([4e270e3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/4e270e3fd7217f43b4b9f48b1a52af4eb3885ad0))
+* JWT Token Provider 및 설정 추가 ([c03a41d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c03a41d530dabb89ae93c81519d37bda07587421))
+* JWT 기반 인증 및 카카오 OAuth 로그인 적용 ([2041c04](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2041c040b7b2a25f285070bba507ad48a1e1a136))
+* JWT 블랙리스트 기반 로그아웃 기능 구현 ([18e121e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/18e121ecc88c50ee70c10d219bd2a4884afbf688))
+* Refresh Token 및 로그아웃 기능 추가 ([7f26ed5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7f26ed51447ef120788192ae7bf935a8131f4746))
+* Spring Security 인증 및 인가 예외 처리 추가 ([262da9c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/262da9c6a56df99ad3d11f3c6eb096bc778f406e))
+* 랜덤 닉네임 생성 유틸 추가 ([ba9605e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ba9605ef4df2ab7d5db0771927d88d2a25565484))
+* 유저 서비스 및 회원가입 기능 추가 ([74669cb](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/74669cb1b5ae0f382c480d4d2d3ee0543f1c0d21))
+* 카카오 로그인 후 JWT 토큰 발급 로직 추가 ([d75b638](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d75b638384c022d2fc890791ca6347a46e374a92))
+* 회원 탈퇴 API 추가 ([acf14da](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/acf14da1243e6b33341a73766c1bee40a609ae95))
+* 회원정보 수정 추가 ([8da5bbc](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8da5bbc1e47004eeda0f0beb266a00afcd6c590c))
+
+### 🐛 BUG FIXES
+
+* merge  branch 'feature/dashboard' into feature/user ([09c22d2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/09c22d226cb52dd8ccc89de8534ce3356e6099e2))
+* Merge branch 'develop' into feature/user ([d2bb496](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d2bb49686563c709b7a6d16fb1549bc6753914fc))
+* Merge branch 'feature/user' of https://github.com/hyoon1129/1-team-1danhaebojo-coalarm-be into feature/user ([f45e566](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f45e56699f8e90348a89bcdc878a9bcf85e63c48))
+* 카카오 OAuth 토큰 요청 시 Content-Type 문제 해결 ([c714616](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c71461604ed794022bf74331287dfe05756725ff))
+
+### ♻️ REFACTORING
+
+* OAuth 로그인 및 인증 기능 개선 ([7e3f9cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7e3f9cdcb8c3ff9d38fb7aa6df0807fd82f628a8))
+* UserController의 비즈니스 로직을 서비스 레이어로 이동 ([47036a9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/47036a91326b35fa8aea6cf5e325386e9068dc42))
+* 보안 설정 및 JWT 필터 코드 정리 ([b771eee](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b771eeeb962d9619b49e42df40b5c0b212f56023))
+* 폴더 구조 변경 ([4ee60c2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/4ee60c28e5f3603c713b853e6b70d42c388bed3e))
+
 ## [1.3.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.2.0...v1.3.0) (2025-03-19)
 
 ### 🚀 NEW FEATURES
