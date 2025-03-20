@@ -8,4 +8,6 @@ import lombok.Getter;
 public class CoinIndicatorResponse {
     private MacdDTO macd;
     private RsiDTO rsi;
+    private LongShortStrengthDTO ratio;
+    private CoinDTO coin;
 }

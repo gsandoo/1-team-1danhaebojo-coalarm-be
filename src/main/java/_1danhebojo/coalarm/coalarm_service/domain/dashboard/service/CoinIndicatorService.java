@@ -4,4 +4,5 @@ import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.
 
 public interface CoinIndicatorService {
     CoinIndicatorResponse getDashboardIndicators(Long coinId);
+    void saveIndicators(Long coinId);
 }
