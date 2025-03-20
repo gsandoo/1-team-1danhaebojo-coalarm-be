@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.9.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.8.1...v1.9.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* health check controller 테스트 2 ([2b5669a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2b5669a8acb94c982aaf22b1581afe9af497cddd))
+
 ## [1.8.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.8.0...v1.8.1) (2025-03-20)
 
 ### 🐛 BUG FIXES
