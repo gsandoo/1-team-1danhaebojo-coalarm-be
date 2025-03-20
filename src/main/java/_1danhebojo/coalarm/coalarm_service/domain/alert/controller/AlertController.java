@@ -8,24 +8,18 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.Aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertHistoryService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+
+import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RestController
@@ -36,11 +30,14 @@ public class AlertController {
     private final AlertSSEService alertSSEService;
     private final AlertHistoryService alertHistoryService;
 
+
     public AlertController(AlertService alertService, AlertHistoryService alertHistoryService, AlertSSEService alertSSEService) {
         this.alertService = alertService;
         this.alertHistoryService = alertHistoryService;
         this.alertSSEService = alertSSEService;
     }
+
+
 
     // <editor-fold desc="알람 추가/수정/삭제/조회 관련 메서드">
     // 알람 추가

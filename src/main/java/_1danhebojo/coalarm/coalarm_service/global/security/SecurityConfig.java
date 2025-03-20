@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 X
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/oauth/kakao/**").permitAll()// 카카오 로그인 API 인증 없이 허용
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .requestMatchers("/health").permitAll()// 헬스 체크 인증 없이 허용
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
