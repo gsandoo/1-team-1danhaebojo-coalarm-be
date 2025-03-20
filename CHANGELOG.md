@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.8.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.7.0...v1.8.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* 디스코드 웹훅 유효성 검사 추가 및 알람 수정 시 SSE 알람 제거 처리 ([eeca22b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/eeca22b73afadb85633242aa8c2467977ebdf218))
+
 ## [1.7.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.6.0...v1.7.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
