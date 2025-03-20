@@ -120,4 +120,11 @@ public class AlertController {
     }
     // </editor-fold>
 
+    // <editor-fold desc="알람 SSE 관련 메서드">
+    // SSE 구독 (로그인 시 활성화된 알람 전송)
+    @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe(@PathVariable Long userId) {
+        return alertSSEService.subscribe(userId);
+    }
+    // </editor-fold>
 }
