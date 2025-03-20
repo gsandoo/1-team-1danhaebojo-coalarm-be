@@ -83,7 +83,7 @@ public class AlertService {
             default:
                 throw new IllegalArgumentException("잘못된 알람 타입: " + request.getType());
         }
-        alertSSEService.addEmitter(request.getUserId(), alert);
+        alertSSEService.addEmitter(request.getUserId(), checkAlert.get());
     }
 
     // 알람 활성화 수정
