@@ -1,6 +1,5 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity;
 
-import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,5 +47,12 @@ public class UserEntity {
 
     public void updateProfileImage(String profileImg) {
         this.profileImg = profileImg;
+    }
+
+    public void updateDiscordWebhook(String discordWebhook) {
+        if (!discordWebhook.equals(this.discordWebhook)) {  // 기존 값과 다를 때만 변경
+            this.discordWebhook = discordWebhook;
+            this.chgDt = Instant.now();  // 변경 일시 업데이트
+        }
     }
 }
