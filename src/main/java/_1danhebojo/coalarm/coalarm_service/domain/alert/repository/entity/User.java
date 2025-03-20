@@ -2,6 +2,8 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,28 +15,31 @@ import java.time.LocalDateTime;
 @Builder
 public class User {
 
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment 사용
-    @Column(name = "user_id", unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
 
-    @Column(nullable = false, unique = true)
-    private Long kakaoId;
+    @Column(name = "kakao_id", nullable = false, unique = true)
+    private String kakaoId;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "profile_img")
     private String profileImg;
 
-    @Column(nullable = false)
+    @Column(name = "discord_webhook")
     private String discordWebhook;
 
-    @Column(updatable = false)
-    private LocalDateTime regDt = LocalDateTime.now();
+    @Column(name = "reg_dt", nullable = false, updatable = false)
+    private Instant regDt = Instant.now();  // 기본값 설정
+
+    @Column(name = "chg_dt")
+    private Instant chgDt;
+
 }
 

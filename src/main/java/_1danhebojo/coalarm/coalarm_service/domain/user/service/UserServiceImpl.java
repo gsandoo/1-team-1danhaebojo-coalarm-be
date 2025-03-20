@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.auth.service.JwtBlacklistService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.DiscordWebhookRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.DiscordWebhookResponse;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final RefreshTokenService refreshTokenService;
     private final JwtBlacklistService jwtBlacklistService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AlertSSEService alertSSEService;
 
     @Override
     public UserDTO getMyInfo(UserDetails userDetails) {
@@ -57,6 +59,9 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity savedUser = userRepository.save(newUser);
+
+        alertSSEService.subscribe(savedUser.getUserId());
+
         return UserDTO.fromEntity(savedUser);
     }
 
@@ -77,6 +82,8 @@ public class UserServiceImpl implements UserService {
                 jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
             }
         }
+
+        alertSSEService.removeEmitter(userId);
     }
 
     @Override
