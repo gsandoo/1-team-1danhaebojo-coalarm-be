@@ -10,7 +10,7 @@ public class ResponseKimchiPremium {
     private final Long premiumId;
     private final BigDecimal domesticPrice;
     private final BigDecimal globalPrice;
-    private final Integer exchangeRate;
+    private final BigDecimal exchangeRate;
     private final BigDecimal kimchiPremium;
     private final BigDecimal dailyChange;
     private final CoinDTO coin;

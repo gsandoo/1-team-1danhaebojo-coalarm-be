@@ -9,11 +9,12 @@ import java.util.Optional;
 
 public interface KimchiPremiumRepository {
     List<KimchiPremiumEntity> findAllKimchiPremiums(int offset,int limit);
-    void saveKimchiPremium(KimchiPremiumEntity kimchiPremiumEntity);
 
     Optional<KimchiPremiumEntity> findTopByCoinAndRegDtBetweenOrderByRegDtDesc(
             CoinEntity coin,
             LocalDateTime fromDateTime,
             LocalDateTime toDateTime
     );
+
+    long countAllKimchiPremiums();
 }
