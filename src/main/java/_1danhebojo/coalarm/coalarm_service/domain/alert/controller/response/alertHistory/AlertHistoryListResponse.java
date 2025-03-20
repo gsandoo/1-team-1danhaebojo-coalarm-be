@@ -41,7 +41,7 @@ public class AlertHistoryListResponse {
         public AlertHistoryContent(AlertHistory alertHistory) {
             this.alertHistoryId = alertHistory.getAlertHistoryId();
             this.userId = alertHistory.getUserId();
-            this.coin = alertHistory.getAlert().getCoin(); // ✅ 코인 정보 포함
+            this.coin = alertHistory.getAlert().getCoin(); // 코인 정보 포함
             this.alert = new AlertInfo(alertHistory.getAlert());
             this.registeredDate = alertHistory.getRegisteredDate();
         }

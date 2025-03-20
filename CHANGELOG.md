@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## [1.6.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.5.0...v1.6.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* formatUtil 추가 ([c1c628d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c1c628d19c91c6b46402d2614dc9e63bb7686f6d))
+* 구독 관련 엔티티 추가 및 수정 ([6da2e74](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6da2e742dc1a87d2a85e8e5bbe2f83a2320d4d1e))
+* 디스코드 웹훅 연결 기능 추가 ([df6cbc5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/df6cbc53c3dacb621618be87bc66de67e1bc6347))
+* 스케줄링 설정 추가 ([98aad79](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/98aad7991714bdbf0ed2308abede66521173b59e))
+* 알람 SSE 관련 추가 ([0f367a1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0f367a19710f6c7901aef4325aa1386493fd5bcf))
+* 알람 관련 누락된 엔티티 추가 및 Request/Response 추가 ([07ece15](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/07ece153f10b5f930695214539150388c14ffd11))
+* 알람 세부 내용 추기 ([f7a4271](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f7a42712755716c65900ceb8405d3d4cfdb81645))
+* 알림 히스토리 관련 기능 추가 ([e570046](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e57004682384439dab3cfb802bd62b413ace04bf))
+
+## [1.5.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.4.0...v1.5.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* aws eb cicd ([a9e427b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/a9e427b7fce132e3b660d2bf539db328109a83b1))
+* aws eb cicd test ([be0eaa1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/be0eaa1b743b5fcba368928d92712ad3b76a4506))
+* aws eb cicd test ([d4b9aea](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d4b9aea3ef66a30016d5c9cc59784addb2e1fffd))
+* aws eb cicd test ([e142561](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e1425616d9eb17219558c958af29ae873f015a3a))
+* aws eb cicd test ([9da3016](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9da30169058d4560a1ae7e158fe3814af9eaba93))
+* aws eb cicd test ([ff1455a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ff1455ac3da942a7af1f4f88831db984256b130e))
+* aws eb cicd test ([e2075e7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e2075e7fce90304bc21505985af6f2562f296a3b))
+* aws eb cicd test ([b4e48bd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b4e48bd97b4f7f5af2a079ae99620018fc767eb5))
+* aws eb cicd test ([c11924b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c11924ba347677572799666e4dcf53d451dacac1))
+* health check controller 삽입 ([826302a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/826302ac6ed90083d058c16d9eef921f584d1a5b))
+* health check controller 테스트 ([070f89a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/070f89a796e00fa1d9788299dea1e94f2c57b6c6))
+
 ## [1.4.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.3.0...v1.4.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
