@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [1.6.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.5.0...v1.6.0) (2025-03-20)
+
+### 🚀 NEW FEATURES
+
+* formatUtil 추가 ([c1c628d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c1c628d19c91c6b46402d2614dc9e63bb7686f6d))
+* 구독 관련 엔티티 추가 및 수정 ([6da2e74](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6da2e742dc1a87d2a85e8e5bbe2f83a2320d4d1e))
+* 디스코드 웹훅 연결 기능 추가 ([df6cbc5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/df6cbc53c3dacb621618be87bc66de67e1bc6347))
+* 스케줄링 설정 추가 ([98aad79](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/98aad7991714bdbf0ed2308abede66521173b59e))
+* 알람 SSE 관련 추가 ([0f367a1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0f367a19710f6c7901aef4325aa1386493fd5bcf))
+* 알람 관련 누락된 엔티티 추가 및 Request/Response 추가 ([07ece15](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/07ece153f10b5f930695214539150388c14ffd11))
+* 알람 세부 내용 추기 ([f7a4271](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f7a42712755716c65900ceb8405d3d4cfdb81645))
+* 알림 히스토리 관련 기능 추가 ([e570046](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e57004682384439dab3cfb802bd62b413ace04bf))
+
 ## [1.5.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.4.0...v1.5.0) (2025-03-20)
 
 ### 🚀 NEW FEATURES
