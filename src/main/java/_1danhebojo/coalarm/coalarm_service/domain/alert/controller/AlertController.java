@@ -10,9 +10,11 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertHistoryService;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,11 +33,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AlertController {
 
     private final AlertService alertService;
+    private final AlertSSEService alertSSEService;
     private final AlertHistoryService alertHistoryService;
 
-    public AlertController(AlertService alertService, AlertHistoryService alertHistoryService) {
+    public AlertController(AlertService alertService, AlertHistoryService alertHistoryService, AlertSSEService alertSSEService) {
         this.alertService = alertService;
         this.alertHistoryService = alertHistoryService;
+        this.alertSSEService = alertSSEService;
     }
 
     // <editor-fold desc="알람 추가/수정/삭제/조회 관련 메서드">
