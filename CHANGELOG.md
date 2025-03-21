@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.13.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.1...v1.13.2) (2025-03-21)
+
+### 🐛 BUG FIXES
+
+* security config 수정 ([bf09de9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/bf09de93678476011fda528bc2b5ff63764ab962))
+
 ## [1.13.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.0...v1.13.1) (2025-03-21)
 
 ### 🐛 BUG FIXES
