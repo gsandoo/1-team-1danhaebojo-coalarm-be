@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.14.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.3...v1.14.0) (2025-03-21)
+
+### 🚀 NEW FEATURES
+
+* cors 설정 추가 및 로그인 url API 작성 ([31ef292](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/31ef2929b0659c44283e30d8fd90473771407104))
+
 ## [1.13.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.2...v1.13.3) (2025-03-21)
 
 ### 🐛 BUG FIXES
