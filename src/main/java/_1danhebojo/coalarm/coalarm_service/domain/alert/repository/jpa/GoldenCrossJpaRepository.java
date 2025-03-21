@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,7 +19,7 @@ public interface GoldenCrossJpaRepository extends JpaRepository<GoldenCrossAlert
     @Query("    SELECT t" +
             "    FROM GoldenCrossAlert t" +
             "    JOIN FETCH t.alert a" +
-            "    JOIN FETCH a.user u " +
+//            "    JOIN FETCH a.user u " +
             "    JOIN FETCH a.coin c" +
             "    WHERE a.isGoldenCross = true AND a.alertId = :alertId")
     Optional<GoldenCrossAlert> findGoldenCrossAlertsByAlertId(Long alertId);
