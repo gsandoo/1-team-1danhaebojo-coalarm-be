@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.13.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.0...v1.13.1) (2025-03-21)
+
+### 🐛 BUG FIXES
+
+* swagger 테스트 ([94b5340](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/94b534070edc6137a0c61b65124f171dba72d2e2))
+
 ## [1.13.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.12.0...v1.13.0) (2025-03-21)
 
 ### 🚀 NEW FEATURES
