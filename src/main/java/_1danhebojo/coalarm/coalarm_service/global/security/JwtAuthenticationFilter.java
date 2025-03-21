@@ -25,6 +25,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // 카카오 로그인 경로는 필터 제외
+        if (path.startsWith("/api/v1/oauth/kakao") || path.startsWith("/oauth/kakao")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String token = jwtTokenProvider.resolveToken(request);
 
         if (token != null) {
