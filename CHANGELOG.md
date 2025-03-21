@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.15.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.14.0...v1.15.0) (2025-03-21)
+
+### 🚀 NEW FEATURES
+
+* 인증 없이 접근 가능한 요청 범위 수정 ([b98f003](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b98f00323f8c0c03f80914487e9490873e516705))
+* 카카오 로그인 경로 필터 제외 및 인증 설정 수정 ([831061d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/831061dfdf024a098d7b9dc78b320d61799f5151))
+
 ## [1.14.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.3...v1.14.0) (2025-03-21)
 
 ### 🚀 NEW FEATURES
