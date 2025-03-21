@@ -1,4 +1,4 @@
-name: Deploy Coalarm-backend Dev
+name: Deploy Ccoalarm-server Dev
 
 on:
   push:
