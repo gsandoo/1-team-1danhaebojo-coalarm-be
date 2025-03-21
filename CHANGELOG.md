@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.12.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.11.1...v1.12.0) (2025-03-21)
+
+### 🚀 NEW FEATURES
+
+* 5분 이내 알림 전송 여부 확인 쿼리 추가 ([b1bc03a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b1bc03a5dc3eccaeaeee3c0fd17f1fa05fc1cb38))
+* 알람 수정 및 제거 로직 개선 ([73a09f2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/73a09f2086aa263e4d799001c395702b905116b5))
+
+### ♻️ REFACTORING
+
+* 사용하지 않는 코드 제거 및 쿼리 개선 ([63276aa](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/63276aac8d9fda60eb521cf8a727ed203c744c94))
+
 ## [1.11.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.11.0...v1.11.1) (2025-03-20)
 
 ### 🐛 BUG FIXES
