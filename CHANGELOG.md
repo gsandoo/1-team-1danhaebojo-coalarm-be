@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.13.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.12.0...v1.13.0) (2025-03-21)
+
+### 🚀 NEW FEATURES
+
+* 엔드포인트 api/v1 분기처리 ([227c210](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/227c21025def16227fedc5e759d79d6417cf4e20))
+* 회원탈퇴시 유저의 알람 삭제 ([e41ce6a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e41ce6a03d8ef6fc646ee418de5d5aedb5619e50))
+
 ## [1.12.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.11.1...v1.12.0) (2025-03-21)
 
 ### 🚀 NEW FEATURES
