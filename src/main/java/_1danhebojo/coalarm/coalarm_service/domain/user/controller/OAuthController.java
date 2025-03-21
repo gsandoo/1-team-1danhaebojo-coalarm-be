@@ -6,6 +6,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.service.KakaoAuthService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.RefreshTokenService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
+import _1danhebojo.coalarm.coalarm_service.global.config.KakaoProperties;
 import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,17 @@ public class OAuthController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final KakaoProperties kakaoProperties;
+
+    @GetMapping("/login-url")
+    public ResponseEntity<BaseResponse<String>> getKakaoLoginUrl() {
+        String kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize"
+                + "?client_id=" + kakaoProperties.getClientId()
+                + "&redirect_uri=" + kakaoProperties.getRedirectUri()
+                + "&response_type=code";
+
+        return ResponseEntity.ok(BaseResponse.success(kakaoLoginUrl));
+    }
 
     @GetMapping("/callback")
     public ResponseEntity<BaseResponse<UserLoginResponse>> kakaoCallback(@RequestParam("code") String code) {
