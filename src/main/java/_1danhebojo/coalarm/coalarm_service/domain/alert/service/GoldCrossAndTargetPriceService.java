@@ -4,7 +4,6 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertSSERepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.util.FormatUtil;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
@@ -115,13 +114,10 @@ public class GoldCrossAndTargetPriceService {
     boolean isPriceStillValid(Alert alert) {
         // 1분 뒤에도 가격 유지 여부 확인
         LocalDateTime minutesAgo = LocalDateTime.now().minusMinutes(1);
-        List<AlertHistory> recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUserId(), alert.getAlertId(), minutesAgo);
+        boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUserId(), alert.getAlertId(), minutesAgo);
 
         // 1분 내 동일한 알람이 있음 → 알람 전송 안함
-        if (!recentHistory.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !recentHistory;
     }
 
     // 이동 평균 계산

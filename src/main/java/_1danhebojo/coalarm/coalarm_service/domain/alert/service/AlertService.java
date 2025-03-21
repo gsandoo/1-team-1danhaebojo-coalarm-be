@@ -3,7 +3,6 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
 import lombok.RequiredArgsConstructor;
@@ -91,15 +90,19 @@ public class AlertService {
     public Long updateAlertStatus(Long alertId, boolean active) {
         Alert alert = alertRepositoryImpl.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
+        boolean isActive = alert.isActive();
 
-        alert.setActive(active);
-        Alert saveAlert = alertRepositoryImpl.save(alert);
-        if(active) {
-            alertSSEService.addEmitter(saveAlert.getUserId(), alert);
-        } else {
-            alertSSEService.deleteEmitter(saveAlert.getUserId(), alert);
+        if(active != isActive) {
+            alert.setActive(active);
+            Alert saveAlert = alertRepositoryImpl.save(alert);
+            if (active) {
+                alertSSEService.addEmitter(saveAlert.getUserId(), alert);
+            } else {
+                alertSSEService.deleteEmitter(saveAlert.getUserId(), alert);
+            }
         }
-        return saveAlert.getAlertId();
+
+        return alert.getAlertId();
     }
 
     // 알람 삭제

@@ -43,7 +43,7 @@ public class AlertHistoryRepositoryImpl {
         return alertHistoryJpaRepository.findById(alertHistoryId);
     }
 
-    public List<AlertHistory> findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo) {
+    public boolean findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo) {
         return alertHistoryJpaRepository.findRecentHistory(userId, alertId, minutesAgo);
     }
 }
