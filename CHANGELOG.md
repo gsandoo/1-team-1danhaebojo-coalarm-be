@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.13.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.2...v1.13.3) (2025-03-21)
+
+### 🐛 BUG FIXES
+
+* 대시보드 컨트롤러 엔드포인트 수정 ([8f86972](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8f86972c57fc3c31f7f4b858cd01afbfc02f1e7c))
+
 ## [1.13.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.13.1...v1.13.2) (2025-03-21)
 
 ### 🐛 BUG FIXES
