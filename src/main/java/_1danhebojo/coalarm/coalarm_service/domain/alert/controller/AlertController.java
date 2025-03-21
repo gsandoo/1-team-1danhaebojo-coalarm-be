@@ -23,7 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @RestController
-@RequestMapping("/alerts")
+@RequestMapping("/api/v1/alerts")
 public class AlertController {
 
     private final AlertService alertService;

@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
