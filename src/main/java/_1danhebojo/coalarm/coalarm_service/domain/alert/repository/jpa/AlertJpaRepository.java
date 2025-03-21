@@ -41,4 +41,6 @@ public interface AlertJpaRepository extends JpaRepository<Alert, Long> {
             "JOIN FETCH a.user u " +
             "WHERE a.active = true")
     List<Alert> findAllActiveAlerts();
+
+    void deleteAlertByUserId(Long userId);
 }
