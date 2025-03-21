@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.stream.Collectors;
@@ -46,9 +47,11 @@ public class AlertSSEService {
         activeAlertList.clear(); // 기존 데이터 삭제
         activeAlertList.putAll(
                 activeAlerts.stream()
-                        .collect(Collectors.groupingBy(alert -> alert.getUser().getUserId()))
+                        .collect(Collectors.groupingBy(Alert::getUserId))
         );
     }
+
+    @Transactional
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void discordScheduler() {
         Map<Long, List<Alert>> filteredAlerts = activeAlertList.entrySet()
@@ -61,10 +64,17 @@ public class AlertSSEService {
                 ));
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
+
+    @Transactional
     @Scheduled(fixedRate = 1000) // 1분마다 실행
     public void checkAlertsForSubscribedUsers() {
+        log.debug("Checking alerts for subscribed users1");
         for (Long userId : userEmitters.keySet()) {
+            log.debug("Checking alerts for subscribed users2");
             List<Alert> activeAlerts = activeAlertList.get(userId);
+
+            // 유효성 추가
+            if (activeAlerts == null || activeAlerts.isEmpty()) continue;
 
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
@@ -191,12 +201,35 @@ public class AlertSSEService {
         log.info("📢 사용자 " + userId + " 에 대한 새로운 SSE 구독 추가됨. 활성화된 알람 개수: " + activeAlertList.get(userId).size());
     }
 
-    // SSE 구독 제거
+    // SEE 알람 수정
+    public void updateEmitter(Long userId, Alert alert) {
+        // 해당 userId의 알람 리스트 가져오기
+        List<Alert> alerts = activeAlertList.get(userId);
+
+        if (alerts != null) {
+            // 같은 alertId를 가진 객체 찾아서 active 값 변경
+            for (Alert existingAlert : alerts) {
+                if (existingAlert.getAlertId().equals(alert.getAlertId())) {
+                    existingAlert.setActive(alert.isActive()); // ✅ active 값 수정
+                    log.info("✅ Alert ID {} 의 active 상태가 {} 으로 업데이트됨.", alert.getAlertId(), alert.isActive());
+                    return;
+                }
+            }
+        }
+
+        // 리스트에 기존 alertId가 없으면 추가
+        alerts = activeAlertList.computeIfAbsent(userId, k -> new ArrayList<>());
+        alerts.add(alert);
+
+        log.info("📢 사용자 {} 의 새로운 Alert 추가됨. 현재 활성화된 알람 개수: {}", userId, alerts.size());
+    }
+
+    // SSE 알람 제거
     public void deleteEmitter(Long userId, Alert alert) {
         // 사용자의 알람 리스트에서 해당 알람 제거
         activeAlertList.computeIfPresent(userId, (k, alerts) -> {
-            alerts.remove(alert);
-            return alerts.isEmpty() ? null : alerts; // 리스트가 비면 null 반환해서 map에서도 제거
+            alerts.removeIf(a -> a.getAlertId().equals(alert.getAlertId())); // ✅ alertId가 동일한 경우만 삭제
+            return alerts.isEmpty() ? null : alerts; // 리스트가 비면 null 반환해서 Map에서 삭제
         });
 
         log.info("사용자 " + userId + " 의 알람 제거됨. 남은 알람 개수: "
@@ -214,5 +247,4 @@ public class AlertSSEService {
         }
         log.info("사용자 " + userId + " 의 모든 SSE 구독 취소 완료");
     }
-
 }
