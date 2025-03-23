@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.17.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.16.2...v1.17.0) (2025-03-23)
+
+### 🚀 NEW FEATURES
+
+* 코인 검색 api 구현 ([3e75a67](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3e75a6726d5a17def675022245236a6a53103961))
+
 ## [1.16.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.16.1...v1.16.2) (2025-03-23)
 
 ### ♻️ REFACTORING
