@@ -19,7 +19,7 @@ public class UserDTO {
                 .userId(user.getUserId())
                 .kakaoId(user.getKakaoId())
                 .nickname(user.getNickname())
-                .email(user.getEmail())
+                .email(user.getKakaoId())
                 .profileImg(user.getProfileImg())
                 .discordWebhook(user.getDiscordWebhook())
                 .build();

@@ -11,7 +11,6 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
-import _1danhebojo.coalarm.coalarm_service.global.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -30,8 +28,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final RefreshTokenService refreshTokenService;
-    private final JwtBlacklistService jwtBlacklistService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final AlertSSEService alertSSEService;
     private final AlertRepositoryImpl alertRepository;
 
@@ -77,13 +73,7 @@ public class UserServiceImpl implements UserService {
         Long userId = findByKakaoId(userDetails.getUsername()).getUserId();
         refreshTokenService.deleteRefreshToken(userId);
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String accessToken = authorizationHeader.substring(7).trim();
-            Instant expiryInstant = jwtTokenProvider.getExpirationInstant(accessToken);
-            if (expiryInstant != null) {
-                jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
-            }
-        }
+        // TODO : 액세스 토큰 블랙리스트 처리
 
         alertSSEService.removeEmitter(userId);
     }
@@ -145,14 +135,7 @@ public class UserServiceImpl implements UserService {
         // 리프레시 토큰 삭제
         refreshTokenService.deleteRefreshToken(user.getUserId());
 
-        // 액세스 토큰 블랙리스트 추가
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String accessToken = authorizationHeader.substring(7).trim();
-            Instant expiryInstant = jwtTokenProvider.getExpirationInstant(accessToken);
-            if (expiryInstant != null) {
-                jwtBlacklistService.addToBlacklist(accessToken, expiryInstant);
-            }
-        }
+        // TODO : 액세스 토큰 블랙리스트 처리
 
         //유저의 알람 삭제
         alertRepository.deleteByUserId(user.getUserId());
