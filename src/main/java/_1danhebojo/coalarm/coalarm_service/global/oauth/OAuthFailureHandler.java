@@ -3,7 +3,7 @@ package _1danhebojo.coalarm.coalarm_service.global.oauth;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import _1danhebojo.coalarm.coalarm_service.global.api.ErrorResponse;
-import _1danhebojo.coalarm.coalarm_service.global.config.OAuthProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.OAuthProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -2,8 +2,8 @@ package _1danhebojo.coalarm.coalarm_service.global.oauth;
 
 import java.io.IOException;
 
-import _1danhebojo.coalarm.coalarm_service.global.config.JwtProperties;
-import _1danhebojo.coalarm.coalarm_service.global.config.OAuthProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.JwtProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.OAuthProperties;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.Token;
 import lombok.extern.slf4j.Slf4j;

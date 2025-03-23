@@ -1,4 +1,4 @@
-package _1danhebojo.coalarm.coalarm_service.global.config;
+package _1danhebojo.coalarm.coalarm_service.global.properties;
 
 import lombok.Getter;
 import lombok.Setter;

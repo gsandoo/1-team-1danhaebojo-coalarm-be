@@ -1,10 +1,8 @@
 package _1danhebojo.coalarm.coalarm_service.global.jwt;
 
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
-import _1danhebojo.coalarm.coalarm_service.global.config.JwtProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.JwtProperties;
 import _1danhebojo.coalarm.coalarm_service.global.oauth.CoalarmOAuth2User;
-import _1danhebojo.coalarm.coalarm_service.global.oauth.KakaoResponse;
-import _1danhebojo.coalarm.coalarm_service.global.oauth.OAuthResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
@@ -12,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;

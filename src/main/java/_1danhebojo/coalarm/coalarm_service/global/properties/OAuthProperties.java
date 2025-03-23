@@ -1,4 +1,4 @@
-package _1danhebojo.coalarm.coalarm_service.global.config;
+package _1danhebojo.coalarm.coalarm_service.global.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;

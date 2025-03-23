@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.global.security;
 
-import _1danhebojo.coalarm.coalarm_service.global.config.CorsProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.CorsProperties;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtVerificationFilter;
 import _1danhebojo.coalarm.coalarm_service.global.oauth.CoalarmOAuth2UserService;
