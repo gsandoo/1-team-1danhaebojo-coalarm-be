@@ -51,14 +51,14 @@ public class UserController {
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<Void>> logout() {
-        userService.logout();
+//        userService.logout();
         return ResponseEntity.ok(BaseResponse.success());
     }
 
     // 회원 탈퇴
     @DeleteMapping("")
     public ResponseEntity<BaseResponse<Void>> withdraw() {
-        userService.deleteUser();
+//        userService.deleteUser();
         return ResponseEntity.ok(BaseResponse.success());
     }
 

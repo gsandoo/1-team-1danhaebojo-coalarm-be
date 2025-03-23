@@ -11,7 +11,7 @@ public interface UserService {
     PkResponse updateUser(Long userId, String nickname, MultipartFile profileImage);
     UserDTO registerOrLogin(String kakaoId, String email);
     UserDTO findByKakaoId(String kakaoId);
-    void logout();
-    void deleteUser();
+    void logout(UserDetails userDetails, String authorizationHeader);
+    void deleteUser(UserDetails userDetails, String authorizationHeader);
     PkResponse updateDiscordWebhook(Long userId, DiscordWebhookRequest request);
 }
