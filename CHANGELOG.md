@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.16.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.16.0...v1.16.1) (2025-03-23)
+
+### 🐛 BUG FIXES
+
+* WebConfig 파일 수정 ([b44f42a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b44f42a4c2128e30831af7b5a590a5be6f1177bd))
+
 ## [1.16.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.15.0...v1.16.0) (2025-03-23)
 
 ### 🚀 NEW FEATURES
