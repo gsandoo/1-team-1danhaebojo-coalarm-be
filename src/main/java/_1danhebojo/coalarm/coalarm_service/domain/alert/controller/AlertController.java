@@ -11,10 +11,12 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertHistoryService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertService;
+import _1danhebojo.coalarm.coalarm_service.domain.user.service.AuthService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,21 +25,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/alerts")
 public class AlertController {
 
     private final AlertService alertService;
     private final AlertSSEService alertSSEService;
     private final AlertHistoryService alertHistoryService;
-
-
-    public AlertController(AlertService alertService, AlertHistoryService alertHistoryService, AlertSSEService alertSSEService) {
-        this.alertService = alertService;
-        this.alertHistoryService = alertHistoryService;
-        this.alertSSEService = alertSSEService;
-    }
-
-
+    private final AuthService authService;
 
     // <editor-fold desc="알람 추가/수정/삭제/조회 관련 메서드">
     // 알람 추가
@@ -90,8 +85,7 @@ public class AlertController {
             @RequestParam int offset,
             @RequestParam int limit
     ) {
-        //Long userId = AuthUtil.getCurrentUserId();
-        Long userId = 1L;
+        Long userId = authService.getLoginUserId();
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setOffset(offset);
@@ -110,8 +104,7 @@ public class AlertController {
 
     @PostMapping("/history/{alert_id}")
     public ResponseEntity<?> addAlertHistory(@PathVariable("alert_id") Long alertId) {
-        //Long userId = AuthUtil.getCurrentUserId();
-        Long userId = 1L;
+        Long userId = authService.getLoginUserId();
 
         alertHistoryService.addAlertHistory(alertId, userId);
         return ResponseEntity.ok(BaseResponse.success());

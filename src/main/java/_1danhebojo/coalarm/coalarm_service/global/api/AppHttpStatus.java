@@ -29,6 +29,12 @@ public enum AppHttpStatus {
      */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 Access Token입니다."),
+    INVALID_TOKEN( HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
+    MALFORMED_TOKEN( HttpStatus.UNAUTHORIZED, "손상된 토큰입니다."),
+    EXPIRED_TOKEN( HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    UNSUPPORTED_TOKEN( HttpStatus.UNAUTHORIZED, "지원하지 않는 토큰입니다."),
+    BLOCKED_TOKEN( HttpStatus.UNAUTHORIZED, "로그아웃 처리된 토큰입니다."),
+    OAUTH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "OAuth 로그인에 실패 했습니다."),
 
     /**
      * 403 : 접근 권한이 없음
@@ -54,6 +60,7 @@ public enum AppHttpStatus {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에 에러가 발생했습니다."),
     IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"S3에 이미지 업로드중 에러가 발생했습니다."),
     IMAGE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3의 이미지 삭제중 에러가 발생했습니다."),
+    FAILED_AUTHENTICATION_OAUTH(HttpStatus.INTERNAL_SERVER_ERROR, "OAuth 인증에 실패했습니다."),
 
     /**
      * 502: 게이트웨이, 프록시 역할을 하는 서버가 다른 서버로부터 유효하지 않은 응답을 받았을 때

@@ -2,7 +2,7 @@ package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
-import _1danhebojo.coalarm.coalarm_service.global.config.KakaoProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.KakaoProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
