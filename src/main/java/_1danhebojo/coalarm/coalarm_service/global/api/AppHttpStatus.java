@@ -18,6 +18,9 @@ public enum AppHttpStatus {
      */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 Refresh Token입니다."),
+    INVALID_OFFSET(HttpStatus.BAD_REQUEST, "오프셋은 0 이상이어야 합니다."),
+    INVALID_LIMIT(HttpStatus.BAD_REQUEST, "한 페이지당 항목 수는 1 이상이어야 합니다."),
+    INVALID_COIN_ID(HttpStatus.BAD_REQUEST, "코인 ID는 1 이상이어야 합니다."),
     INVALID_OAUTH_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 OAuth 타입입니다."),
 
 
@@ -44,6 +47,7 @@ public enum AppHttpStatus {
     NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리소스입니다."),
     NOT_FOUND_ENDPOINT(HttpStatus.NOT_FOUND, "존재하지 않는 엔드포인트입니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND,"존재하지 않는 회원입니다."),
+    NOT_FOUND_COIN(HttpStatus.NOT_FOUND, "존재하지 않는 코인입니다."),
 
     /**
      * 415 : 미디어 타입 에러
