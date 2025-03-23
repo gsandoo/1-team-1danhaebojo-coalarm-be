@@ -11,11 +11,13 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
+import _1danhebojo.coalarm.coalarm_service.global.api.PkResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -32,11 +34,12 @@ public class UserServiceImpl implements UserService {
     private final AlertRepositoryImpl alertRepository;
 
     @Override
-    public UserDTO getMyInfo(UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
-        }
-        return findByKakaoId(userDetails.getUsername());
+    public UserDTO getMyInfo(Long userId) {
+        UserEntity user = userRepository.findByUserId(userId).orElseThrow(
+                () -> new ApiException(AppHttpStatus.NOT_FOUND)
+        );
+
+        return UserDTO.fromEntity(user);
     }
 
     @Override
@@ -81,18 +84,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByKakaoId(String kakaoId) {
         UserEntity user = userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
         return UserDTO.fromEntity(user); // Entity → DTO 변환
     }
 
     @Override
-    public Long updateUser(UserDetails userDetails, String nickname, MultipartFile profileImage) {
-        UserEntity user = userRepository.findByKakaoId(userDetails.getUsername())
+    public PkResponse updateUser(Long userId, String nickname, MultipartFile profileImage) {
+        UserEntity user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
         // 닉네임 업데이트
-        if (nickname != null && !nickname.isEmpty()) {
+        if (StringUtils.hasText(nickname)) {
             validateNickname(nickname);
             user.updateNickname(nickname);
         }
@@ -107,7 +110,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
-        return user.getUserId();
+        return PkResponse.of(user.getUserId());
     }
 
     private void validateNickname(String nickname) {
@@ -146,20 +149,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public DiscordWebhookResponse updateDiscordWebhook(UserDetails userDetails, DiscordWebhookRequest request) {
-        if (userDetails == null) {
-            throw new ApiException(AppHttpStatus.UNAUTHORIZED);
-        }
-
-        String kakaoId = userDetails.getUsername();
-
-        UserEntity user = userRepository.findByKakaoId(kakaoId)
+    public PkResponse updateDiscordWebhook(Long userId, DiscordWebhookRequest request) {
+        UserEntity user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
         user.updateDiscordWebhook(request.getDiscordWebhook());
 
         userRepository.save(user);
 
-        return new DiscordWebhookResponse(user.getUserId());
+        return PkResponse.of(user.getUserId());
     }
 }
