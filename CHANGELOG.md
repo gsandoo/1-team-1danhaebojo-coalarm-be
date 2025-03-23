@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.16.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.16.1...v1.16.2) (2025-03-23)
+
+### ♻️ REFACTORING
+
+* 대시보드 응답 포맷 통일 ([8397394](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/839739405f8037249df3767809bcc907fb03c0ba))
+
 ## [1.16.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.16.0...v1.16.1) (2025-03-23)
 
 ### 🐛 BUG FIXES
