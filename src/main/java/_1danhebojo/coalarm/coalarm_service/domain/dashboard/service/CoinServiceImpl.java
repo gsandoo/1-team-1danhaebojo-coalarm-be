@@ -1,11 +1,13 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -73,5 +75,12 @@ public class CoinServiceImpl implements CoinService {
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_COIN));
 
         return new CoinDTO(coinEntity);
+    }
+
+    @Override
+    public CoinDTO searchCoinByNameOrSymbol(String term) {
+        CoinEntity coin = coinJpaRepository.findByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(term, term)
+                .orElseThrow(() -> new EntityNotFoundException("검색어와 일치하는 코인을 찾을 수 없습니다: " + term));
+        return new CoinDTO(coin);
     }
 }
