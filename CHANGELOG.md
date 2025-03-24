@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.17.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.1...v1.17.2) (2025-03-24)
+
+### 📚 DOCUMENTATION
+
+* deploy.yml 수정 ([e44b513](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e44b51340f678881ebc8889c02ecd5782384cf48))
+
 ## [1.17.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.0...v1.17.1) (2025-03-24)
 
 ### 📚 DOCUMENTATION
