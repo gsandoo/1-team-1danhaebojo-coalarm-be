@@ -50,9 +50,11 @@ public class UserEntity {
     }
 
     public void updateDiscordWebhook(String discordWebhook) {
-        if (!discordWebhook.equals(this.discordWebhook)) {  // 기존 값과 다를 때만 변경
-            this.discordWebhook = discordWebhook;
-            this.chgDt = Instant.now();  // 변경 일시 업데이트
+        if ((this.discordWebhook == null && discordWebhook == null) ||
+                (this.discordWebhook != null && this.discordWebhook.equals(discordWebhook))) {
+            return;
         }
+        this.discordWebhook = discordWebhook;
+        this.chgDt = Instant.now();  // 변경 일시 업데이트
     }
 }
