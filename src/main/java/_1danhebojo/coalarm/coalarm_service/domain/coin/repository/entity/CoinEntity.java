@@ -1,4 +1,4 @@
-package _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity;
+package _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
