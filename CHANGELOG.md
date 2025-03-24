@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.17.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.7...v1.17.8) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* 401 에러 수정(테스트) ([b362df4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b362df43e4e4630fd0e6f2ec0c1f9fa04ffa98f4))
+
 ## [1.17.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.6...v1.17.7) (2025-03-24)
 
 ### 🐛 BUG FIXES
