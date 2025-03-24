@@ -38,8 +38,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 X
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/api/v1/health").permitAll()// 헬스 체크 인증 없이 허용
-                        .requestMatchers("/api/v1/**").authenticated()
+//                        .requestMatchers("/api/v1/health").permitAll()// 헬스 체크 인증 없이 허용
+                        .requestMatchers("/api/v1/**").permitAll()
                 )
                 // OAuth 설정 (기본)
                 .oauth2Login((oauth) -> {
