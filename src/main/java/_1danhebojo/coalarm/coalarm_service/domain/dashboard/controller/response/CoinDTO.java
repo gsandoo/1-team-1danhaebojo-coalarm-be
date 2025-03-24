@@ -1,7 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response;
 
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import lombok.Getter;
 
 @Getter

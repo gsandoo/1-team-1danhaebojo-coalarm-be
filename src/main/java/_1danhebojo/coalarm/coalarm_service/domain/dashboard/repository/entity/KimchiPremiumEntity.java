@@ -1,7 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity;
 
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -59,11 +59,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 		}
 	}
 
-	//TODO: 테스트 용 임시 . 추후 수정 필요
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) {
-		return true; // 모든 요청에 대해 필터 비활성화
-	}
 
 	private void setAuthenticationToSecurityContextHolder(String accessToken) {
 		Authentication authentication = jwtRepository.getAuthentication(accessToken);

@@ -3,11 +3,11 @@ package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.*;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinIndicatorEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinIndicatorJpaRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
