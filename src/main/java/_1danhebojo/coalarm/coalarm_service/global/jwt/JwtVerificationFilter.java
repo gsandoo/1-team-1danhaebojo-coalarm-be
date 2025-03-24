@@ -62,12 +62,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 	//TODO: 테스트 용 임시 . 추후 수정 필요
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
-		String path = request.getRequestURI();
-		return path.equals("/api/v1/health") ||
-				path.startsWith("/api/v1/swagger-ui/") ||
-				path.startsWith("/v3/api-docs/") ||
-				path.startsWith("/swagger-resources/") ||
-				path.startsWith("/webjars/");
+		return true; // 모든 요청에 대해 필터 비활성화
 	}
 
 	private void setAuthenticationToSecurityContextHolder(String accessToken) {
