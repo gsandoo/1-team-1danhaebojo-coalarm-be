@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [1.18.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.10...v1.18.0) (2025-03-24)
+
+### 🚀 NEW FEATURES
+
+* 알람 추가 시 userId 필드 포함하도록 구현 ([42b5f6a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/42b5f6a77208a49777088cba83ce69ac94dc1d0e))
+
+### ♻️ REFACTORING
+
+* GoldenCrossRequest에서 사용하지 않는 필드의 @NotNull 어노테이션 제거 ([6852cf9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6852cf99a52b7bfcd45b4c2b53a8e853cad2bf0b))
+* 사용되지 않는 필드의 @NotNull 제거 ([2c355df](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2c355dfadae13583ff9579916206640b59340217))
+* 생성자 관련 어노테이션 추가 및 User 엔티티 매핑 수정 ([e4fa5ff](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e4fa5ff7857ecd9616c15b8dff5b661e9e05b187))
+
 ## [1.17.10](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.9...v1.17.10) (2025-03-24)
 
 ### 🐛 BUG FIXES
