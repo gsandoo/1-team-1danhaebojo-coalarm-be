@@ -1,9 +1,9 @@
-package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
+package _1danhebojo.coalarm.coalarm_service.domain.coin.service;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.CoinRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinDTO;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
@@ -12,17 +12,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CoinServiceImpl implements CoinService {
 
     private final CoinJpaRepository coinJpaRepository;
-
+    private final CoinRepository coinRepository;
     @Override
+    @Transactional(readOnly = true)
     public List<CoinDTO> getAllCoins() {
         try {
             List<CoinEntity> coins = coinJpaRepository.findAll();
@@ -35,6 +38,16 @@ public class CoinServiceImpl implements CoinService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<CoinDTO> getMyAlertCoins(Long userId) {
+        return coinRepository.findAlertCoinsByUserId(userId)
+                .stream()
+                .map(CoinDTO::new)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public OffsetResponse<CoinDTO> getCoinsWithPaging(Integer offset, Integer limit) {
         try {
             if (offset < 0) {
@@ -66,6 +79,7 @@ public class CoinServiceImpl implements CoinService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CoinDTO getCoinById(Long coinId) {
         if (coinId == null || coinId <= 0) {
             throw new ApiException(AppHttpStatus.INVALID_COIN_ID);
@@ -78,6 +92,7 @@ public class CoinServiceImpl implements CoinService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CoinDTO searchCoinByNameOrSymbol(String term) {
         CoinEntity coin = coinJpaRepository.findByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(term, term)
                 .orElseThrow(() -> new EntityNotFoundException("검색어와 일치하는 코인을 찾을 수 없습니다: " + term));
