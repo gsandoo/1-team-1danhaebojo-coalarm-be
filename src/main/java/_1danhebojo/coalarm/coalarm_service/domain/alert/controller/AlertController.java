@@ -39,7 +39,8 @@ public class AlertController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse<?>> addAlert(@Valid @RequestBody BaseAlertRequest request) {
         log.debug("Received Alert Request: {}", request);
-        request.setUserId(1L);
+        Long userId = authService.getLoginUserId();
+        request.setUserId(userId);
         alertService.addAlert(request);
         return ResponseEntity.ok(BaseResponse.success());
     }
@@ -75,7 +76,7 @@ public class AlertController {
         request.setFilter(filter);
         request.setSort(sort);
 
-        long userId = 1L;
+        Long userId = authService.getLoginUserId();
 
         AlertListResponse alertList = alertService.getAllAlerts(request, userId);
         return ResponseEntity.ok(BaseResponse.success(alertList));
