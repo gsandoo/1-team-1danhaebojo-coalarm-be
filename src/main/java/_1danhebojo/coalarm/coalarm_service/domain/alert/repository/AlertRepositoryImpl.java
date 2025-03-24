@@ -114,8 +114,8 @@ public class AlertRepositoryImpl {
     }
 
     @Transactional
-    public Page<Alert> findAlertsByFilter(Boolean active, String filter, Pageable pageable) {
-        return alertJpaRepository.findAlertsByFilter(active, filter, pageable);
+    public Page<Alert> findAlertsByFilter(Boolean active, String filter, Pageable pageable, long userId) {
+        return alertJpaRepository.findAlertsByFilter(active, filter, pageable, userId);
     }
 
     public List<Alert> findActiveAlertsByUserId(Long userId) {

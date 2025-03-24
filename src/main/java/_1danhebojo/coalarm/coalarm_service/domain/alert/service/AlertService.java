@@ -116,7 +116,7 @@ public class AlertService {
     }
 
     // 알람 목록 조회
-    public AlertListResponse getAllAlerts(AlertFilterRequest request) {
+    public AlertListResponse getAllAlerts(AlertFilterRequest request, long userId) {
         // 정렬 방식 설정
         Sort sort = request.getSort().equalsIgnoreCase("LATEST")
                 ? Sort.by(Sort.Direction.DESC, "regDt")
@@ -128,6 +128,7 @@ public class AlertService {
         Boolean active = request.getActive();
 
         Page<Alert> alerts = alertRepositoryImpl.findAlertsByFilter(active, request.getFilter(), pageRequest);
+        Page<Alert> alerts = alertRepositoryImpl.findAlertsByFilter(active, request.getFilter(), pageRequest, userId);
 
         List<AlertResponse> alertResponses = alerts.getContent().stream()
                 .map(AlertResponse::new)
