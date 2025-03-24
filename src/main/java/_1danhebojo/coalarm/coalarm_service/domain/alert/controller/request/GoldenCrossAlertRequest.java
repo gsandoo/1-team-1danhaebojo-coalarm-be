@@ -12,11 +12,9 @@ public class GoldenCrossAlertRequest extends BaseAlertRequest {
     @Null
     private Long goldenCrossId;
 
-    @NotNull
     @JsonProperty("short_ma")
     private Long shortMa;
 
-    @NotNull
     @JsonProperty("long_ma")
     private Long longMa;
 }

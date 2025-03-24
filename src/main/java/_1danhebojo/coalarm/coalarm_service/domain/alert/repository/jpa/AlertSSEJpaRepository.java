@@ -18,7 +18,7 @@ public interface AlertSSEJpaRepository extends JpaRepository<Alert, Long> {
             "FROM Alert a " +
             "JOIN FETCH a.coin " +
             "JOIN FETCH a.user u " +
-            "WHERE a.userId = :userId " +
+            "WHERE a.user.userId = :userId " +
             "AND a.active = true")
     List<Alert> findByUserId(Long userId);
 
@@ -28,7 +28,7 @@ public interface AlertSSEJpaRepository extends JpaRepository<Alert, Long> {
     @Query("SELECT a " +
             "FROM Alert a " +
             "JOIN FETCH a.user u " +
-            "WHERE a.userId = :userId " +
+            "WHERE a.user.userId = :userId " +
             "AND a.active = true")
     List<Alert> findActiveAlertsByUserId(Long userId);
 
