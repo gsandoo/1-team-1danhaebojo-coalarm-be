@@ -15,7 +15,7 @@ public class VolumeSpikeAlert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long marketAlertId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private boolean tradingVolumeSoaring;
 
     @JsonIgnore
