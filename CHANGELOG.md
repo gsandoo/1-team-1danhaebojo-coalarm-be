@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.18.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.1...v1.18.2) (2025-03-24)
+
+### ♻️ REFACTORING
+
+* 불필요한 설정 제거 및 updateDiscordWebhook 조건문 추가 ([f6557be](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f6557bef521c4351c4038b74c520f970916bdb74))
+
 ## [1.18.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.0...v1.18.1) (2025-03-24)
 
 ### ♻️ REFACTORING
