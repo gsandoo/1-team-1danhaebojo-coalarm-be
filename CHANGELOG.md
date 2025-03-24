@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.18.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.0...v1.18.1) (2025-03-24)
+
+### ♻️ REFACTORING
+
+* getAlertList와 addAlert 메서드에 userId를 활용 ([e9dc2e0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e9dc2e098a0034af51f3d7d38dbad8f9409c54b0))
+
 ## [1.18.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.10...v1.18.0) (2025-03-24)
 
 ### 🚀 NEW FEATURES
