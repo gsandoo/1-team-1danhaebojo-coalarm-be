@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.17.10](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.9...v1.17.10) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* oAuth 2.0 리다이렉트 에러 테스트 ([7b1b6de](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7b1b6dee4d2f0078e6eaf4263902cf3e71d7053d))
+
 ## [1.17.9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.8...v1.17.9) (2025-03-24)
 
 ### 🐛 BUG FIXES
