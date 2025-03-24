@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.global.security;
 
+import _1danhebojo.coalarm.coalarm_service.global.api.RequestLoggingFilter;
 import _1danhebojo.coalarm.coalarm_service.global.properties.CorsProperties;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtVerificationFilter;
@@ -51,6 +52,10 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint) // 인증 실패 처리
                         .accessDeniedHandler(customAccessDeniedHandler) // 권한 부족(403) 처리
+                )
+                .addFilterBefore(
+                        new RequestLoggingFilter(),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         new JwtVerificationFilter(

@@ -84,14 +84,6 @@ public class ErrorResponse {
                     .build();
         }
 
-        // 그 밖의 런타임 예외 처리
-        else if (t instanceof RuntimeException e) {
-            return ErrorResponse.builder()
-                    .code(500)
-                    .message(e.getMessage())
-                    .build();
-        }
-
         // 그 외 알 수 없는 예외 처리
         return ErrorResponse.builder()
                 .code(500)
