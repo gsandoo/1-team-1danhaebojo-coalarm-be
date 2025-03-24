@@ -12,10 +12,20 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<BaseResponse<Void>> exceptionHandler(Exception e) {
+		log.error(500 + " " + e.getMessage());
+		e.printStackTrace();
+
+		return ResponseEntity
+				.status(500)
+				.body( BaseResponse.error(ErrorResponse.of(e)));
+	}
+
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<BaseResponse<Void>> runtimeExceptionHandler(RuntimeException e) {
-		log.warn(500 + " " + e.getMessage());
-
+		log.error(500 + " " + e.getMessage());
+		e.printStackTrace();
 		return ResponseEntity
 				.status(500)
 				.body( BaseResponse.error(ErrorResponse.of(e)));
