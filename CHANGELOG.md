@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.17.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.4...v1.17.5) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* security config 테스트 임시 허용 ([49b1619](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/49b16198778cb78290da88ee85b1b649b4fa8784))
+
 ## [1.17.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.3...v1.17.4) (2025-03-24)
 
 ### 📚 DOCUMENTATION
