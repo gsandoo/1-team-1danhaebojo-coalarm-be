@@ -18,14 +18,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class AlertSSERepositoryImpl {
     private final AlertSSEJpaRepository alertSSEJpaRepository;
     private final VolumeSpikeJpaRepository volumeSpikeJpaRepository;
-
-    public AlertSSERepositoryImpl(AlertSSEJpaRepository alertSSEJpaRepository,VolumeSpikeJpaRepository volumeSpikeJpaRepository) {
-        this.alertSSEJpaRepository = alertSSEJpaRepository;
-        this.volumeSpikeJpaRepository = volumeSpikeJpaRepository;
-    }
 
     public Optional<Ticker> findLatestBySymbol(String symbol, String exchange) {
         return alertSSEJpaRepository.findLatestBySymbol(symbol, exchange);

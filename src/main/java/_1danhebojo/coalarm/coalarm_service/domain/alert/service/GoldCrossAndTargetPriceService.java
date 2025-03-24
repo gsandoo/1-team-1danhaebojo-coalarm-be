@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertSSERepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.util.FormatUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
@@ -16,13 +17,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GoldCrossAndTargetPriceService {
     private final AlertSSERepositoryImpl alertSSERepositoryImpl;
     private final AlertHistoryRepositoryImpl alertHistoryRepositoryImpl;
-    public GoldCrossAndTargetPriceService(AlertSSERepositoryImpl alertSSERepositoryImpl, AlertHistoryRepositoryImpl alertHistoryRepositoryImpl) {
-        this.alertHistoryRepositoryImpl = alertHistoryRepositoryImpl;
-        this.alertSSERepositoryImpl = alertSSERepositoryImpl;
-    }
 
     // 알람 설정에 도달했는지 체크
     boolean isPriceReached(Alert alert) {
@@ -114,7 +112,7 @@ public class GoldCrossAndTargetPriceService {
     boolean isPriceStillValid(Alert alert) {
         // 1분 뒤에도 가격 유지 여부 확인
         LocalDateTime minutesAgo = LocalDateTime.now().minusMinutes(1);
-        boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUserId(), alert.getAlertId(), minutesAgo);
+        boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUser().getUserId(), alert.getAlertId(), minutesAgo);
 
         // 1분 내 동일한 알람이 있음 → 알람 전송 안함
         return !recentHistory;

@@ -21,7 +21,7 @@ public class AlertResponse {
         this.alertId = alert.getAlertId();
         this.title = alert.getTitle();
         this.coin = new CoinResponse(alert.getCoin());
-        this.userId = alert.getUserId();
+        this.userId = alert.getUser().getUserId();
         this.active = alert.isActive();
         // `is_*` 값 중 `true`인 값을 기준으로 alertType 설정
         if (alert.isGoldenCross()) {

@@ -16,17 +16,18 @@ public interface AlertHistoryJpaRepository extends JpaRepository<AlertHistory, L
     @Query("SELECT ah FROM AlertHistory ah " +
             "JOIN FETCH ah.alert a " +
             "JOIN FETCH a.coin c " + // Coin 정보까지 함께 가져오기
-            "WHERE ah.userId = :userId")
+            "WHERE ah.user.userId = :userId")
     List<AlertHistory> findByUserId(@Param("userId") Long userId);
 
     // 특정 사용자(userId)에게 특정 알람(alertId)이 최근 특정 시간 내에 전송되었는지 확인
-@Query("SELECT CASE WHEN COUNT(ah) > 0 THEN TRUE ELSE FALSE END " +
-        "FROM AlertHistory ah " +
-        "JOIN ah.alert a " +
-        "WHERE a.alertId = :alertId " +
-        "AND ah.userId = :userId " +
-        "AND ah.registeredDate >= :minutesAgo")
-boolean findRecentHistory(@Param("userId") Long userId,
-                            @Param("alertId") Long alertId,
-                            @Param("minutesAgo") LocalDateTime minutesAgo);
+    @Query("SELECT CASE WHEN COUNT(ah) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM AlertHistory ah " +
+            "JOIN ah.alert a " +
+            "WHERE a.alertId = :alertId " +
+            "AND ah.user.userId = :userId " +
+            "AND ah.registeredDate >= :minutesAgo")
+    boolean findRecentHistory(@Param("userId") Long userId,
+                                @Param("alertId") Long alertId,
+                                @Param("minutesAgo") LocalDateTime minutesAgo);
+
 }

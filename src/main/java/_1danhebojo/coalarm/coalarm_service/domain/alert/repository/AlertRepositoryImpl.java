@@ -9,6 +9,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.GoldenCro
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.TargetPriceJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.VolumeSpikeJpaRepository;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class AlertRepositoryImpl {
 
     private final AlertJpaRepository alertJpaRepository;
@@ -31,16 +33,6 @@ public class AlertRepositoryImpl {
 
     @PersistenceContext
     private EntityManager entityManager; // ★ EntityManager 추가
-
-    public AlertRepositoryImpl(AlertJpaRepository alertJpaRepository,
-                               TargetPriceJpaRepository targetPriceJpaRepository,
-                               GoldenCrossJpaRepository goldenCrossJpaRepository,
-                               VolumeSpikeJpaRepository volumeSpikeJpaRepository) {
-        this.alertJpaRepository = alertJpaRepository;
-        this.targetPriceJpaRepository = targetPriceJpaRepository;
-        this.goldenCrossJpaRepository = goldenCrossJpaRepository;
-        this.volumeSpikeJpaRepository = volumeSpikeJpaRepository;
-    }
 
     @Transactional
     public Long saveTargetPriceAlert(TargetPriceAlertRequest request) {
