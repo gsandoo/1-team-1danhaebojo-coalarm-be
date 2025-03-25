@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.19.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.3...v1.19.4) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 병합중 발생한 오류 수정 ([24efc51](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/24efc51db61855eba4a5b4bf750814f64ed3cb5c))
+
 ## [1.19.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.2...v1.19.3) (2025-03-25)
 
 ### 🐛 BUG FIXES
