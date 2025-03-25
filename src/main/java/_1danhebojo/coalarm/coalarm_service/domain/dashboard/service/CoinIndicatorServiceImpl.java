@@ -54,6 +54,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 indicator.getTrend()
         );
         RsiDTO rsiDTO = new RsiDTO(indicator.getRsi());
+        LongShortStrengthDTO longShortStrengthDTO = new LongShortStrengthDTO(indicator.getLongStrength(), BigDecimal.valueOf(1.0).subtract(indicator.getLongStrength()));
 
         // longStrength를 사용하여 롱/숏 비율 계산
         BigDecimal longStrength = indicator.getLongStrength();
@@ -299,7 +300,10 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 .histogram(macdDTO.getHistogram())
                 .trend(macdDTO.getTrend())
                 .rsi(rsiDTO.getValue())
-                .longStrength(longStrength)
+                .longStrength(longShortDTO != null
+                        ? (longShortDTO.getLongRatio().subtract(longShortDTO.getShortRatio()))
+                        .divide(BigDecimal.valueOf(100), 8, BigDecimal.ROUND_HALF_UP)
+                        : null)
                 .build();
 
         coinIndicatorJpaRepository.save(indicatorEntity);
