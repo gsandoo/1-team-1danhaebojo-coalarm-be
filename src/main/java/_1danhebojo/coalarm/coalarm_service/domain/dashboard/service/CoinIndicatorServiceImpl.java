@@ -1,6 +1,5 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
-
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.*;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +54,42 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 indicator.getTrend()
         );
         RsiDTO rsiDTO = new RsiDTO(indicator.getRsi());
-        LongShortStrengthDTO longShortStrengthDTO = new LongShortStrengthDTO(indicator.getLongShortStrength(), BigDecimal.valueOf(1.0).subtract(indicator.getLongShortStrength()));
+
+        // longStrength를 사용하여 롱/숏 비율 계산
+        BigDecimal longStrength = indicator.getLongStrength();
+
+        // longStrength가 null인 경우 기본값 처리
+        if (longStrength == null) {
+            longStrength = BigDecimal.valueOf(0.5);  // 기본값 50:50
+        }
+
+        // longStrength를 0과 1 사이의 값으로 변환 (0.5가 50:50 비율)
+        BigDecimal normalizedStrength;
+
+        if (longStrength.compareTo(BigDecimal.ZERO) < 0) {
+            // 음수인 경우 0.0 ~ 0.5 범위로 변환 (숏 우세)
+            normalizedStrength = BigDecimal.valueOf(0.5).multiply(
+                    BigDecimal.ONE.add(longStrength.abs().min(BigDecimal.ONE))
+            );
+        } else if (longStrength.compareTo(BigDecimal.ZERO) > 0) {
+            // 양수인 경우 0.5 ~ 1.0 범위로 변환 (롱 우세)
+            normalizedStrength = BigDecimal.valueOf(0.5).add(
+                    BigDecimal.valueOf(0.5).multiply(longStrength.min(BigDecimal.ONE))
+            );
+        } else {
+            // 0인 경우 0.5 (50:50)
+            normalizedStrength = BigDecimal.valueOf(0.5);
+        }
+
+        // 롱/숏 비율 계산 (백분율로 표현)
+        BigDecimal longRatio = normalizedStrength.multiply(BigDecimal.valueOf(100));
+        BigDecimal shortRatio = BigDecimal.valueOf(100).subtract(longRatio);
+
+        // 소수점 2자리까지 반올림
+        longRatio = longRatio.setScale(2, RoundingMode.HALF_UP);
+        shortRatio = shortRatio.setScale(2, RoundingMode.HALF_UP);
+
+        LongShortStrengthDTO longShortStrengthDTO = new LongShortStrengthDTO(longRatio, shortRatio);
 
         return new CoinIndicatorResponse(macdDTO, rsiDTO, longShortStrengthDTO, coinDTO);
     }
@@ -175,24 +210,24 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         return new RsiDTO(rsi);
     }
 
-    private LongShortStrengthDTO calculateLongShortStrength(String symbol) {
+    private BigDecimal calculateLongStrength(String symbol) {
         try {
             // 1. 롱/숏 비율 데이터 가져오기
             JsonNode longShortData = getLongShortRatioData(symbol);
             if (longShortData == null || longShortData.isEmpty()) {
                 System.out.println("롱/숏 비율 데이터를 가져오는데 실패했습니다.");
-                return null;
+                return BigDecimal.valueOf(0); // 기본값 0 (롱/숏 비율 1:1)
             }
 
             JsonNode latestLsData = longShortData.get(0);
-            BigDecimal longRatio = BigDecimal.valueOf(latestLsData.get("longAccount").asDouble());
-            BigDecimal shortRatio = BigDecimal.valueOf(latestLsData.get("shortAccount").asDouble());
+            BigDecimal longAccount = BigDecimal.valueOf(latestLsData.get("longAccount").asDouble());
+            BigDecimal shortAccount = BigDecimal.valueOf(latestLsData.get("shortAccount").asDouble());
 
             // 2. 미결제약정 데이터 가져오기
             JsonNode openInterestData = getOpenInterestData(symbol);
             if (openInterestData == null) {
                 System.out.println("미결제약정 데이터를 가져오는데 실패했습니다.");
-                return null;
+                return BigDecimal.valueOf(0);
             }
 
             BigDecimal openInterest = BigDecimal.valueOf(openInterestData.get("openInterest").asDouble());
@@ -201,35 +236,37 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             JsonNode fundingRateData = getFundingRateData(symbol);
             if (fundingRateData == null || fundingRateData.isEmpty()) {
                 System.out.println("펀딩 비율 데이터를 가져오는데 실패했습니다.");
-                return null;
+                return BigDecimal.valueOf(0);
             }
 
             JsonNode latestFrData = fundingRateData.get(0);
             BigDecimal fundingRate = BigDecimal.valueOf(latestFrData.get("fundingRate").asDouble());
 
-            // 4. 공매수/공매도 강도 계산
-            BigDecimal longStrength = longRatio.multiply(openInterest).multiply(BigDecimal.ONE.add(fundingRate));
-            BigDecimal shortStrength = shortRatio.multiply(openInterest).multiply(BigDecimal.ONE.subtract(fundingRate));
+            // 4. 롱 강도와 숏 강도 계산
+            BigDecimal longStrength = longAccount.multiply(openInterest).multiply(BigDecimal.ONE.add(fundingRate));
+            BigDecimal shortStrength = shortAccount.multiply(openInterest).multiply(BigDecimal.ONE.subtract(fundingRate));
 
-            BigDecimal longShortStrength;
-            if (shortStrength.compareTo(BigDecimal.ZERO) == 0) {
-                longShortStrength = BigDecimal.valueOf(1000); // 무한대 대신 큰 값 사용
-            } else {
-                longShortStrength = longStrength.divide(shortStrength, 8, BigDecimal.ROUND_HALF_UP).subtract(BigDecimal.ONE);
+            // 5. 롱/숏 비율 계산 (-1 ~ 1 사이의 값) - -1은 완전 숏, 0은 균형, 1은 완전 롱
+            BigDecimal total = longStrength.add(shortStrength);
+            if (total.compareTo(BigDecimal.ZERO) == 0) {
+                return BigDecimal.ZERO; // 총 강도가 0인 경우 균형을 의미하는 0 반환
             }
 
-            String status = longShortStrength.compareTo(BigDecimal.ZERO) > 0 ? "LONG_DOMINANCE" : "SHORT_DOMINANCE";
+            // 비율을 -1 ~ 1 사이의 값으로 정규화
+            BigDecimal longRatio = longStrength.divide(total, 8, RoundingMode.HALF_UP);
+            BigDecimal shortRatio = shortStrength.divide(total, 8, RoundingMode.HALF_UP);
 
-            LongShortStrengthDTO result = LongShortStrengthDTO.builder()
-                    .longRatio(longRatio.multiply(BigDecimal.valueOf(100))) // 퍼센트로 변환
-                    .shortRatio(shortRatio.multiply(BigDecimal.valueOf(100))) // 퍼센트로 변환
-                    .build();
+            // longRatio - shortRatio 계산 (범위: -1 ~ 1)
+            BigDecimal longStrengthValue = longRatio.multiply(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE);
 
-            return result;
+            // 값이 너무 극단적이지 않도록 제한
+            longStrengthValue = longStrengthValue.max(BigDecimal.valueOf(-1)).min(BigDecimal.valueOf(1));
+
+            return longStrengthValue;
         } catch (Exception e) {
-            System.err.println("공매수/공매도 강도 계산 중 오류 발생: " + e.getMessage());
+            System.err.println("롱 강도 계산 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
-            return null;
+            return BigDecimal.ZERO; // 오류 발생 시 0 반환
         }
     }
 
@@ -251,8 +288,8 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         // 4. RSI 계산
         RsiDTO rsiDTO = calculateRSI(prices, 14);
 
-        // 5. 롱숏 강도 계산
-        LongShortStrengthDTO longShortDTO = calculateLongShortStrength("BTCUSDT");
+        // 5. 롱 강도 계산
+        BigDecimal longStrength = calculateLongStrength("BTCUSDT");
 
         // 6. CoinIndicatorEntity 생성 및 저장
         CoinIndicatorEntity indicatorEntity = CoinIndicatorEntity.builder()
@@ -262,10 +299,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 .histogram(macdDTO.getHistogram())
                 .trend(macdDTO.getTrend())
                 .rsi(rsiDTO.getValue())
-                .longShortStrength(longShortDTO != null
-                        ? (longShortDTO.getLongRatio().subtract(longShortDTO.getShortRatio()))
-                        .divide(BigDecimal.valueOf(100), 8, BigDecimal.ROUND_HALF_UP)
-                        : null)
+                .longStrength(longStrength)
                 .build();
 
         coinIndicatorJpaRepository.save(indicatorEntity);
