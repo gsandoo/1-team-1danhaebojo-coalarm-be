@@ -150,17 +150,16 @@ public class AlertService {
         alert.setGoldenCross(request instanceof GoldenCrossAlertRequest);
         alert.setTargetPrice(request instanceof TargetPriceAlertRequest);
         alert.setVolumeSpike(request instanceof VolumeSpikeAlertRequest);
-        if (request.getCoinId() != null) {
-            Coin coin = new Coin();
-            coin.setCoinId(request.getCoinId());
+        alert.setUserId(request.getUserId());
+
+        // 우선적으로 추가 추후에 변경 필요
+        if (request.getSymbol() != null) {
+            Coin coin = alertRepositoryImpl.findCoinBySymbol(request.getSymbol())
+                    .orElseThrow(() -> new RuntimeException("해당 심볼의 코인이 존재하지 않습니다."));
             alert.setCoin(coin);
         }
-        UserEntity user = UserEntity.builder()
-                .userId(1L)
-                .build();
-
-        alert.setUser(user);
 
         return alert;
     }
+
 }

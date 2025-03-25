@@ -11,6 +11,7 @@ public class VolumeSpikeAlertRequest extends BaseAlertRequest {
     @Null
     private Long marketId;
 
-    @NotNull
+    private Boolean tradingVolumeSoaring;
+  
     private Boolean tradingVolumeSoaring = true;
 }

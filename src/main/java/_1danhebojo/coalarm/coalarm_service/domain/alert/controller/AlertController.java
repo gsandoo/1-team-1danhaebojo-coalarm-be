@@ -38,6 +38,8 @@ public class AlertController {
     // 알람 추가
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse<?>> addAlert(@Valid @RequestBody BaseAlertRequest request) {
+        Long userId = authService.getLoginUserId();
+        request.setUserId(userId);
         log.debug("Received Alert Request: {}", request);
         Long userId = authService.getLoginUserId();
         request.setUserId(userId);
