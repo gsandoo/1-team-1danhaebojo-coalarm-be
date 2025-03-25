@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.Golde
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.TargetPriceAlertRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.VolumeSpikeAlertRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +25,5 @@ public interface AlertRepository {
     List<Alert> findActiveAlertsByUserId(Long userId);
     List<Alert> findAllActiveAlerts();
     Page<Alert> findAllUserAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit);
+    Optional<Coin> findCoinBySymbol(String symbol);
 }
