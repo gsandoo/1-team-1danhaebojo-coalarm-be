@@ -57,4 +57,5 @@ jobs:
 
       - name: 🚀 Deploy to Kubernetes with Git SHA image
         run: |
-          sed "s|__IMAGE_TAG__|$IMAGE_TAG|g" k8s/deployment.yaml | kubectl apply -f -
+          sed "s|__IMAGE_TAG__|$IMAGE_TAG|g" k8s/deployment.yaml | kubectl apply --insecure-skip-tls-verify -f -
+      
