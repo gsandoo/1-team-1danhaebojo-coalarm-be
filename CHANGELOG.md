@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.19.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.1...v1.19.2) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 충돌 해결 ([4021661](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/402166174b0fa18fcd3ad1e3c050e0bebd0b05d2))
+
 ## [1.19.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.0...v1.19.1) (2025-03-25)
 
 ### ♻️ REFACTORING
