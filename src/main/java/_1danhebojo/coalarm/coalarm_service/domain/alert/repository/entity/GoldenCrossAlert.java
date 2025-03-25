@@ -15,10 +15,10 @@ public class GoldenCrossAlert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long goldenCrossId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long shortMa;  // 단기 이동평균선
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long longMa;   // 장기 이동평균선
 
     @JsonIgnore

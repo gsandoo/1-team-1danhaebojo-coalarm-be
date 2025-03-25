@@ -1,6 +1,6 @@
-package _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa;
+package _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa;
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -109,8 +109,8 @@ public class TradingVolumeAlertService {
                 boolean tradingVolume = hasVolumeSpike(symbol);
 
                 if (tradingVolume) {
-                    alertSSEService.sendAlertToUserSSE(volumeSpike.getAlert().getUserId(), volumeSpike.getAlert());
-                    alertSSEService.sendAlertToUserDiscord(volumeSpike.getAlert().getUserId(), volumeSpike.getAlert());
+                    alertSSEService.sendAlertToUserSSE(volumeSpike.getAlert().getUser().getUserId(), volumeSpike.getAlert());
+                    alertSSEService.sendAlertToUserDiscord(volumeSpike.getAlert().getUser().getUserId(), volumeSpike.getAlert());
                     log.info("거래량 급등 알림 전송: " + symbol);
                 }
             }

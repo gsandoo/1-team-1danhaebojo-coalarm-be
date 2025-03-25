@@ -41,6 +41,8 @@ public class AlertController {
         Long userId = authService.getLoginUserId();
         request.setUserId(userId);
         log.debug("Received Alert Request: {}", request);
+        Long userId = authService.getLoginUserId();
+        request.setUserId(userId);
         alertService.addAlert(request);
         return ResponseEntity.ok(BaseResponse.success());
     }
@@ -76,7 +78,9 @@ public class AlertController {
         request.setFilter(filter);
         request.setSort(sort);
 
-        AlertListResponse alertList = alertService.getAllAlerts(request);
+        Long userId = authService.getLoginUserId();
+
+        AlertListResponse alertList = alertService.getAllAlerts(request, userId);
         return ResponseEntity.ok(BaseResponse.success(alertList));
     }
     // </editor-fold>

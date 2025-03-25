@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.global.security;
 
+import _1danhebojo.coalarm.coalarm_service.global.api.RequestLoggingFilter;
 import _1danhebojo.coalarm.coalarm_service.global.properties.CorsProperties;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtVerificationFilter;
@@ -38,8 +39,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 X
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/api/v1/health").permitAll()// 헬스 체크 인증 없이 허용
-                        .requestMatchers("/api/v1/**").authenticated()
+//                        .requestMatchers("/api/v1/health").permitAll()// 헬스 체크 인증 없이 허용
+                        .requestMatchers("/api/v1/**").permitAll()
                 )
                 // OAuth 설정 (기본)
                 .oauth2Login((oauth) -> {
@@ -51,6 +52,10 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint) // 인증 실패 처리
                         .accessDeniedHandler(customAccessDeniedHandler) // 권한 부족(403) 처리
+                )
+                .addFilterBefore(
+                        new RequestLoggingFilter(),
+                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         new JwtVerificationFilter(

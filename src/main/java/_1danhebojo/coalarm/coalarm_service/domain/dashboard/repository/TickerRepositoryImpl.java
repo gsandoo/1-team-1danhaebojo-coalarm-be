@@ -1,7 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository;
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.QCoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.QCoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.QTickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor

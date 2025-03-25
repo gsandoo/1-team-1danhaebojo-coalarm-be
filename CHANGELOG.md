@@ -1,5 +1,95 @@
 # CHANGELOG
 
+## [1.19.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.2...v1.19.0) (2025-03-25)
+
+### 🚀 NEW FEATURES
+
+* 롱숏 비율 계산 방식 longStrength 기반으로 변경 ([8ff0bf2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8ff0bf27ed54076d584a057999259ff5ba6440e1))
+
+## [1.18.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.1...v1.18.2) (2025-03-24)
+
+### ♻️ REFACTORING
+
+* 불필요한 설정 제거 및 updateDiscordWebhook 조건문 추가 ([f6557be](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f6557bef521c4351c4038b74c520f970916bdb74))
+
+## [1.18.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.0...v1.18.1) (2025-03-24)
+
+### ♻️ REFACTORING
+
+* getAlertList와 addAlert 메서드에 userId를 활용 ([e9dc2e0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e9dc2e098a0034af51f3d7d38dbad8f9409c54b0))
+
+## [1.18.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.10...v1.18.0) (2025-03-24)
+
+### 🚀 NEW FEATURES
+
+* 알람 추가 시 userId 필드 포함하도록 구현 ([42b5f6a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/42b5f6a77208a49777088cba83ce69ac94dc1d0e))
+
+### ♻️ REFACTORING
+
+* GoldenCrossRequest에서 사용하지 않는 필드의 @NotNull 어노테이션 제거 ([6852cf9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6852cf99a52b7bfcd45b4c2b53a8e853cad2bf0b))
+* 사용되지 않는 필드의 @NotNull 제거 ([2c355df](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2c355dfadae13583ff9579916206640b59340217))
+* 생성자 관련 어노테이션 추가 및 User 엔티티 매핑 수정 ([e4fa5ff](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e4fa5ff7857ecd9616c15b8dff5b661e9e05b187))
+
+## [1.17.10](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.9...v1.17.10) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* oAuth 2.0 리다이렉트 에러 테스트 ([7b1b6de](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7b1b6dee4d2f0078e6eaf4263902cf3e71d7053d))
+
+## [1.17.9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.8...v1.17.9) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* 401 에러 수정(테스트) ([8fbddbd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8fbddbdc9ee2eb359720cf6fb553c6935563b668))
+
+## [1.17.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.7...v1.17.8) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* 401 에러 수정(테스트) ([b362df4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b362df43e4e4630fd0e6f2ec0c1f9fa04ffa98f4))
+
+## [1.17.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.6...v1.17.7) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* 401 에러 수정 ([6efd755](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6efd755ed9c120e6d4f5eff1bc564525c4556744))
+
+## [1.17.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.5...v1.17.6) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* 401 에러 수정 ([71fad31](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/71fad319deab464d788872c25e17f29a26c7648b))
+
+## [1.17.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.4...v1.17.5) (2025-03-24)
+
+### 🐛 BUG FIXES
+
+* security config 테스트 임시 허용 ([49b1619](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/49b16198778cb78290da88ee85b1b649b4fa8784))
+
+## [1.17.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.3...v1.17.4) (2025-03-24)
+
+### 📚 DOCUMENTATION
+
+* deploy.yml 수정 ([89a7d58](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/89a7d5800a20a80c8c21fa2a808b9d4f3f362a24))
+
+## [1.17.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.2...v1.17.3) (2025-03-24)
+
+### 📚 DOCUMENTATION
+
+* deploy.yml 수정 ([290c4b3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/290c4b3972af9520b528179add19a9d2cca916bc))
+
+## [1.17.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.1...v1.17.2) (2025-03-24)
+
+### 📚 DOCUMENTATION
+
+* deploy.yml 수정 ([e44b513](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e44b51340f678881ebc8889c02ecd5782384cf48))
+
+## [1.17.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.17.0...v1.17.1) (2025-03-24)
+
+### 📚 DOCUMENTATION
+
+* deploy.yml 수정 ([450875d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/450875d8d2b5b3551a4a4613cc6b3002eb8c6098))
+
 ## [1.17.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.16.2...v1.17.0) (2025-03-23)
 
 ### 🚀 NEW FEATURES

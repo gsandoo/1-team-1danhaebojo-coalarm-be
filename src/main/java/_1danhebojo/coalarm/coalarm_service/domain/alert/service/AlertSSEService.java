@@ -13,11 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -47,7 +45,7 @@ public class AlertSSEService {
         activeAlertList.clear(); // 기존 데이터 삭제
         activeAlertList.putAll(
                 activeAlerts.stream()
-                        .collect(Collectors.groupingBy(Alert::getUserId))
+                        .collect(Collectors.groupingBy(alert -> alert.getUser().getUserId()))
         );
     }
 
@@ -105,10 +103,12 @@ public class AlertSSEService {
     // 사용자의 기존 알람을 새로운 Emitter에게 전송
     public void sendUserAlerts(Long userId, SseEmitter emitter) {
         // TargetPrice랑 GoldenCross만 가져오기
-        List<Alert> alerts = activeAlertList.get(userId)
+        List<Alert> alerts = Optional.ofNullable(activeAlertList.get(userId))
+                .orElse(Collections.emptyList()) // null이면 빈 리스트 반환
                 .stream()
-                .filter(alert -> alert.isTargetPrice() || alert.isGoldenCross()) //
+                .filter(alert -> alert.isTargetPrice() || alert.isGoldenCross())
                 .collect(Collectors.toList());
+
         try {
             if(alerts != null) {
                 emitter.send(SseEmitter.event()

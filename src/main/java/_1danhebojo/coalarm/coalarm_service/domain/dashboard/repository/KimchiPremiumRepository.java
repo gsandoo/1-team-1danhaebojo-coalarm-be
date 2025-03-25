@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository;
 
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.KimchiPremiumEntity;
 
 import java.time.LocalDateTime;

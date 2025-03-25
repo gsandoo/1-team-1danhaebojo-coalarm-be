@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.Aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -96,9 +97,9 @@ public class AlertService {
             alert.setActive(active);
             Alert saveAlert = alertRepositoryImpl.save(alert);
             if (active) {
-                alertSSEService.addEmitter(saveAlert.getUserId(), alert);
+                alertSSEService.addEmitter(saveAlert.getUser().getUserId(), alert);
             } else {
-                alertSSEService.deleteEmitter(saveAlert.getUserId(), alert);
+                alertSSEService.deleteEmitter(saveAlert.getUser().getUserId(), alert);
             }
         }
 
@@ -111,12 +112,12 @@ public class AlertService {
         Alert alert = alertRepositoryImpl.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
 
-        alertSSEService.deleteEmitter(alert.getUserId(), alert);
+        alertSSEService.deleteEmitter(alert.getUser().getUserId(), alert);
         alertRepositoryImpl.deleteById(alertId);
     }
 
     // 알람 목록 조회
-    public AlertListResponse getAllAlerts(AlertFilterRequest request) {
+    public AlertListResponse getAllAlerts(AlertFilterRequest request, long userId) {
         // 정렬 방식 설정
         Sort sort = request.getSort().equalsIgnoreCase("LATEST")
                 ? Sort.by(Sort.Direction.DESC, "regDt")
@@ -127,7 +128,7 @@ public class AlertService {
         // `active`가 null이면 전체 조회, 아니면 필터링 적용
         Boolean active = request.getActive();
 
-        Page<Alert> alerts = alertRepositoryImpl.findAlertsByFilter(active, request.getFilter(), pageRequest);
+        Page<Alert> alerts = alertRepositoryImpl.findAlertsByFilter(active, request.getFilter(), pageRequest, userId);
 
         List<AlertResponse> alertResponses = alerts.getContent().stream()
                 .map(AlertResponse::new)
