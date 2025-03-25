@@ -143,7 +143,7 @@ public class AlertService {
 
         // 우선적으로 추가 추후에 변경 필요
         if (request.getSymbol() != null) {
-            Coin coin = alertRepositoryImpl.findCoinBySymbol(request.getSymbol())
+            Coin coin = alertRepository.findCoinBySymbol(request.getSymbol())
                     .orElseThrow(() -> new RuntimeException("해당 심볼의 코인이 존재하지 않습니다."));
             alert.setCoin(coin);
         }
