@@ -40,9 +40,6 @@ public class AlertController {
     public ResponseEntity<BaseResponse<?>> addAlert(@Valid @RequestBody BaseAlertRequest request) {
         Long userId = authService.getLoginUserId();
         request.setUserId(userId);
-        log.debug("Received Alert Request: {}", request);
-        Long userId = authService.getLoginUserId();
-        request.setUserId(userId);
         alertService.addAlert(request);
         return ResponseEntity.ok(BaseResponse.success());
     }

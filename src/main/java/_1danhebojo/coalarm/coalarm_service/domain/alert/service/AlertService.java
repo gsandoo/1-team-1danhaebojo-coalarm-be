@@ -150,7 +150,12 @@ public class AlertService {
         alert.setGoldenCross(request instanceof GoldenCrossAlertRequest);
         alert.setTargetPrice(request instanceof TargetPriceAlertRequest);
         alert.setVolumeSpike(request instanceof VolumeSpikeAlertRequest);
-        alert.setUserId(request.getUserId());
+
+        UserEntity user = UserEntity.builder()
+                .userId(request.getUserId())
+                .build();
+
+        alert.setUser(user);
 
         // 우선적으로 추가 추후에 변경 필요
         if (request.getSymbol() != null) {
