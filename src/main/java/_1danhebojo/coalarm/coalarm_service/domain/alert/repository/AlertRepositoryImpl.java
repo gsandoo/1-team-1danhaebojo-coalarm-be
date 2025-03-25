@@ -125,5 +125,10 @@ public class AlertRepositoryImpl {
     public List<Alert> findAllActiveAlerts() {
         return alertJpaRepository.findAllActiveAlerts();
     }
+
+    // 알람에서 코인 심볼 조회 추가
+    public Optional<Coin> findCoinBySymbol(String symbol) {
+        return alertJpaRepository.findCoinBySymbol(symbol);
+    }
 }
 
