@@ -1,41 +1,37 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
+import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AlertService {
 
-    private final AlertRepositoryImpl alertRepositoryImpl;
+    private final AlertRepository alertRepository;
     @Lazy
     @Autowired
     private final AlertSSEService alertSSEService;
 
     // 알람 추가
-    @Transactional
     public void addAlert(BaseAlertRequest request) {
         Alert alert = convertToAlertEntity(request);
-        Alert savedAlert = alertRepositoryImpl.save(alert);
+        Alert savedAlert = alertRepository.save(alert);
 
-        Optional<Alert> checkAlert = alertRepositoryImpl.findById(alert.getAlertId());
+        Optional<Alert> checkAlert = alertRepository.findById(alert.getAlertId());
         if (checkAlert.isEmpty()) {
             throw new RuntimeException("🚨 flush() 후에도 저장 안 됨!");
         }
@@ -51,7 +47,7 @@ public class AlertService {
                 targetPriceAlert.setIsTargetPrice(true);
                 targetPriceAlert.setAlertId(alertId);
 
-                Long target = alertRepositoryImpl.saveTargetPriceAlert(targetPriceAlert);
+                Long target = alertRepository.saveTargetPriceAlert(targetPriceAlert);
                 if (target == null) {
                     throw new RuntimeException("Target Price Alert 저장 실패");
                 }
@@ -62,7 +58,7 @@ public class AlertService {
                 goldenCrossAlert.setIsGoldenCross(true);
                 goldenCrossAlert.setAlertId(alertId);
 
-                Long goldenCrossId = alertRepositoryImpl.saveGoldenCrossAlert(goldenCrossAlert);
+                Long goldenCrossId = alertRepository.saveGoldenCrossAlert(goldenCrossAlert);
                 if (goldenCrossId == null) {
                     throw new RuntimeException("Golden Cross Alert 저장 실패");
                 }
@@ -73,7 +69,7 @@ public class AlertService {
                 volumeSpikeAlert.setAlertId(alertId);
                 volumeSpikeAlert.setIsTradingVolumeSoaring(true);
 
-                Long volumeSpikeId = alertRepositoryImpl.saveVolumeSpikeAlert(volumeSpikeAlert);
+                Long volumeSpikeId = alertRepository.saveVolumeSpikeAlert(volumeSpikeAlert);
                 if (volumeSpikeId == null) {
                     throw new RuntimeException("Volume Spike Alert 저장 실패");
                 }
@@ -86,15 +82,14 @@ public class AlertService {
     }
 
     // 알람 활성화 수정
-    @Transactional
     public Long updateAlertStatus(Long alertId, boolean active) {
-        Alert alert = alertRepositoryImpl.findById(alertId)
+        Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
         boolean isActive = alert.isActive();
 
         if(active != isActive) {
             alert.setActive(active);
-            Alert saveAlert = alertRepositoryImpl.save(alert);
+            Alert saveAlert = alertRepository.save(alert);
             if (active) {
                 alertSSEService.addEmitter(saveAlert.getUserId(), alert);
             } else {
@@ -106,39 +101,27 @@ public class AlertService {
     }
 
     // 알람 삭제
-    @Transactional
     public void deleteAlert(Long alertId) {
-        Alert alert = alertRepositoryImpl.findById(alertId)
+        Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
 
         alertSSEService.deleteEmitter(alert.getUserId(), alert);
-        alertRepositoryImpl.deleteById(alertId);
+        alertRepository.deleteById(alertId);
     }
 
     // 알람 목록 조회
-    public AlertListResponse getAllAlerts(AlertFilterRequest request) {
-        // 정렬 방식 설정
-        Sort sort = request.getSort().equalsIgnoreCase("LATEST")
-                ? Sort.by(Sort.Direction.DESC, "regDt")
-                : Sort.by(Sort.Direction.ASC, "regDt");
+    @Transactional(readOnly = true)
+    public OffsetResponse<AlertResponse> getMyAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit) {
 
-        PageRequest pageRequest = PageRequest.of(request.getOffset(), request.getLimit(), sort);
+        Page<Alert> alerts = alertRepository.findAllUserAlerts(userId, symbol, active, sort, offset, limit);
 
-        // `active`가 null이면 전체 조회, 아니면 필터링 적용
-        Boolean active = request.getActive();
-
-        Page<Alert> alerts = alertRepositoryImpl.findAlertsByFilter(active, request.getFilter(), pageRequest);
-
-        List<AlertResponse> alertResponses = alerts.getContent().stream()
-                .map(AlertResponse::new)
-                .collect(Collectors.toList());
-
-        return new AlertListResponse(
-                alertResponses,
-                request.getOffset(),
-                request.getLimit(),
-                alerts.getTotalElements(),
-                alerts.hasNext()
+        return OffsetResponse.of(
+                alerts.getContent().stream()
+                        .map(AlertResponse::new)
+                        .toList(),
+                offset,
+                limit,
+                alerts.getTotalElements()
         );
     }
 
