@@ -54,7 +54,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 indicator.getTrend()
         );
         RsiDTO rsiDTO = new RsiDTO(indicator.getRsi());
-        LongShortStrengthDTO longShortStrengthDTO = new LongShortStrengthDTO(indicator.getLongShortStrength(), BigDecimal.valueOf(1.0).subtract(indicator.getLongShortStrength()));
+        LongShortStrengthDTO longShortStrengthDTO = new LongShortStrengthDTO(indicator.getLongStrength(), BigDecimal.valueOf(1.0).subtract(indicator.getLongStrength()));
 
         return new CoinIndicatorResponse(macdDTO, rsiDTO, longShortStrengthDTO, coinDTO);
     }
@@ -262,7 +262,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 .histogram(macdDTO.getHistogram())
                 .trend(macdDTO.getTrend())
                 .rsi(rsiDTO.getValue())
-                .longShortStrength(longShortDTO != null
+                .longStrength(longShortDTO != null
                         ? (longShortDTO.getLongRatio().subtract(longShortDTO.getShortRatio()))
                         .divide(BigDecimal.valueOf(100), 8, BigDecimal.ROUND_HALF_UP)
                         : null)

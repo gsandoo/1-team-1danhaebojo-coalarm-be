@@ -23,8 +23,8 @@ public class CoinIndicatorEntity {
     @JoinColumn(name = "coin_id", nullable = false)
     private CoinEntity coin;
 
-    @Column(name = "long_short_strength", precision = 19, scale = 6)
-    private BigDecimal longShortStrength;
+    @Column(name = "long_strength", precision = 19, scale = 6)
+    private BigDecimal longStrength;
 
     @Column(name = "macd", precision = 19, scale = 6)
     private BigDecimal macd;
@@ -45,10 +45,10 @@ public class CoinIndicatorEntity {
     private LocalDateTime createdAt;
 
     @Builder
-    public CoinIndicatorEntity(CoinEntity coin, BigDecimal longShortStrength, BigDecimal macd,
+    public CoinIndicatorEntity(CoinEntity coin, BigDecimal longStrength, BigDecimal macd,
                                BigDecimal signal, BigDecimal histogram, String trend, BigDecimal rsi) {
         this.coin = coin;
-        this.longShortStrength = longShortStrength;
+        this.longStrength = longStrength;
         this.macd = macd;
         this.signal = signal;
         this.histogram = histogram;
