@@ -8,44 +8,39 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.Aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertHistoryService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertService;
+import _1danhebojo.coalarm.coalarm_service.domain.user.service.AuthService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import jakarta.validation.Valid;
+
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Slf4j
 @RestController
-@RequestMapping("/alerts")
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/alerts")
 public class AlertController {
 
     private final AlertService alertService;
-    private final AlertHistoryService alertHistoryService;
     private final AlertSSEService alertSSEService;
-
-    public AlertController(AlertService alertService, AlertHistoryService alertHistoryService, AlertSSEService alertSSEService) {
-        this.alertService = alertService;
-        this.alertHistoryService = alertHistoryService;
-        this.alertSSEService = alertSSEService;
-    }
+    private final AlertHistoryService alertHistoryService;
+    private final AuthService authService;
 
     // <editor-fold desc="알람 추가/수정/삭제/조회 관련 메서드">
     // 알람 추가
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse<?>> addAlert(@Valid @RequestBody BaseAlertRequest request) {
         log.debug("Received Alert Request: {}", request);
+        Long userId = authService.getLoginUserId();
+        request.setUserId(userId);
         alertService.addAlert(request);
         return ResponseEntity.ok(BaseResponse.success());
     }
@@ -81,7 +76,9 @@ public class AlertController {
         request.setFilter(filter);
         request.setSort(sort);
 
-        AlertListResponse alertList = alertService.getAllAlerts(request);
+        Long userId = authService.getLoginUserId();
+
+        AlertListResponse alertList = alertService.getAllAlerts(request, userId);
         return ResponseEntity.ok(BaseResponse.success(alertList));
     }
     // </editor-fold>
@@ -92,8 +89,7 @@ public class AlertController {
             @RequestParam int offset,
             @RequestParam int limit
     ) {
-        //Long userId = AuthUtil.getCurrentUserId();
-        Long userId = 1L;
+        Long userId = authService.getLoginUserId();
 
         PaginationRequest paginationRequest = new PaginationRequest();
         paginationRequest.setOffset(offset);
@@ -112,12 +108,18 @@ public class AlertController {
 
     @PostMapping("/history/{alert_id}")
     public ResponseEntity<?> addAlertHistory(@PathVariable("alert_id") Long alertId) {
-        //Long userId = AuthUtil.getCurrentUserId();
-        Long userId = 1L;
+        Long userId = authService.getLoginUserId();
 
         alertHistoryService.addAlertHistory(alertId, userId);
         return ResponseEntity.ok(BaseResponse.success());
     }
     // </editor-fold>
 
+    // <editor-fold desc="알람 SSE 관련 메서드">
+    // SSE 구독 (로그인 시 활성화된 알람 전송)
+    @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe(@PathVariable Long userId) {
+        return alertSSEService.subscribe(userId);
+    }
+    // </editor-fold>
 }

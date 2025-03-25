@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
@@ -27,12 +28,31 @@ public class ErrorResponse {
     /**
      * 다양한 예외를 단일 메서드에서 처리하는 예시
      */
+    public static ErrorResponse of(AppHttpStatus appHttpStatus) {
+        return ErrorResponse.builder()
+                .code(appHttpStatus.getHttpStatus().value())
+                .message(appHttpStatus.getMessage())
+                .build();
+    }
+
     public static ErrorResponse of(Throwable t) {
         // ApiException 유형 처리
         if (t instanceof ApiException e) {
             return ErrorResponse.builder()
                     .code(e.getStatus().getHttpStatus().value())
                     .message(e.getStatus().getMessage())
+                    .build();
+        }
+
+        // 요청 파라미터 누락 예외 처리
+        else if (t instanceof MissingServletRequestParameterException e) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put(e.getParameterName(), "필수 요청 파라미터 누락");
+
+            return ErrorResponse.builder()
+                    .code(400)
+                    .message("요청에 필수 파라미터가 없습니다.")
+                    .errors(errors)
                     .build();
         }
 
@@ -61,14 +81,6 @@ public class ErrorResponse {
             return ErrorResponse.builder()
                     .code(404)
                     .message(message)
-                    .build();
-        }
-
-        // 그 밖의 런타임 예외 처리
-        else if (t instanceof RuntimeException e) {
-            return ErrorResponse.builder()
-                    .code(500)
-                    .message(e.getMessage())
                     .build();
         }
 

@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -36,10 +37,8 @@ public class Alert {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coin_id", referencedColumnName = "coin_id")
+    @JsonBackReference
     private Coin coin;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
 
     @Column(name = "reg_dt", nullable = false)
     private LocalDateTime regDt = LocalDateTime.now();
@@ -60,5 +59,9 @@ public class Alert {
     @OneToMany(mappedBy = "alert", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<AlertHistory> alertHistories = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id") // FK 설정
+    private _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity user;
 }
 

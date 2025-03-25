@@ -38,8 +38,10 @@ out/
 .vscode/
 
 ### application.yml ###
-application-*.yml
+src/main/resources/*.yml
 
 /node_modules
 
 gradle/wrapper/gradle-wrapper.jar
+
+*.p12

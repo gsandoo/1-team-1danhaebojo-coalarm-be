@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,6 @@ public class AlertHistoryRepositoryImpl {
     public Page<AlertHistory> findAlertHistoryByFilter(Long userId, Pageable pageable) {
         List<AlertHistory> alertHistories = alertHistoryJpaRepository.findByUserId(userId);
 
-        // PageImpl을 이용해 Pageable 적용
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), alertHistories.size());
 
@@ -41,5 +41,9 @@ public class AlertHistoryRepositoryImpl {
 
     public Optional<AlertHistory> findById(Long alertHistoryId) {
         return alertHistoryJpaRepository.findById(alertHistoryId);
+    }
+
+    public boolean findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo) {
+        return alertHistoryJpaRepository.findRecentHistory(userId, alertId, minutesAgo);
     }
 }

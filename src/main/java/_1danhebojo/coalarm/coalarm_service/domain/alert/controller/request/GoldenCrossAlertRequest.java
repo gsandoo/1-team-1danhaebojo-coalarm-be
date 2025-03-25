@@ -9,14 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GoldenCrossAlertRequest extends BaseAlertRequest {
-    @NotNull
+    @Null
     private Long goldenCrossId;
 
-    @NotNull
     @JsonProperty("short_ma")
     private Long shortMa;
 
-    @NotNull
     @JsonProperty("long_ma")
     private Long longMa;
 }
