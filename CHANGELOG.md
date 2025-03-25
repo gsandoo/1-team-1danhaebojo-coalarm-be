@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.19.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.2...v1.19.0) (2025-03-25)
+
+### 🚀 NEW FEATURES
+
+* 롱숏 비율 계산 방식 longStrength 기반으로 변경 ([8ff0bf2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8ff0bf27ed54076d584a057999259ff5ba6440e1))
+
 ## [1.18.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.1...v1.18.2) (2025-03-24)
 
 ### ♻️ REFACTORING
