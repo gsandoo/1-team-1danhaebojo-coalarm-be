@@ -64,7 +64,7 @@ public class AlertSSEService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 1000) // 1분마다 실행
+    @Scheduled(fixedRate = 1000) // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
         log.debug("Checking alerts for subscribed users1");
         for (Long userId : userEmitters.keySet()) {
@@ -83,7 +83,7 @@ public class AlertSSEService {
         }
     }
 
-    // 맨처음에 SSE 구독 실행 : 활성화 되어있는 알람들 다 보낸다. 사용자가 받든지 말든지...
+    // 로그인한 사용자가 실행
     public SseEmitter subscribe(Long userId) {
         SseEmitter emitter = new SseEmitter(0L);
 
@@ -127,9 +127,6 @@ public class AlertSSEService {
 
     // 사용자의 기존 알람 SSE 전송
     public void sendAlertToUserSSE(Long userId, Alert alert) {
-        userEmitters.computeIfAbsent(userId, k -> new ArrayList<>());
-        activeAlertList.get(userId);
-
         List<SseEmitter> emitters = userEmitters.get(userId);
         if (emitters == null || emitters.isEmpty()) {
             log.info("사용자 " + userId + " 에 대한 SSE 연결이 없습니다.");
@@ -191,7 +188,7 @@ public class AlertSSEService {
         }
     }
 
-    // 새로운 알람 추가 -> 하는 부분은 이미 구현이 되어있고
+    // 새로운 알람 추가
     // 알림을 추가했을 때 SseEmitter에 추가하는 부분이 필요
     public void addEmitter(Long userId, Alert alert) {
         SseEmitter emitter = new SseEmitter(0L);
