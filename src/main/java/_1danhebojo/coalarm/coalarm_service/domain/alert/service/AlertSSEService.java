@@ -156,6 +156,7 @@ public class AlertSSEService {
         if(alert == null) {
             return;
         }
+
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("👤 사용자 닉네임: ").append(alert.getUser().getNickname()).append("\n");
         messageBuilder.append("📢(코인) ").append(alert.getCoin().getName());
@@ -164,13 +165,16 @@ public class AlertSSEService {
             discordService.sendDiscordAlert(alert.getUser().getDiscordWebhook(), messageBuilder.toString());
         }
     }
+
     public void sendAlertListToUserDiscord(Long userId, List<Alert> alerts) {
         StringBuilder messageBuilder = new StringBuilder();
 
         if (alerts.isEmpty()) {
             return;
         }
-
+        if (alerts.get(0).getUser() == null) {
+            return;
+        }
         String nickname = alerts.get(0).getUser().getNickname();
         messageBuilder.append("👤 사용자 닉네임: ").append(alerts.get(0).getUser().getNickname()).append("\n");
 
