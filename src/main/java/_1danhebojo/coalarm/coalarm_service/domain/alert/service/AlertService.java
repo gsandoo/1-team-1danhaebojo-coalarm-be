@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.Aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -91,9 +92,9 @@ public class AlertService {
             alert.setActive(active);
             Alert saveAlert = alertRepository.save(alert);
             if (active) {
-                alertSSEService.addEmitter(saveAlert.getUserId(), alert);
+                alertSSEService.addEmitter(saveAlert.getUser().getUserId(), alert);
             } else {
-                alertSSEService.deleteEmitter(saveAlert.getUserId(), alert);
+                alertSSEService.deleteEmitter(saveAlert.getUser().getUserId(), alert);
             }
         }
 
@@ -105,13 +106,14 @@ public class AlertService {
         Alert alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
 
-        alertSSEService.deleteEmitter(alert.getUserId(), alert);
+        alertSSEService.deleteEmitter(alert.getUser().getUserId(), alert);
         alertRepository.deleteById(alertId);
     }
 
     // 알람 목록 조회
     @Transactional(readOnly = true)
     public OffsetResponse<AlertResponse> getMyAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit) {
+
 
         Page<Alert> alerts = alertRepository.findAllUserAlerts(userId, symbol, active, sort, offset, limit);
 
@@ -137,7 +139,12 @@ public class AlertService {
             coin.setCoinId(request.getCoinId());
             alert.setCoin(coin);
         }
-        alert.setUserId(request.getUserId());
+        UserEntity user = UserEntity.builder()
+                .userId(1L)
+                .build();
+
+        alert.setUser(user);
+
         return alert;
     }
 }

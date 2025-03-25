@@ -9,6 +9,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistory;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,10 +67,13 @@ public class AlertHistoryService {
 
         Alert alert = new Alert();
         alert.setAlertId(alertId);
-        alert.setUserId(userId);
 
+        UserEntity user = UserEntity.builder()
+                .userId(userId)
+                .build();
+
+        alertHistory.setUser(user);
         alertHistory.setAlert(alert);
-        alertHistory.setUserId(userId);
         alertHistory.setRegisteredDate(LocalDateTime.now());
 
         alertHistoryRepository.save(alertHistory);
