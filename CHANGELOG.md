@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.19.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.2...v1.19.3) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 알람 Emitter 로직 수정 ([55bc4d1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/55bc4d1a2219d89d0f2e1c08e4a19108cc2724bc))
+
 ## [1.19.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.1...v1.19.2) (2025-03-25)
 
 ### 🐛 BUG FIXES
