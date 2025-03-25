@@ -1,16 +1,14 @@
-FROM openjdk:17-jdk-slim
+# 베이스 이미지
+FROM openjdk:17-jdk-alpine
 
-# AWS CLI 설치에 필요한 패키지 추가
-RUN apt-get update && apt-get install -y curl unzip awscli
-
-# 환경 변수 설정
-ENV SPRING_PROFILES_ACTIVE=dev
-
+# 컨테이너 내 작업 디렉토리 설정
 WORKDIR /app
 
-# 실행할 사용자 생성 (보안 강화)
-RUN useradd -m appuser
-USER appuser
+# JAR 파일을 컨테이너의 /app 디렉토리에 복사
+COPY ./build/libs/coalarm-service.jar .
 
-# S3에서 JAR 다운로드 및 실행
-CMD sh -c 'while ! aws s3 cp s3://$AWS_S3_DEV_BUCKET_NAME/app.jar /app/app.jar; do echo "Retrying S3 download..."; sleep 5; done && java -Dspring.profiles.active=dev -jar /app/app.jar'
+# 애플리케이션 실행
+ENTRYPOINT ["java", "-jar", "coalarm-service.jar"]
+
+# 포트 노출
+EXPOSE 8080
