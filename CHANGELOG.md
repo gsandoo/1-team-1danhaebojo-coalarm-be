@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## [1.19.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.1...v1.19.2) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 충돌 해결 ([4021661](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/402166174b0fa18fcd3ad1e3c050e0bebd0b05d2))
+
+## [1.19.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.0...v1.19.1) (2025-03-25)
+
+### ♻️ REFACTORING
+
+* goldenCross, VolumeSpike에서 필수값 제거 ([1b2593d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/1b2593dd12514c3513a5e8fa16f330a13e52008f))
+* user 정보 조회 추가 ([21e997e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/21e997ef1361c0a4ed9425afe4418ca1ef24da36))
+* volumeSpike user 정보 조회 추가 ([dbf17b4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/dbf17b43e3cd1b0503c6b9bff539f25ed0d38839))
+* 알람 추가시 userId 추가 ([41d2368](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/41d2368910a5d49eec9594d54fa0745773066421))
+* 코인 심볼 추가 ([f9bdeb8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f9bdeb83127dd6173f7df571aa34f335e2d13938))
+
+## [1.19.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.2...v1.19.0) (2025-03-25)
+
+### 🚀 NEW FEATURES
+
+* 롱숏 비율 계산 방식 longStrength 기반으로 변경 ([8ff0bf2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8ff0bf27ed54076d584a057999259ff5ba6440e1))
+
 ## [1.18.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.1...v1.18.2) (2025-03-24)
 
 ### ♻️ REFACTORING

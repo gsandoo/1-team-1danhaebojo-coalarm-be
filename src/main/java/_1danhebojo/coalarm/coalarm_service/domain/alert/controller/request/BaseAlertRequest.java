@@ -35,6 +35,9 @@ public abstract class BaseAlertRequest {
     @JsonProperty("coin_id")
     private Long coinId; // 코인 ID
 
+    @JsonProperty("symbol")
+    private String symbol; // 코인 심볼
+
     @JsonProperty("user_id") // 중복 문제 해결
     private Long userId; // 유저 ID
 }

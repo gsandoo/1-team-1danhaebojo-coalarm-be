@@ -167,5 +167,9 @@ public class AlertRepositoryImpl implements AlertRepository {
         return StringUtils.hasText(symbol) ? alert.coin.symbol.eq(symbol) : null;
     }
 
+    // 알람에서 코인 심볼 조회 추가
+    public Optional<Coin> findCoinBySymbol(String symbol) {
+        return alertJpaRepository.findCoinBySymbol(symbol);
+    }
 }
 
