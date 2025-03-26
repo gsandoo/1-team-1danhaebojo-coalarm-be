@@ -57,7 +57,7 @@ public class AlertSSEService {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, // 사용자 ID 유지 (key)
                         entry -> entry.getValue().stream() // value(알람 리스트) 필터링
-                                .filter(alert -> alert.isTargetPrice() || alert.isGoldenCross())
+                                .filter(alert -> alert.isTargetPriceFlag() || alert.isGoldenCrossFlag())
                                 .collect(Collectors.toList())
                 ));
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
@@ -66,9 +66,7 @@ public class AlertSSEService {
     @Transactional
     @Scheduled(fixedRate = 1000) // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
-        log.debug("Checking alerts for subscribed users1");
         for (Long userId : userEmitters.keySet()) {
-            log.debug("Checking alerts for subscribed users2");
             List<Alert> activeAlerts = activeAlertList.get(userId);
 
             // 유효성 추가
@@ -106,7 +104,7 @@ public class AlertSSEService {
         List<Alert> alerts = Optional.ofNullable(activeAlertList.get(userId))
                 .orElse(Collections.emptyList()) // null이면 빈 리스트 반환
                 .stream()
-                .filter(alert -> alert.isTargetPrice() || alert.isGoldenCross())
+                .filter(alert -> alert.isTargetPriceFlag() || alert.isGoldenCrossFlag())
                 .collect(Collectors.toList());
 
         try {
@@ -163,6 +161,7 @@ public class AlertSSEService {
         }
     }
 
+    // 사용자의 알람 스케줄러 discord 전송
     public void sendAlertListToUserDiscord(Long userId, List<Alert> alerts) {
         StringBuilder messageBuilder = new StringBuilder();
 
@@ -201,6 +200,24 @@ public class AlertSSEService {
 
         log.info("📢 사용자 " + userId + " 에 대한 새로운 SSE 구독 추가됨. 활성화된 알람 개수: " + activeAlertList.get(userId).size());
     }
+
+    // 사용자가 설정한 알람 중 같은 코인에 같은 타입의 알람이 존재하는지
+    public boolean isAlertSetForSymbolAndType(Long userId, String symbol, String alertType) {
+        List<Alert> alerts = activeAlertList.get(userId);
+        if (alerts == null) {
+            return false;
+        }
+
+        return alerts.stream().anyMatch(alert ->
+                symbol.equalsIgnoreCase(alert.getCoin().getSymbol()) &&
+                        (
+                                ("GOLDEN_CROSS".equalsIgnoreCase(alertType) && alert.isGoldenCrossFlag()) ||
+                                        ("TARGET_PRICE".equalsIgnoreCase(alertType) && alert.isTargetPriceFlag()) ||
+                                        ("VOLUME_SPIKE".equalsIgnoreCase(alertType) && alert.isVolumeSpikeFlag())
+                        )
+        );
+    }
+
 
     // SEE 알람 수정
     public void updateEmitter(Long userId, Alert alert) {
