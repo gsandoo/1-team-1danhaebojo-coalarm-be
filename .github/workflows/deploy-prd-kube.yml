@@ -21,6 +21,9 @@ jobs:
       - name: ✅ Checkout source code
         uses: actions/checkout@v3
 
+      - name: 📁 Ensure resources directory exists
+        run: mkdir -p src/main/resources
+
       - name: 📄 Restore application-prd.yml from secret
         run: |
           echo '${{ secrets.APP_PRD_YML }}' > src/main/resources/application-prd.yml
