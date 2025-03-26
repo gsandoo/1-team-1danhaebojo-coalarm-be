@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [1.21.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.20.0...v1.21.0) (2025-03-26)
+
+### 🚀 NEW FEATURES
+
+* 김치 프리미엄 리팩토링 ([fa7c73b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/fa7c73bf072044a0c18b19137da1972d3e85d8f5))
+
+### 🐛 BUG FIXES
+
+* sse 컨트롤러 수정 & SSE연결 ([766f530](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/766f5301fcf9d2e660f163bfb0b28adca5bef810))
+
 ## [1.20.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.6...v1.20.0) (2025-03-26)
 
 ### 🚀 NEW FEATURES
