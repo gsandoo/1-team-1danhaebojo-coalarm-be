@@ -2,6 +2,7 @@ package _1danhebojo.coalarm.coalarm_service.global.oauth;
 
 import java.io.IOException;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.global.properties.JwtProperties;
 import _1danhebojo.coalarm.coalarm_service.global.properties.OAuthProperties;
 import _1danhebojo.coalarm.coalarm_service.global.jwt.JwtRepositoryImpl;
@@ -28,12 +29,15 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 	private final JwtRepositoryImpl jwtRepositoryImpl;
 	private final JwtProperties jwtProperties;
 	private final OAuthProperties oAuthProperties;
+    private final AlertSSEService alertSSEService;
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) throws IOException, ServletException {
 		CoalarmOAuth2User oAuthUser = (CoalarmOAuth2User) authentication.getPrincipal();
         log.info("카카오 ID : {} 인증 성공, 액세스 토큰 발급... ", oAuthUser.getKakaoId());
 
+        alertSSEService.subscribe(oAuthUser.getId());
+        
         Token token = jwtRepositoryImpl.generateTokenDto(oAuthUser.getId(), oAuthUser.getKakaoId());
 
         response.addHeader(COOKIE_HEADER, createCookie(AUTHORIZATION_HEADER, BEARER_PREFIX + token.getAccessToken()));
