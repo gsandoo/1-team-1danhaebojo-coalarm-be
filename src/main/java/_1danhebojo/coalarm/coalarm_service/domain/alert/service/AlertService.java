@@ -3,7 +3,7 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -30,6 +29,13 @@ public class AlertService {
     // 알람 추가
     public void addAlert(BaseAlertRequest request) {
         Alert alert = convertToAlertEntity(request);
+
+        // 해당 알람의 코인을 등록한 적이 있는지 체크
+//        if(alertSSEService.isAlertSetForSymbolAndType(request.getUserId(), request.getSymbol(), request.getType()))
+//        {
+//            throw new RuntimeException("🚨 이미 등록된 알람 있음!");
+//        }
+
         Alert savedAlert = alertRepository.save(alert);
 
         Optional<Alert> checkAlert = alertRepository.findById(alert.getAlertId());
@@ -44,10 +50,15 @@ public class AlertService {
 
         switch (request.getType()) {
             case "TARGET_PRICE":
-                TargetPriceAlertRequest targetPriceAlert = (TargetPriceAlertRequest) request;
-                targetPriceAlert.setIsTargetPrice(true);
-                targetPriceAlert.setAlertId(alertId);
+                TargetPriceAlert targetPriceAlert = new TargetPriceAlert();
+                targetPriceAlert.setPrice(((TargetPriceAlertRequest) request).getPrice());
+                targetPriceAlert.setPercentage(((TargetPriceAlertRequest) request).getPercentage());
 
+                Alert tartgetAlert = new Alert();
+                tartgetAlert.setAlertId(alertId);
+                targetPriceAlert.setAlert(tartgetAlert);
+
+                savedAlert.setTargetPrice(targetPriceAlert);
                 Long target = alertRepository.saveTargetPriceAlert(targetPriceAlert);
                 if (target == null) {
                     throw new RuntimeException("Target Price Alert 저장 실패");
@@ -55,9 +66,11 @@ public class AlertService {
                 break;
 
             case "GOLDEN_CROSS":
-                GoldenCrossAlertRequest goldenCrossAlert = (GoldenCrossAlertRequest) request;
-                goldenCrossAlert.setIsGoldenCross(true);
-                goldenCrossAlert.setAlertId(alertId);
+                GoldenCrossAlert goldenCrossAlert = new GoldenCrossAlert();
+
+                Alert goldenAlert = new Alert();
+                goldenAlert.setAlertId(alertId);
+                goldenCrossAlert.setAlert(goldenAlert);
 
                 Long goldenCrossId = alertRepository.saveGoldenCrossAlert(goldenCrossAlert);
                 if (goldenCrossId == null) {
@@ -66,9 +79,12 @@ public class AlertService {
                 break;
 
             case "VOLUME_SPIKE":
-                VolumeSpikeAlertRequest volumeSpikeAlert = (VolumeSpikeAlertRequest) request;
-                volumeSpikeAlert.setAlertId(alertId);
-                volumeSpikeAlert.setIsTradingVolumeSoaring(true);
+                VolumeSpikeAlert volumeSpikeAlert = new VolumeSpikeAlert();
+                volumeSpikeAlert.setTradingVolumeSoaring(((VolumeSpikeAlertRequest) request).getTradingVolumeSoaring());
+
+                Alert volumeAlert = new Alert();
+                volumeAlert.setAlertId(alertId);
+                volumeSpikeAlert.setAlert(volumeAlert);
 
                 Long volumeSpikeId = alertRepository.saveVolumeSpikeAlert(volumeSpikeAlert);
                 if (volumeSpikeId == null) {
@@ -131,9 +147,33 @@ public class AlertService {
         Alert alert = new Alert();
         alert.setActive(request.getActive());
         alert.setTitle(request.getTitle());
-        alert.setGoldenCross(request instanceof GoldenCrossAlertRequest);
-        alert.setTargetPrice(request instanceof TargetPriceAlertRequest);
-        alert.setVolumeSpike(request instanceof VolumeSpikeAlertRequest);
+
+        if (request instanceof GoldenCrossAlertRequest goldenCrossRequest) {
+            GoldenCrossAlert goldenCrossAlert = new GoldenCrossAlert();
+            goldenCrossAlert.setAlert(alert); // 양방향 관계 연결
+
+            alert.setGoldenCross(goldenCrossAlert);
+            alert.setGoldenCrossFlag(true);
+        }
+
+        if (request instanceof TargetPriceAlertRequest targetPriceRequest) {
+            TargetPriceAlert targetPriceAlert = new TargetPriceAlert();
+            targetPriceAlert.setAlert(alert);
+            targetPriceAlert.setPrice(((TargetPriceAlertRequest) request).getPrice()); // 필드 세팅
+            targetPriceAlert.setPercentage(((TargetPriceAlertRequest) request).getPercentage());
+
+            alert.setTargetPrice(targetPriceAlert);
+            alert.setTargetPriceFlag(true);
+        }
+
+        if (request instanceof VolumeSpikeAlertRequest volumeSpikeAlertRequest) {
+            VolumeSpikeAlert volumeSpikeAlert = new VolumeSpikeAlert();
+            volumeSpikeAlert.setAlert(alert);
+            volumeSpikeAlert.setTradingVolumeSoaring(volumeSpikeAlertRequest.getTradingVolumeSoaring());
+
+            alert.setVolumeSpike(volumeSpikeAlert);
+            alert.setVolumeSpikeFlag(true);
+        }
 
         UserEntity user = UserEntity.builder()
                 .userId(request.getUserId())
