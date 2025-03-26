@@ -83,7 +83,10 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     public Alert save(Alert alert) {
         Alert savedAlert = alertJpaRepository.save(alert);
-        entityManager.flush();  // ★ 즉시 DB 반영하여 ID 생성
+
+        entityManager.flush();
+        entityManager.refresh(alert);
+
         return savedAlert;
     }
 
