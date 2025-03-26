@@ -120,5 +120,10 @@ public class AlertController {
         Long userId =  authService.getLoginUserId();
         return alertSSEService.subscribe(userId);
     }
+
+    @GetMapping(value = "/subscribeTest/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeTest(@PathVariable Long userId) {
+        return alertSSEService.subscribe(userId);
+    }
     // </editor-fold>
 }

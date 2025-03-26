@@ -25,12 +25,12 @@ public class GoldCrossAndTargetPriceService {
     // 알람 설정에 도달했는지 체크
     boolean isPriceReached(Alert alert) {
         // 가격 지정가 알람 확인
-        if (alert.isTargetPrice()) {
+        if (alert.isTargetPriceFlag()) {
             return checkTargetPrice(alert);
         }
 
         // 골든 크로스 알람 확인
-        else if (alert.isGoldenCross()) {
+        else if (alert.isGoldenCrossFlag()) {
             return checkGoldenCross(alert);
         }
 

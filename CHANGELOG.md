@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## [1.20.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.6...v1.20.0) (2025-03-26)
+
+### 🚀 NEW FEATURES
+
+* 알람 테스트 URL 추가 ([9852d47](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9852d47061901b7a10c1ae8f0ac5c972269dbbd6))
+
+### 🐛 BUG FIXES
+
+* 객체 맵핑 변경 ([db1731b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/db1731b8915a26fc127ddde904b140c3aa45ffff))
+* 이름 충돌로 인한 변수명 수정 ([2df809a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2df809a4be032f880603692e8c1b8f849c754763))
+
+## [1.19.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.5...v1.19.6) (2025-03-26)
+
+### 📚 DOCUMENTATION
+
+* 개발환경 deploy.yml 명칭 수정-2 ([55e3a80](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/55e3a80d07b7b00f235d4c0da65530fa3999426b))
+
+## [1.19.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.4...v1.19.5) (2025-03-26)
+
+### 📚 DOCUMENTATION
+
+* 개발환경 deploy.yml 명칭 수정 ([3240eae](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3240eaef90b54e5a407a40fba5b416d0e837e884))
+
 ## [1.19.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.3...v1.19.4) (2025-03-25)
 
 ### 🐛 BUG FIXES
