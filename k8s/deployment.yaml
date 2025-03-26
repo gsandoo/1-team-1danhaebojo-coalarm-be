@@ -28,4 +28,7 @@ spec:
                 name: aws-secret
             - secretRef:
                 name: jwt-secret
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prd
       restartPolicy: Always
