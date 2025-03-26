@@ -21,7 +21,7 @@ public interface VolumeSpikeJpaRepository extends JpaRepository<VolumeSpikeAlert
             "    FROM VolumeSpikeAlert t" +
             "    JOIN FETCH t.alert a" +
             "    JOIN FETCH a.coin c" +
-            "    WHERE a.isVolumeSpike = true AND a.alertId = :alertId")
+            "    WHERE a.isVolumeSpikeFlag = true AND a.alertId = :alertId")
     Optional<VolumeSpikeAlert> findVolumeSpikeAlertByAlertId(Long alertId);
 
     @Query("    SELECT t" +
@@ -29,6 +29,6 @@ public interface VolumeSpikeJpaRepository extends JpaRepository<VolumeSpikeAlert
             "    JOIN FETCH t.alert a" +
             "    JOIN FETCH a.user u " +
             "    JOIN FETCH a.coin c" +
-            "    WHERE a.isVolumeSpike = true")
+            "    WHERE a.isVolumeSpikeFlag = true")
     List<VolumeSpikeAlert> findAllVolumeSpikeAlertByStatus();
 }

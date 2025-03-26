@@ -22,6 +22,6 @@ public interface TargetPriceJpaRepository extends JpaRepository<TargetPriceAlert
             "    JOIN FETCH t.alert a" +
             "    JOIN FETCH a.user u " +
             "    JOIN FETCH a.coin c" +
-            "    WHERE a.isTargetPrice = true AND a.alertId = :alertId")
+            "    WHERE a.isTargetPriceFlag = true AND a.alertId = :alertId")
     Optional<TargetPriceAlert> findTargetPriceAlertsByAlertId(Long alertId);
 }

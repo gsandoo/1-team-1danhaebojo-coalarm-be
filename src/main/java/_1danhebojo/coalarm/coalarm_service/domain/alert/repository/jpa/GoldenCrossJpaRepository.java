@@ -21,6 +21,6 @@ public interface GoldenCrossJpaRepository extends JpaRepository<GoldenCrossAlert
             "    JOIN FETCH t.alert a" +
 //            "    JOIN FETCH a.user u " +
             "    JOIN FETCH a.coin c" +
-            "    WHERE a.isGoldenCross = true AND a.alertId = :alertId")
+            "    WHERE a.isGoldenCrossFlag = true AND a.alertId = :alertId")
     Optional<GoldenCrossAlert> findGoldenCrossAlertsByAlertId(Long alertId);
 }
