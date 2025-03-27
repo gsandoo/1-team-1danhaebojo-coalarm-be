@@ -39,8 +39,8 @@ public class AlertController {
     public ResponseEntity<BaseResponse<?>> addAlert(@Valid @RequestBody BaseAlertRequest request) {
         Long userId = authService.getLoginUserId();
         request.setUserId(userId);
-        alertService.addAlert(request);
-        return ResponseEntity.ok(BaseResponse.success());
+        AlertResponse result = alertService.addAlert(request);
+        return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     // 알람 활성화 수정
