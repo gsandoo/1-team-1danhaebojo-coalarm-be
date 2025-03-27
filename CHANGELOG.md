@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.22.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.3...v1.22.0) (2025-03-27)
+
+### 🚀 NEW FEATURES
+
+* 여러 코인 검색이 가능하도록 API 수정하고 에러 처리 추가 ([ed1fa42](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ed1fa42107e50b75eb3d950091fcaf09246d8e23))
+
 ## [1.21.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.2...v1.21.3) (2025-03-27)
 
 ### 🐛 BUG FIXES
