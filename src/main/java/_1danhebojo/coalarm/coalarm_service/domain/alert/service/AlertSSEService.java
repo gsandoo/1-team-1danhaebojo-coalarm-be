@@ -29,6 +29,8 @@ public class AlertSSEService {
     private final Map<Long, List<Alert>> activeAlertList = new ConcurrentHashMap<>();
     private final DiscordService discordService;
 
+    private final Map<Long, Queue<Alert>> userAlertQueue = new ConcurrentHashMap<>();
+
     @Lazy
     @Autowired
     private GoldCrossAndTargetPriceService goldCrossAndTargetPriceService;
@@ -48,6 +50,40 @@ public class AlertSSEService {
                 activeAlerts.stream()
                         .collect(Collectors.groupingBy(alert -> alert.getUser().getUserId()))
         );
+    }
+
+    // 중간중간 전체 알람 상태 재로딩
+    @Scheduled(fixedRate = 180000) // 3분마다 실행
+    public void refreshActiveAlerts() {
+        log.info("전체 알람 상태 재로딩 시작");
+        getActiveAlertsGroupedByUser();
+    }
+
+    // SSE 연결 유지를 위한 heartbeat 이벤트 주기적 전송 추가
+    @Scheduled(fixedRate = 15000) // 15초마다 실행
+    public void sendHeartbeatToClients() {
+        for (Map.Entry<Long, List<SseEmitter>> entry : userEmitters.entrySet()) {
+            Long userId = entry.getKey();
+            List<SseEmitter> emitters = entry.getValue();
+
+            List<SseEmitter> deadEmitters = new ArrayList<>();
+
+            for (SseEmitter emitter : emitters) {
+                try {
+                    emitter.send(SseEmitter.event()
+                            .name("heartbeat")
+                            .data("keep-alive")); // 클라이언트에선 로그로만 찍어도 OK
+                } catch (IOException e) {
+                    deadEmitters.add(emitter);
+                    log.warn("heartbeat 전송 실패 - userId: " + userId);
+                }
+            }
+
+            emitters.removeAll(deadEmitters);
+            if (emitters.isEmpty()) {
+                userEmitters.remove(userId);
+            }
+        }
     }
 
     @Transactional
