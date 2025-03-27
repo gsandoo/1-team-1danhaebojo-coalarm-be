@@ -34,7 +34,7 @@ public class AlertService {
     private final UserRepository userRepository;
 
     // 알람 추가
-    public void addAlert(BaseAlertRequest request) {
+    public AlertResponse addAlert(BaseAlertRequest request) {
         // 해당 알람의 코인을 등록한 적이 있는지 체크
         boolean checkAlerts = alertRepository.findAlertsByUserIdAndSymbolAndAlertType(request.getUserId(), request.getSymbol(), request.getType());
         if (checkAlerts) {
@@ -55,11 +55,13 @@ public class AlertService {
         }
 
         alertSSEService.addEmitter(request.getUserId(), alert);
+
+        return new AlertResponse(alert);
     }
 
     // 알람 활성화 수정
     public Long updateAlertStatus(Long alertId, boolean active) {
-        Alert alert = alertRepository.findById(alertId)
+        Alert alert = alertRepository.findByIdWithCoin(alertId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
         boolean isActive = alert.isActive();
 

@@ -61,4 +61,7 @@ public interface AlertJpaRepository extends JpaRepository<Alert, Long> {
             "      AND ((:alertType = 'GOLDEN_CROSS' AND a.isGoldenCrossFlag = true) " +
             "        OR (:alertType = 'VOLUME_SPIKE' AND a.isVolumeSpikeFlag = true))")
     boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
+
+    @Query("SELECT a FROM Alert a JOIN FETCH a.coin WHERE a.alertId = :alertId")
+    Optional<Alert> findByIdWithCoin(Long alertId);
 }
