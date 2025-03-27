@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "oauth.kakao")
+@ConfigurationProperties(prefix = "spring.security.oauth2.web")
 public class KakaoProperties {
     private String clientId;
     private String clientSecret;
