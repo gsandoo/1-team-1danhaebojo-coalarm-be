@@ -93,9 +93,22 @@ public class CoinServiceImpl implements CoinService {
 
     @Override
     @Transactional(readOnly = true)
-    public CoinDTO searchCoinByNameOrSymbol(String term) {
-        CoinEntity coin = coinJpaRepository.findByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(term, term)
-                .orElseThrow(() -> new EntityNotFoundException("검색어와 일치하는 코인을 찾을 수 없습니다: " + term));
-        return new CoinDTO(coin);
+    public List<CoinDTO> searchCoinByNameOrSymbol(String term) {
+        if (term == null || term.trim().isEmpty()) {
+            throw new ApiException(AppHttpStatus.EMPTY_SEARCH_TERM);
+        }
+
+        // 검색 수행
+        List<CoinEntity> coins = coinJpaRepository.findByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(term, term);
+
+        // 검색 결과가 없는 경우 처리
+        if (coins.isEmpty()) {
+            throw new ApiException(AppHttpStatus.NO_SEARCH_RESULTS);
+        }
+
+        // 엔티티 목록을 DTO 목록으로 변환
+        return coins.stream()
+                .map(CoinDTO::new)
+                .collect(Collectors.toList());
     }
 }
