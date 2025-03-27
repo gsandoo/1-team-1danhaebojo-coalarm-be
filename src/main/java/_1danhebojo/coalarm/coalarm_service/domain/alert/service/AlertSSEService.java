@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +31,6 @@ public class AlertSSEService {
     private final DiscordService discordService;
 
     private final Map<Long, Queue<Alert>> userAlertQueue = new ConcurrentHashMap<>();
-
     @Lazy
     @Autowired
     private GoldCrossAndTargetPriceService goldCrossAndTargetPriceService;
@@ -38,6 +38,19 @@ public class AlertSSEService {
     @PostConstruct
     public void init() {
         getActiveAlertsGroupedByUser();
+    }
+
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendQueueInterval}")
+    public void sendAlertsSequentially() {
+        for (Map.Entry<Long, Queue<Alert>> entry : userAlertQueue.entrySet()) {
+            Long userId = entry.getKey();
+            Queue<Alert> queue = entry.getValue();
+
+            if (!queue.isEmpty()) {
+                Alert alert = queue.poll(); // 하나 꺼내기
+                sendAlertToUserSSE(userId, alert); // 기존 로직 사용
+            }
+        }
     }
 
     // 전체 활성화된 사용자의 알람 저장
@@ -53,14 +66,14 @@ public class AlertSSEService {
     }
 
     // 중간중간 전체 알람 상태 재로딩
-    @Scheduled(fixedRate = 180000) // 3분마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.refreshActive}") // 3분마다 실행
     public void refreshActiveAlerts() {
         log.info("전체 알람 상태 재로딩 시작");
         getActiveAlertsGroupedByUser();
     }
 
     // SSE 연결 유지를 위한 heartbeat 이벤트 주기적 전송 추가
-    @Scheduled(fixedRate = 15000) // 15초마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendHeartClient}") // 15초마다 실행
     public void sendHeartbeatToClients() {
         for (Map.Entry<Long, List<SseEmitter>> entry : userEmitters.entrySet()) {
             Long userId = entry.getKey();
@@ -87,7 +100,7 @@ public class AlertSSEService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendDiscordInterval}") // 1분마다 실행
     public void discordScheduler() {
         Map<Long, List<Alert>> filteredAlerts = activeAlertList.entrySet()
                 .stream()
@@ -100,7 +113,7 @@ public class AlertSSEService {
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
 
-    @Scheduled(fixedRate = 1000) // 1초마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
             List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
@@ -111,7 +124,7 @@ public class AlertSSEService {
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
                 if (goldCrossAndTargetPriceService.isPriceReached(alert) && goldCrossAndTargetPriceService.isPriceStillValid(alert)) {
-                    sendAlertToUserSSE(userId, alert);
+                    userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>()).add(alert);
                 }
             }
         }
