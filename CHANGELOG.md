@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [1.23.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.2...v1.23.3) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* SSE 요청 시 GlobalExceptionHandler에서 BaseResponse 반환으로 인한 예외 분기 처리 ([7a5226b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7a5226bdab1dda6daa08b2ad4b1d1941474bb933))
+
+### ♻️ REFACTORING
+
+* SSE 알람 response 추가 ([edc70c4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/edc70c43f12830980974ad935476191e51e35123))
+* 사용하지 않는 값 제거 ([613e7b7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/613e7b72427561167bfad782042d56fc095eafe4))
+* 임시 AlertDto 제거 및 AlertSSEResponse로 반환 변경 ([c3f9f92](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c3f9f92de9a06c3720b8045990a3f9fe7b164da8))
+
 ## [1.23.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.1...v1.23.2) (2025-03-27)
 
 ### 🐛 BUG FIXES
