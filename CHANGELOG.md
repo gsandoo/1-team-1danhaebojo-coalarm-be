@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.23.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.0...v1.23.1) (2025-03-27)
+
+### ♻️ REFACTORING
+
+* 알람 관련 스케줄러 주기 yml 파일 관리 ([652ac90](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/652ac90527493e89f2f60f4fd546307e18d23bf4))
+* 알람 메세지 전송 큐로 관리 ([0a15f7a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0a15f7ad5b816bceef5f3e9c2efbc5bdbbe726ca))
+
 ## [1.23.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.22.0...v1.23.0) (2025-03-27)
 
 ### 🚀 NEW FEATURES
