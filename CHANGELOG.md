@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.21.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.1...v1.21.2) (2025-03-27)
+
+### ♻️ REFACTORING
+
+* addEmitter 수정 ([f9432e2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f9432e27d20edb9f17241f4336df168e4f1dfac9))
+* 알람 수정 조회 수정 ([480a4d8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/480a4d8fe8140ac936b8e0191b947a2ce9cdb4f7))
+* 알람 추가 시 알람 정보 반환 ([179963f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/179963f0c4f87e699cc813d6c2b387133b5262fc))
+
 ## [1.21.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.0...v1.21.1) (2025-03-27)
 
 ### 🐛 BUG FIXES
