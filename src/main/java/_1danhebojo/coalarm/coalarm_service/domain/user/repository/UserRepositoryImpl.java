@@ -4,7 +4,6 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEnt
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.jpa.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void delete(UserEntity userEntity) {
-        userJpaRepository.delete(userEntity);
+    public void deleteById(Long userId) {
+        userJpaRepository.deleteById(userId);
     }
 }
