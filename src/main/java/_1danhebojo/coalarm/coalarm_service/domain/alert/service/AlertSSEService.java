@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertSSEResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
@@ -130,7 +131,14 @@ public class AlertSSEService {
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
                 if (goldCrossAndTargetPriceService.isPriceReached(alert) && goldCrossAndTargetPriceService.isPriceStillValid(alert)) {
-                    userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>()).add(alert);
+                    Queue<Alert> queue = userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
+
+                    boolean alreadyQueued = queue.stream()
+                            .anyMatch(a -> a.getAlertId().equals(alert.getAlertId()));
+
+                    if (!alreadyQueued) {
+                        queue.add(alert);
+                    }
                 }
             }
         }
@@ -164,16 +172,15 @@ public class AlertSSEService {
 
         try {
             if(alerts != null) {
-//                emitter.send(SseEmitter.event()
-//                        .name("existing-alerts") // 기존 알람 목록
-//                        .data(alerts) // 기존 알람 데이터를 리스트로 전송
-//                );
+                List<AlertSSEResponse> responseList = alerts.stream()
+                        .map(AlertSSEResponse::new)
+                        .collect(Collectors.toList());
+
                 emitter.send(SseEmitter.event()
                         .name("existing-alerts")
-                        .data(alerts.stream()
-                                .map(this::convertToDto)
-                                .collect(Collectors.toList()))
+                        .data(responseList)
                 );
+
 
 
                 for (Alert alert : alerts) {
@@ -197,9 +204,12 @@ public class AlertSSEService {
         for (SseEmitter emitter : emitters) {
             try {
 //                emitter.send(SseEmitter.event().name("alert").data(alert));
-                AlertDto alertDto = convertToDto(alert);
+                AlertSSEResponse response = new AlertSSEResponse(alert);
 
-                emitter.send(SseEmitter.event().name("alert").data(alertDto));
+                emitter.send(SseEmitter.event()
+                        .name("alert")
+                        .data(response)
+                );
 
             } catch (IOException e) {
                 deadEmitters.add(emitter);
@@ -302,65 +312,5 @@ public class AlertSSEService {
         }
         log.info("사용자 " + userId + " 의 모든 SSE 구독 취소 완료");
     }
-    private static class AlertDto {
-        private Long alertId;
-        private String title;
-        private String coinName;
-        private String nickname;
-
-        public AlertDto(Long alertId, String title, String coinName, String nickname) {
-            this.alertId = alertId;
-            this.title = title;
-            this.coinName = coinName;
-            this.nickname = nickname;
-        }
-
-        // Getter들 (Jackson 직렬화를 위해 필요)
-        public Long getAlertId() { return alertId; }
-        public String getTitle() { return title; }
-        public String getCoinName() { return coinName; }
-        public String getNickname() { return nickname; }
-    }
-
-    // Alert -> AlertDto로 변환하는 메서드
-    private AlertDto convertToDto(Alert alert) {
-        // lazy 로딩 전부 강제로 초기화
-        String nickname = Optional.ofNullable(alert.getUser())
-                .map(user -> {
-                    try {
-                        return user.getNickname(); // 여기가 Lazy 터지는 부분
-                    } catch (Exception e) {
-                        log.warn("유저 닉네임 초기화 실패 (세션 없음): {}", e.getMessage());
-                        return "(알 수 없음)";
-                    }
-                })
-                .orElse("(사용자 없음)");
-
-        String coinName = Optional.ofNullable(alert.getCoin())
-                .map(coin -> {
-                    try {
-                        return coin.getName(); // 이 부분도 지연로딩 가능성 있음
-                    } catch (Exception e) {
-                        log.warn("코인 이름 초기화 실패 (세션 없음): {}", e.getMessage());
-                        return "(알 수 없음)";
-                    }
-                })
-                .orElse("(코인 없음)");
-
-        return new AlertDto(
-                alert.getAlertId(),
-                alert.getTitle(),
-                coinName,
-                nickname
-        );
-    }
-    @ExceptionHandler(Exception.class)
-    public void exceptionHandler(Exception e, HttpServletResponse response) throws IOException {
-        log.error("🔥 예외 발생!", e);
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setContentType("text/plain");
-        response.getWriter().write("Internal Server Error"); // 간단한 문자열 응답
-    }
-
 }
 
