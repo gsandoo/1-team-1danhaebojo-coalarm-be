@@ -151,5 +151,9 @@ public class AlertRepositoryImpl implements AlertRepository {
     public Optional<Coin> findCoinBySymbol(String symbol) {
         return alertJpaRepository.findCoinBySymbol(symbol);
     }
+
+    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType) {
+        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType);
+    }
 }
 

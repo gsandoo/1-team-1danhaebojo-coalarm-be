@@ -4,6 +4,10 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepositoryImpl;
+import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserServiceImpl;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
@@ -27,31 +31,37 @@ public class AlertService {
     @Lazy
     @Autowired
     private final AlertSSEService alertSSEService;
+    private final UserRepository userRepository;
 
     // 알람 추가
     public void addAlert(BaseAlertRequest request) {
-        Alert alert = convertToAlertEntity(request);
-
         // 해당 알람의 코인을 등록한 적이 있는지 체크
-        if(alertSSEService.isAlertSetForSymbolAndType(request.getUserId(), request.getSymbol(), request.getType()))
-        {
+        boolean checkAlerts = alertRepository.findAlertsByUserIdAndSymbolAndAlertType(request.getUserId(), request.getSymbol(), request.getType());
+        if (checkAlerts) {
             throw new ApiException(AppHttpStatus.ALREADY_EXISTS_ALERT);
         }
 
+        UserEntity getMyInfo = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        Alert alert = convertToAlertEntity(request);
         Alert savedAlert = alertRepository.save(alert);
 
-        Optional<Alert> checkAlert = alertRepository.findById(alert.getAlertId());
-        if (checkAlert.isEmpty()) {
-
-            throw new ApiException(AppHttpStatus.FAILED_TO_SAVE_ALERT);
-        }
+        alert.setUser(getMyInfo);
 
         Long alertId = savedAlert.getAlertId();
         if (alertId == null) {
             throw new ApiException(AppHttpStatus.FAILED_TO_SAVE_ALERT);
         }
 
-        alertSSEService.addEmitter(request.getUserId(), checkAlert.get());
+        alertSSEService.addEmitter(request.getUserId(), alert);
+    }
+
+    // 디스코드 알람을 위한 유저 정보 조회
+    @Transactional(readOnly = true)
+    public UserEntity getMyInfoByUserId(Long userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
     }
 
     // 알람 활성화 수정
@@ -85,8 +95,6 @@ public class AlertService {
     // 알람 목록 조회
     @Transactional(readOnly = true)
     public OffsetResponse<AlertResponse> getMyAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit) {
-
-
         Page<Alert> alerts = alertRepository.findAllUserAlerts(userId, symbol, active, sort, offset, limit);
 
         return OffsetResponse.of(

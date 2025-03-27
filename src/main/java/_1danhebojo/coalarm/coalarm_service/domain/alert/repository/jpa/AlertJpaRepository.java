@@ -39,6 +39,9 @@ public interface AlertJpaRepository extends JpaRepository<Alert, Long> {
             "FROM Alert a " +
             "JOIN FETCH a.coin c " +
             "JOIN FETCH a.user u " +
+            "LEFT JOIN FETCH a.targetPrice " +
+            "LEFT JOIN FETCH a.goldenCross " +
+            "LEFT JOIN FETCH a.volumeSpike " +
             "WHERE a.active = true")
     List<Alert> findAllActiveAlerts();
 
@@ -50,4 +53,12 @@ public interface AlertJpaRepository extends JpaRepository<Alert, Long> {
             "FROM Coin c " +
             "WHERE c.symbol = :symbol")
     Optional<Coin> findCoinBySymbol(String symbol);
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Alert a " +
+            "WHERE a.user.userId = :userId " +
+            "AND a.coin.symbol = :symbol " +
+            "      AND ((:alertType = 'GOLDEN_CROSS' AND a.isGoldenCrossFlag = true) " +
+            "        OR (:alertType = 'VOLUME_SPIKE' AND a.isVolumeSpikeFlag = true))")
+    boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
 }

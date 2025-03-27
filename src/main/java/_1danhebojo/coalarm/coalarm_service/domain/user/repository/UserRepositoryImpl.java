@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEnt
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.jpa.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 

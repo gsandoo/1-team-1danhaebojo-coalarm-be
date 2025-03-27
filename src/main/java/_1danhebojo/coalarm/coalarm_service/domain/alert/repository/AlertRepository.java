@@ -29,4 +29,5 @@ public interface AlertRepository {
     List<Alert> findAllActiveAlerts();
     Page<Alert> findAllUserAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit);
     Optional<Coin> findCoinBySymbol(String symbol);
+    boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
 }

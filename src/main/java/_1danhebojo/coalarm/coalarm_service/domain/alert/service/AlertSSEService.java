@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class AlertSSEService {
     private final AlertHistoryService alertHistoryService;
     private final AlertRepositoryImpl alertRepositoryImpl;
@@ -63,11 +64,10 @@ public class AlertSSEService {
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
 
-    @Transactional
     @Scheduled(fixedRate = 1000) // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
-            List<Alert> activeAlerts = activeAlertList.get(userId);
+            List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
 
             // 유효성 추가
             if (activeAlerts == null || activeAlerts.isEmpty()) continue;
@@ -200,24 +200,6 @@ public class AlertSSEService {
 
         log.info("📢 사용자 " + userId + " 에 대한 새로운 SSE 구독 추가됨. 활성화된 알람 개수: " + activeAlertList.get(userId).size());
     }
-
-    // 사용자가 설정한 알람 중 같은 코인에 같은 타입의 알람이 존재하는지
-    public boolean isAlertSetForSymbolAndType(Long userId, String symbol, String alertType) {
-        List<Alert> alerts = activeAlertList.get(userId);
-        if (alerts == null) {
-            return false;
-        }
-
-        return alerts.stream().anyMatch(alert ->
-                symbol.equalsIgnoreCase(alert.getCoin().getSymbol()) &&
-                        (
-                                ("GOLDEN_CROSS".equalsIgnoreCase(alertType) && alert.isGoldenCrossFlag()) ||
-                                        ("TARGET_PRICE".equalsIgnoreCase(alertType) && alert.isTargetPriceFlag()) ||
-                                        ("VOLUME_SPIKE".equalsIgnoreCase(alertType) && alert.isVolumeSpikeFlag())
-                        )
-        );
-    }
-
 
     // SEE 알람 수정
     public void updateEmitter(Long userId, Alert alert) {
