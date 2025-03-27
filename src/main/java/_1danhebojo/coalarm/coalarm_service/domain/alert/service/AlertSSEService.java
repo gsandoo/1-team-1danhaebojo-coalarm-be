@@ -40,7 +40,7 @@ public class AlertSSEService {
         getActiveAlertsGroupedByUser();
     }
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendQueueInterval}")
     public void sendAlertsSequentially() {
         for (Map.Entry<Long, Queue<Alert>> entry : userAlertQueue.entrySet()) {
             Long userId = entry.getKey();
@@ -66,14 +66,14 @@ public class AlertSSEService {
     }
 
     // 중간중간 전체 알람 상태 재로딩
-    @Scheduled(fixedRate = 180000) // 3분마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.refreshActive}") // 3분마다 실행
     public void refreshActiveAlerts() {
         log.info("전체 알람 상태 재로딩 시작");
         getActiveAlertsGroupedByUser();
     }
 
     // SSE 연결 유지를 위한 heartbeat 이벤트 주기적 전송 추가
-    @Scheduled(fixedRate = 15000) // 15초마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendHeartClient}") // 15초마다 실행
     public void sendHeartbeatToClients() {
         for (Map.Entry<Long, List<SseEmitter>> entry : userEmitters.entrySet()) {
             Long userId = entry.getKey();
@@ -100,7 +100,7 @@ public class AlertSSEService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendDiscordInterval}") // 1분마다 실행
     public void discordScheduler() {
         Map<Long, List<Alert>> filteredAlerts = activeAlertList.entrySet()
                 .stream()
@@ -113,7 +113,7 @@ public class AlertSSEService {
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
 
-    @Scheduled(fixedRate = 1000) // 1초마다 실행
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
             List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
