@@ -48,11 +48,18 @@ public enum AppHttpStatus {
     NOT_FOUND_ENDPOINT(HttpStatus.NOT_FOUND, "존재하지 않는 엔드포인트입니다."),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND,"존재하지 않는 회원입니다."),
     NOT_FOUND_COIN(HttpStatus.NOT_FOUND, "존재하지 않는 코인입니다."),
+    NOT_FOUND_ALERT(HttpStatus.NOT_FOUND, "존재하지 않는 알람입니다.."),
+    NOT_FOUND_ALERT_HISTORY(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 알람 히스토리입니다."),
 
     /**
      * 415 : 미디어 타입 에러
      */
     UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "허용되지 않은 파일 형식입니다."),
+
+    /**
+     * 409 : 현재 상태와 충돌되는 요청
+     */
+    ALREADY_EXISTS_ALERT(HttpStatus.CONFLICT, "이미 동일한 알림이 존재합니다."),
 
     /**
      * 500 : 서버 내부에서 에러가 발생함
@@ -61,6 +68,8 @@ public enum AppHttpStatus {
     IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"S3에 이미지 업로드중 에러가 발생했습니다."),
     IMAGE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3의 이미지 삭제중 에러가 발생했습니다."),
     FAILED_AUTHENTICATION_OAUTH(HttpStatus.INTERNAL_SERVER_ERROR, "OAuth 인증에 실패했습니다."),
+    FAILED_TO_SAVE_ALERT(HttpStatus.INTERNAL_SERVER_ERROR, "알림 저장에 실패했습니다."),
+    FAILED_TO_SEND_DISCORD(HttpStatus.INTERNAL_SERVER_ERROR, "디스코드 알림 전송에 실패했습니다."),
 
     /**
      * 502: 게이트웨이, 프록시 역할을 하는 서버가 다른 서버로부터 유효하지 않은 응답을 받았을 때

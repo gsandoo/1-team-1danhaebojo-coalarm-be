@@ -16,9 +16,9 @@ import java.util.Optional;
 
 
 public interface AlertRepository {
-    Long saveTargetPriceAlert(TargetPriceAlert request);
-    Long saveGoldenCrossAlert(GoldenCrossAlert request);
-    Long saveVolumeSpikeAlert(VolumeSpikeAlert request);
+    Long saveTargetPriceAlert(TargetPriceAlert targetPriceAlert);
+    Long saveGoldenCrossAlert(GoldenCrossAlert goldenCrossAlert);
+    Long saveVolumeSpikeAlert(VolumeSpikeAlert volumeSpikeAlert);
     List<Alert> findAll();
     Optional<Alert> findById(Long alertId);
     void deleteById(Long alertId);
@@ -29,4 +29,5 @@ public interface AlertRepository {
     List<Alert> findAllActiveAlerts();
     Page<Alert> findAllUserAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit);
     Optional<Coin> findCoinBySymbol(String symbol);
+    boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
 }

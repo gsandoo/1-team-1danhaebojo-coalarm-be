@@ -83,7 +83,10 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     public Alert save(Alert alert) {
         Alert savedAlert = alertJpaRepository.save(alert);
-        entityManager.flush();  // ★ 즉시 DB 반영하여 ID 생성
+
+        entityManager.flush();
+        entityManager.refresh(alert);
+
         return savedAlert;
     }
 
@@ -147,6 +150,10 @@ public class AlertRepositoryImpl implements AlertRepository {
     // 알람에서 코인 심볼 조회 추가
     public Optional<Coin> findCoinBySymbol(String symbol) {
         return alertJpaRepository.findCoinBySymbol(symbol);
+    }
+
+    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType) {
+        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType);
     }
 }
 
