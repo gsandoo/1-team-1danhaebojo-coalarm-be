@@ -8,9 +8,9 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEnt
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.user.util.NicknameGenerator;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppCookie;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.PkResponse;
-import _1danhebojo.coalarm.coalarm_service.global.properties.JwtProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     private final AlertSSEService alertSSEService;
     private final AlertRepositoryImpl alertRepository;
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-    private final JwtProperties jwtProperties;
+    private final AppCookie appCookie;
 
     @Override
     public UserDTO getMyInfo(Long userId) {
@@ -158,8 +158,8 @@ public class UserServiceImpl implements UserService {
         }
 
         // 쿠키 제거
-        response.addHeader(COOKIE_HEADER, deleteCookie(AUTHORIZATION_HEADER));
-        response.addHeader(COOKIE_HEADER, deleteCookie(REFRESH_HEADER));
+        response.addHeader(COOKIE_HEADER, appCookie.deleteCookie(AUTHORIZATION_HEADER));
+        response.addHeader(COOKIE_HEADER, appCookie.deleteCookie(REFRESH_HEADER));
 
         //유저의 알람 삭제
         // TODO : 유저와 관련된 데이터 모두 삭제
@@ -194,17 +194,6 @@ public class UserServiceImpl implements UserService {
         if (response.getStatusCode() == HttpStatus.OK) {
             log.info("카카오 사용자 언링크 성공: {}", response.getBody());
         }
-    }
-
-    private String deleteCookie(String key) {
-        return ResponseCookie.from(key, "")
-                .path(jwtProperties.getCookie().getPath())
-                .sameSite(jwtProperties.getCookie().getSameSite())
-                .httpOnly(jwtProperties.getCookie().isHttpOnly())
-                .secure(jwtProperties.getCookie().isSecure())
-                .maxAge(0)
-                .build()
-                .toString();
     }
 
     @Override
