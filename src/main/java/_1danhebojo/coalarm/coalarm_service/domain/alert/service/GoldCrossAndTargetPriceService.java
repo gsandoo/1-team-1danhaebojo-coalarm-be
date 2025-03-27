@@ -111,7 +111,7 @@ public class GoldCrossAndTargetPriceService {
 
     boolean isPriceStillValid(Alert alert) {
         // 1분 뒤에도 가격 유지 여부 확인
-        LocalDateTime minutesAgo = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
         boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUser().getUserId(), alert.getAlertId(), minutesAgo);
 
         // 1분 내 동일한 알람이 있음 → 알람 전송 안함
