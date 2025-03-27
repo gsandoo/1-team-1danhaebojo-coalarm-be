@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +31,6 @@ public class AlertSSEService {
     private final DiscordService discordService;
 
     private final Map<Long, Queue<Alert>> userAlertQueue = new ConcurrentHashMap<>();
-
     @Lazy
     @Autowired
     private GoldCrossAndTargetPriceService goldCrossAndTargetPriceService;
@@ -38,6 +38,19 @@ public class AlertSSEService {
     @PostConstruct
     public void init() {
         getActiveAlertsGroupedByUser();
+    }
+
+    @Scheduled(fixedRate = 2000)
+    public void sendAlertsSequentially() {
+        for (Map.Entry<Long, Queue<Alert>> entry : userAlertQueue.entrySet()) {
+            Long userId = entry.getKey();
+            Queue<Alert> queue = entry.getValue();
+
+            if (!queue.isEmpty()) {
+                Alert alert = queue.poll(); // 하나 꺼내기
+                sendAlertToUserSSE(userId, alert); // 기존 로직 사용
+            }
+        }
     }
 
     // 전체 활성화된 사용자의 알람 저장
@@ -111,7 +124,7 @@ public class AlertSSEService {
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
                 if (goldCrossAndTargetPriceService.isPriceReached(alert) && goldCrossAndTargetPriceService.isPriceStillValid(alert)) {
-                    sendAlertToUserSSE(userId, alert);
+                    userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>()).add(alert);
                 }
             }
         }
