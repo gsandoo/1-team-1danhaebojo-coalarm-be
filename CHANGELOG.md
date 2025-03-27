@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## [1.21.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.0...v1.21.1) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* Jwt 스케줄러에 transactional 추가 ([450270f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/450270f515554a354ee3fc80f8090cb337c993ec))
+* 골든크로스 예외 처리 추가 ([f37142b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f37142b6e1c7e20ca435cfa4e7c5936e8e83f850))
+* 알람 정보 저장 시 refresh 추가 ([55a220a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/55a220aef27cbf9879275b90516b39b0cb1ff646))
+
+### ♻️ REFACTORING
+
+* exception 관련 수정 ([808f8b7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/808f8b73595e3dc2f80453f9833a2e560ec273c1))
+* VolumeSpike 전체 조회 관련 수정 ([75cb717](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/75cb717420f15a76e12c045813c0b57be1c57987))
+* 매개변수 명 수정 ([e7d47ea](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e7d47eabd9bc07e918aa504e45c59846c97e6889))
+* 사용하지 않는 코드 제거 ([708ff39](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/708ff39c43a23acbe578dcb164e969892ad1a091))
+* 알람 중복 확인 로직 수정 ([8923386](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8923386896cb865f8a9dd477bc4dc7fab20edb6f))
+* 예외 처리 코드 추가 ([9b44921](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9b44921b05dd7d0802f1b8b5b54389df0fb8d45f))
+
 ## [1.21.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.20.0...v1.21.0) (2025-03-26)
 
 ### 🚀 NEW FEATURES
