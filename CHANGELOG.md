@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.21.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.2...v1.21.3) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* 알람 삭제 수정 ([42e90cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/42e90cd434c7326e39acad09021b454bcf372b8e))
+
 ## [1.21.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.1...v1.21.2) (2025-03-27)
 
 ### ♻️ REFACTORING
