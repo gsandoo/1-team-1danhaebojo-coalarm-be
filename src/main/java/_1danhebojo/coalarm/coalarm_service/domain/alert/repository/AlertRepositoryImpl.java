@@ -74,10 +74,6 @@ public class AlertRepositoryImpl implements AlertRepository {
     }
 
     public void deleteById(Long alertId) {
-        targetPriceJpaRepository.deleteByAlertId(alertId);
-        goldenCrossJpaRepository.deleteByAlertId(alertId);
-        volumeSpikeJpaRepository.deleteByAlertId(alertId);
-
         alertJpaRepository.deleteById(alertId);
     }
 

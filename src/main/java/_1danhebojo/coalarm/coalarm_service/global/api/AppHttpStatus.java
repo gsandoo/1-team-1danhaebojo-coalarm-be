@@ -22,6 +22,8 @@ public enum AppHttpStatus {
     INVALID_LIMIT(HttpStatus.BAD_REQUEST, "한 페이지당 항목 수는 1 이상이어야 합니다."),
     INVALID_COIN_ID(HttpStatus.BAD_REQUEST, "코인 ID는 1 이상이어야 합니다."),
     INVALID_OAUTH_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 OAuth 타입입니다."),
+    EMPTY_SEARCH_TERM(HttpStatus.BAD_REQUEST, "검색어를 입력해주세요."),
+    NO_SEARCH_RESULTS(HttpStatus.NOT_FOUND, "검색 결과가 없습니다."),
 
 
     /**

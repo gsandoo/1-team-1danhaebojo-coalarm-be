@@ -10,5 +10,5 @@ public interface CoinService {
     List<CoinDTO> getMyAlertCoins(Long userId);
     OffsetResponse<CoinDTO> getCoinsWithPaging(Integer offset, Integer limit);
     CoinDTO getCoinById(Long coinId);
-    CoinDTO searchCoinByNameOrSymbol(String term);
+    List<CoinDTO> searchCoinByNameOrSymbol(String term);
 }

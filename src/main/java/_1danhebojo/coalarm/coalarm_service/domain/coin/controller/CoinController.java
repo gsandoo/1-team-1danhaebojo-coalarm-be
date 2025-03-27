@@ -57,7 +57,7 @@ public class CoinController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<BaseResponse<CoinDTO>> searchCoins(@RequestParam("term") String term) {
+    public ResponseEntity<BaseResponse<List<CoinDTO>>> searchCoins(@RequestParam("term") String term) {
         return ResponseEntity.ok(BaseResponse.success(
                 coinService.searchCoinByNameOrSymbol(term)
         ));
