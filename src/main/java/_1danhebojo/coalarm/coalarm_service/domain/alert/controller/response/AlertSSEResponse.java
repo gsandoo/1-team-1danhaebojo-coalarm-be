@@ -10,7 +10,6 @@ public class AlertSSEResponse {
     private Long alertId;
     private String title;
     private String coinName;
-    private String nickname;
 
     private boolean targetPriceFlag;
     private boolean goldenCrossFlag;
@@ -22,7 +21,6 @@ public class AlertSSEResponse {
         this.alertId = alert.getAlertId();
         this.title = alert.getTitle();
         this.coinName = alert.getCoin().getName();
-        this.nickname = alert.getUser().getNickname();
 
         this.targetPriceFlag = alert.isTargetPriceFlag();
         this.goldenCrossFlag = alert.isGoldenCrossFlag();
