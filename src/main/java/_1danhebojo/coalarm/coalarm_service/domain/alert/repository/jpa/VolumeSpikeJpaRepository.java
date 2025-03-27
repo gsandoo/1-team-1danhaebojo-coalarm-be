@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.VolumeSpikeAlert;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,14 +22,14 @@ public interface VolumeSpikeJpaRepository extends JpaRepository<VolumeSpikeAlert
             "    FROM VolumeSpikeAlert t" +
             "    JOIN FETCH t.alert a" +
             "    JOIN FETCH a.coin c" +
-            "    WHERE a.isVolumeSpike = true AND a.alertId = :alertId")
+            "    WHERE a.isVolumeSpikeFlag = true AND a.alertId = :alertId")
     Optional<VolumeSpikeAlert> findVolumeSpikeAlertByAlertId(Long alertId);
 
-    @Query("    SELECT t" +
-            "    FROM VolumeSpikeAlert t" +
-            "    JOIN FETCH t.alert a" +
+    @Query("    SELECT a" +
+            "    FROM Alert a" +
+            "    JOIN FETCH a.volumeSpike v" +
             "    JOIN FETCH a.user u " +
             "    JOIN FETCH a.coin c" +
-            "    WHERE a.isVolumeSpike = true")
-    List<VolumeSpikeAlert> findAllVolumeSpikeAlertByStatus();
+            "    WHERE a.isVolumeSpikeFlag = true")
+    List<Alert> findAllVolumeSpikeAlertByStatus();
 }

@@ -10,6 +10,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertReposito
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistory;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
+import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,7 +57,7 @@ public class AlertHistoryService {
     // 알람 정보 조회
     public AlertHistoryResponse getAlertHistory(Long alertHistoryId) {
         AlertHistory alertHistory = alertHistoryRepository.findById(alertHistoryId)
-                .orElseThrow(() -> new RuntimeException("해당 알람 히스토리를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT_HISTORY));
 
         return new AlertHistoryResponse(alertHistory);
     }

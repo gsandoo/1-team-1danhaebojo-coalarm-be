@@ -39,8 +39,8 @@ public class AlertController {
     public ResponseEntity<BaseResponse<?>> addAlert(@Valid @RequestBody BaseAlertRequest request) {
         Long userId = authService.getLoginUserId();
         request.setUserId(userId);
-        alertService.addAlert(request);
-        return ResponseEntity.ok(BaseResponse.success());
+        AlertResponse result = alertService.addAlert(request);
+        return ResponseEntity.ok(BaseResponse.success(result));
     }
 
     // 알람 활성화 수정
@@ -115,8 +115,14 @@ public class AlertController {
 
     // <editor-fold desc="알람 SSE 관련 메서드">
     // SSE 구독 (로그인 시 활성화된 알람 전송)
-    @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@PathVariable Long userId) {
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe() {
+        Long userId =  authService.getLoginUserId();
+        return alertSSEService.subscribe(userId);
+    }
+
+    @GetMapping(value = "/subscribeTest/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeTest(@PathVariable Long userId) {
         return alertSSEService.subscribe(userId);
     }
     // </editor-fold>

@@ -43,42 +43,19 @@ public class AlertRepositoryImpl implements AlertRepository {
     @PersistenceContext
     private EntityManager entityManager; // ★ EntityManager 추가
 
-    public Long saveTargetPriceAlert(TargetPriceAlertRequest request) {
-        TargetPriceAlert targetPriceAlert = new TargetPriceAlert();
-        targetPriceAlert.setPrice(request.getPrice());
-        targetPriceAlert.setPercentage(request.getPercentage());
-
-        Alert alert = new Alert();
-        alert.setAlertId(request.getAlertId());
-        targetPriceAlert.setAlert(alert);
-
+    public Long saveTargetPriceAlert(TargetPriceAlert targetPriceAlert) {
         TargetPriceAlert savedTargetPriceAlert = targetPriceJpaRepository.save(targetPriceAlert);
         entityManager.flush();
         return savedTargetPriceAlert.getTargetPriceId();
     }
 
-    public Long saveGoldenCrossAlert(GoldenCrossAlertRequest request) {
-        GoldenCrossAlert goldenCrossAlert = new GoldenCrossAlert();
-        goldenCrossAlert.setLongMa(request.getLongMa());
-        goldenCrossAlert.setShortMa(request.getShortMa());
-
-        Alert alert = new Alert();
-        alert.setAlertId(request.getAlertId());
-        goldenCrossAlert.setAlert(alert);
-
+    public Long saveGoldenCrossAlert(GoldenCrossAlert goldenCrossAlert) {
         GoldenCrossAlert savedGoldenCrossAlert = goldenCrossJpaRepository.save(goldenCrossAlert);
         entityManager.flush();  // ★ 즉시 반영
         return savedGoldenCrossAlert.getGoldenCrossId();
     }
 
-    public Long saveVolumeSpikeAlert(VolumeSpikeAlertRequest request) {
-        VolumeSpikeAlert volumeSpikeAlert = new VolumeSpikeAlert();
-        volumeSpikeAlert.setTradingVolumeSoaring(request.getTradingVolumeSoaring());
-
-        Alert alert = new Alert();
-        alert.setAlertId(request.getAlertId());
-        volumeSpikeAlert.setAlert(alert);
-
+    public Long saveVolumeSpikeAlert(VolumeSpikeAlert volumeSpikeAlert) {
         VolumeSpikeAlert savedVolumeSpikeAlert = volumeSpikeJpaRepository.save(volumeSpikeAlert);
         entityManager.flush();  // ★ 즉시 반영
         return savedVolumeSpikeAlert.getMarketAlertId();
@@ -90,6 +67,10 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     public Optional<Alert> findById(Long alertId) {
         return alertJpaRepository.findById(alertId);
+    }
+
+    public Optional<Alert> findByIdWithCoin(Long alertId) {
+        return alertJpaRepository.findByIdWithCoin(alertId);
     }
 
     public void deleteById(Long alertId) {
@@ -106,7 +87,10 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     public Alert save(Alert alert) {
         Alert savedAlert = alertJpaRepository.save(alert);
-        entityManager.flush();  // ★ 즉시 DB 반영하여 ID 생성
+
+        entityManager.flush();
+        entityManager.refresh(alert);
+
         return savedAlert;
     }
 
@@ -170,6 +154,10 @@ public class AlertRepositoryImpl implements AlertRepository {
     // 알람에서 코인 심볼 조회 추가
     public Optional<Coin> findCoinBySymbol(String symbol) {
         return alertJpaRepository.findCoinBySymbol(symbol);
+    }
+
+    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType) {
+        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType);
     }
 }
 

@@ -3,7 +3,13 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
+import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepositoryImpl;
+import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserServiceImpl;
+import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +18,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -26,66 +31,38 @@ public class AlertService {
     @Lazy
     @Autowired
     private final AlertSSEService alertSSEService;
+    private final UserRepository userRepository;
 
     // 알람 추가
-    public void addAlert(BaseAlertRequest request) {
+    public AlertResponse addAlert(BaseAlertRequest request) {
+        // 해당 알람의 코인을 등록한 적이 있는지 체크
+        boolean checkAlerts = alertRepository.findAlertsByUserIdAndSymbolAndAlertType(request.getUserId(), request.getSymbol(), request.getType());
+        if (checkAlerts) {
+            throw new ApiException(AppHttpStatus.ALREADY_EXISTS_ALERT);
+        }
+
+        UserEntity getMyInfo = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
         Alert alert = convertToAlertEntity(request);
         Alert savedAlert = alertRepository.save(alert);
 
-        Optional<Alert> checkAlert = alertRepository.findById(alert.getAlertId());
-        if (checkAlert.isEmpty()) {
-            throw new RuntimeException("🚨 flush() 후에도 저장 안 됨!");
-        }
+        alert.setUser(getMyInfo);
 
         Long alertId = savedAlert.getAlertId();
         if (alertId == null) {
-            throw new RuntimeException("Alert 저장 실패");
+            throw new ApiException(AppHttpStatus.FAILED_TO_SAVE_ALERT);
         }
 
-        switch (request.getType()) {
-            case "TARGET_PRICE":
-                TargetPriceAlertRequest targetPriceAlert = (TargetPriceAlertRequest) request;
-                targetPriceAlert.setIsTargetPrice(true);
-                targetPriceAlert.setAlertId(alertId);
+        alertSSEService.addEmitter(request.getUserId(), alert);
 
-                Long target = alertRepository.saveTargetPriceAlert(targetPriceAlert);
-                if (target == null) {
-                    throw new RuntimeException("Target Price Alert 저장 실패");
-                }
-                break;
-
-            case "GOLDEN_CROSS":
-                GoldenCrossAlertRequest goldenCrossAlert = (GoldenCrossAlertRequest) request;
-                goldenCrossAlert.setIsGoldenCross(true);
-                goldenCrossAlert.setAlertId(alertId);
-
-                Long goldenCrossId = alertRepository.saveGoldenCrossAlert(goldenCrossAlert);
-                if (goldenCrossId == null) {
-                    throw new RuntimeException("Golden Cross Alert 저장 실패");
-                }
-                break;
-
-            case "VOLUME_SPIKE":
-                VolumeSpikeAlertRequest volumeSpikeAlert = (VolumeSpikeAlertRequest) request;
-                volumeSpikeAlert.setAlertId(alertId);
-                volumeSpikeAlert.setIsTradingVolumeSoaring(true);
-
-                Long volumeSpikeId = alertRepository.saveVolumeSpikeAlert(volumeSpikeAlert);
-                if (volumeSpikeId == null) {
-                    throw new RuntimeException("Volume Spike Alert 저장 실패");
-                }
-                break;
-
-            default:
-                throw new IllegalArgumentException("잘못된 알람 타입: " + request.getType());
-        }
-        alertSSEService.addEmitter(request.getUserId(), checkAlert.get());
+        return new AlertResponse(alert);
     }
 
     // 알람 활성화 수정
     public Long updateAlertStatus(Long alertId, boolean active) {
-        Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+        Alert alert = alertRepository.findByIdWithCoin(alertId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
         boolean isActive = alert.isActive();
 
         if(active != isActive) {
@@ -104,7 +81,7 @@ public class AlertService {
     // 알람 삭제
     public void deleteAlert(Long alertId) {
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
 
         alertSSEService.deleteEmitter(alert.getUser().getUserId(), alert);
         alertRepository.deleteById(alertId);
@@ -113,8 +90,6 @@ public class AlertService {
     // 알람 목록 조회
     @Transactional(readOnly = true)
     public OffsetResponse<AlertResponse> getMyAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit) {
-
-
         Page<Alert> alerts = alertRepository.findAllUserAlerts(userId, symbol, active, sort, offset, limit);
 
         return OffsetResponse.of(
@@ -131,9 +106,33 @@ public class AlertService {
         Alert alert = new Alert();
         alert.setActive(request.getActive());
         alert.setTitle(request.getTitle());
-        alert.setGoldenCross(request instanceof GoldenCrossAlertRequest);
-        alert.setTargetPrice(request instanceof TargetPriceAlertRequest);
-        alert.setVolumeSpike(request instanceof VolumeSpikeAlertRequest);
+
+        if (request instanceof GoldenCrossAlertRequest goldenCrossRequest) {
+            GoldenCrossAlert goldenCrossAlert = new GoldenCrossAlert();
+            goldenCrossAlert.setAlert(alert); // 양방향 관계 연결
+
+            alert.setGoldenCross(goldenCrossAlert);
+            alert.setGoldenCrossFlag(true);
+        }
+
+        if (request instanceof TargetPriceAlertRequest targetPriceRequest) {
+            TargetPriceAlert targetPriceAlert = new TargetPriceAlert();
+            targetPriceAlert.setAlert(alert);
+            targetPriceAlert.setPrice(((TargetPriceAlertRequest) request).getPrice()); // 필드 세팅
+            targetPriceAlert.setPercentage(((TargetPriceAlertRequest) request).getPercentage());
+
+            alert.setTargetPrice(targetPriceAlert);
+            alert.setTargetPriceFlag(true);
+        }
+
+        if (request instanceof VolumeSpikeAlertRequest volumeSpikeAlertRequest) {
+            VolumeSpikeAlert volumeSpikeAlert = new VolumeSpikeAlert();
+            volumeSpikeAlert.setAlert(alert);
+            volumeSpikeAlert.setTradingVolumeSoaring(volumeSpikeAlertRequest.getTradingVolumeSoaring());
+
+            alert.setVolumeSpike(volumeSpikeAlert);
+            alert.setVolumeSpikeFlag(true);
+        }
 
         UserEntity user = UserEntity.builder()
                 .userId(request.getUserId())
@@ -144,7 +143,7 @@ public class AlertService {
         // 우선적으로 추가 추후에 변경 필요
         if (request.getSymbol() != null) {
             Coin coin = alertRepository.findCoinBySymbol(request.getSymbol())
-                    .orElseThrow(() -> new RuntimeException("해당 심볼의 코인이 존재하지 않습니다."));
+                    .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_COIN));
             alert.setCoin(coin);
         }
 
