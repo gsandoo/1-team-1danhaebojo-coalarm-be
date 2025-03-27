@@ -145,9 +145,8 @@ public class AlertSSEService {
         // 더 이상 연결이 없는 유저에 대해서는 Map에서 아예 지워버리고, 연결이 남아 있는 경우만 최신 상태로 다시 저장한다."
         if (emitters.isEmpty()) {
             userEmitters.remove(userId);
-        } else {
-            userEmitters.put(userId, emitters); // 재저장
         }
+
         // 알람 히스토리 저장
         alertHistoryService.addAlertHistory(alert.getAlertId(), Long.valueOf(userId));
     }
@@ -198,8 +197,10 @@ public class AlertSSEService {
     // 알림을 추가했을 때 SseEmitter에 추가하는 부분이 필요
     public void addEmitter(Long userId, Alert alert) {
         SseEmitter emitter = new SseEmitter(0L);
-        userEmitters.computeIfAbsent(userId, k -> new ArrayList<>()).add(emitter);
-        activeAlertList.computeIfAbsent(userId, k -> new ArrayList<>()).add(alert);
+
+        // 내부 동작
+        userEmitters.computeIfAbsent(userId, k -> Collections.synchronizedList(new ArrayList<>())).add(emitter);
+        activeAlertList.computeIfAbsent(userId, k -> Collections.synchronizedList(new ArrayList<>())).add(alert);
 
         emitter.onCompletion(() -> removeEmitter(userId));
         emitter.onTimeout(() -> removeEmitter(userId));
@@ -226,7 +227,11 @@ public class AlertSSEService {
         activeAlertList.remove(userId);
         if (emitters != null) {
             for (SseEmitter emitter : emitters) {
-                emitter.complete(); // 모든 SSE 연결 강제 종료
+                try {
+                    emitter.complete(); // 안전하게 종료
+                } catch (Exception e) {
+                    log.warn("emitter 종료 중 예외 발생: {}", e.getMessage());
+                }
             }
         }
         log.info("사용자 " + userId + " 의 모든 SSE 구독 취소 완료");
