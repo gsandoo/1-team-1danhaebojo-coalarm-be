@@ -8,5 +8,5 @@ public interface UserRepository {
     Optional<UserEntity> findByKakaoId(String kakaoId);
     UserEntity save(UserEntity userEntity);
     Optional<UserEntity> findByUserId(Long userId);
-    void delete(UserEntity userEntity);
+    void deleteById(Long userId);
 }
