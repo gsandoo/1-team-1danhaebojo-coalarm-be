@@ -57,13 +57,6 @@ public class AlertService {
         alertSSEService.addEmitter(request.getUserId(), alert);
     }
 
-    // 디스코드 알람을 위한 유저 정보 조회
-    @Transactional(readOnly = true)
-    public UserEntity getMyInfoByUserId(Long userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
-    }
-
     // 알람 활성화 수정
     public Long updateAlertStatus(Long alertId, boolean active) {
         Alert alert = alertRepository.findById(alertId)
