@@ -41,7 +41,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         // TODO : 리프레쉬 토큰 저장
 
-        response.sendRedirect(oAuthProperties.getUrl().getDashboard());
+        response.sendRedirect(oAuthProperties.getWeb().getUrl().getDashboard());
 	}
 
     private String createCookie(String key, String value) {
