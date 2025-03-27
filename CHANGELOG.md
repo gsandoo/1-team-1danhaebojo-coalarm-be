@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.23.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.22.0...v1.23.0) (2025-03-27)
+
+### 🚀 NEW FEATURES
+
+* SSE 연결 관련 수정 ([afeda01](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/afeda014cb5d50bc15c7d6d2d197472ec1ab0296))
+
 ## [1.22.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.3...v1.22.0) (2025-03-27)
 
 ### 🚀 NEW FEATURES
