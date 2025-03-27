@@ -59,7 +59,7 @@ public class AlertService {
 
     // 알람 활성화 수정
     public Long updateAlertStatus(Long alertId, boolean active) {
-        Alert alert = alertRepository.findById(alertId)
+        Alert alert = alertRepository.findByIdWithCoin(alertId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
         boolean isActive = alert.isActive();
 

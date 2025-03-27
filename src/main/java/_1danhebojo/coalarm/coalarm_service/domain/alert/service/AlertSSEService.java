@@ -141,6 +141,13 @@ public class AlertSSEService {
         }
 
         emitters.removeAll(deadEmitters);
+
+        // 더 이상 연결이 없는 유저에 대해서는 Map에서 아예 지워버리고, 연결이 남아 있는 경우만 최신 상태로 다시 저장한다."
+        if (emitters.isEmpty()) {
+            userEmitters.remove(userId);
+        } else {
+            userEmitters.put(userId, emitters); // 재저장
+        }
         // 알람 히스토리 저장
         alertHistoryService.addAlertHistory(alert.getAlertId(), Long.valueOf(userId));
     }
@@ -199,29 +206,6 @@ public class AlertSSEService {
         emitter.onError((e) -> removeEmitter(userId));
 
         log.info("📢 사용자 " + userId + " 에 대한 새로운 SSE 구독 추가됨. 활성화된 알람 개수: " + activeAlertList.get(userId).size());
-    }
-
-    // SEE 알람 수정
-    public void updateEmitter(Long userId, Alert alert) {
-        // 해당 userId의 알람 리스트 가져오기
-        List<Alert> alerts = activeAlertList.get(userId);
-
-        if (alerts != null) {
-            // 같은 alertId를 가진 객체 찾아서 active 값 변경
-            for (Alert existingAlert : alerts) {
-                if (existingAlert.getAlertId().equals(alert.getAlertId())) {
-                    existingAlert.setActive(alert.isActive()); // ✅ active 값 수정
-                    log.info("✅ Alert ID {} 의 active 상태가 {} 으로 업데이트됨.", alert.getAlertId(), alert.isActive());
-                    return;
-                }
-            }
-        }
-
-        // 리스트에 기존 alertId가 없으면 추가
-        alerts = activeAlertList.computeIfAbsent(userId, k -> new ArrayList<>());
-        alerts.add(alert);
-
-        log.info("📢 사용자 {} 의 새로운 Alert 추가됨. 현재 활성화된 알람 개수: {}", userId, alerts.size());
     }
 
     // SSE 알람 제거

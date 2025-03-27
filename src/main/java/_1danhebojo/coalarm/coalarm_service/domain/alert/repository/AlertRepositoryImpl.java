@@ -69,6 +69,10 @@ public class AlertRepositoryImpl implements AlertRepository {
         return alertJpaRepository.findById(alertId);
     }
 
+    public Optional<Alert> findByIdWithCoin(Long alertId) {
+        return alertJpaRepository.findByIdWithCoin(alertId);
+    }
+
     public void deleteById(Long alertId) {
         targetPriceJpaRepository.deleteByAlertId(alertId);
         goldenCrossJpaRepository.deleteByAlertId(alertId);

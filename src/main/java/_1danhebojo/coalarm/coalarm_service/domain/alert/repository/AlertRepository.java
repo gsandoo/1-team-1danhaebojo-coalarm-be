@@ -21,6 +21,7 @@ public interface AlertRepository {
     Long saveVolumeSpikeAlert(VolumeSpikeAlert volumeSpikeAlert);
     List<Alert> findAll();
     Optional<Alert> findById(Long alertId);
+    Optional<Alert> findByIdWithCoin(Long alertId);
     void deleteById(Long alertId);
     void deleteByUserId(Long userId);
     Alert save(Alert alert);
