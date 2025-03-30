@@ -1,19 +1,22 @@
 package _1danhebojo.coalarm.coalarm_service.domain.coin.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.coin.controller.response.CoinWithPriceDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.CoinRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +28,8 @@ public class CoinServiceImpl implements CoinService {
 
     private final CoinJpaRepository coinJpaRepository;
     private final CoinRepository coinRepository;
+    private final TickerRepository tickerRepository;
+
     @Override
     @Transactional(readOnly = true)
     public List<CoinDTO> getAllCoins() {
@@ -112,4 +117,32 @@ public class CoinServiceImpl implements CoinService {
                 .map(CoinDTO::new)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CoinWithPriceDTO> searchCoinWithPrice(String term) {
+        if (term == null || term.trim().isEmpty()) {
+            throw new ApiException(AppHttpStatus.EMPTY_SEARCH_TERM);
+        }
+
+        List<CoinEntity> coins = coinJpaRepository
+                .findByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(term, term);
+
+        if (coins.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return coins.stream()
+                .map(coin -> {
+                    // 최신 가격 가져오기
+                    BigDecimal price = tickerRepository
+                            .findLatestBySymbol(coin.getSymbol())
+                            .map(TickerEntity::getLast)
+                            .orElse(null);
+
+                    return new CoinWithPriceDTO(coin, price);
+                })
+                .toList();
+    }
+
 }

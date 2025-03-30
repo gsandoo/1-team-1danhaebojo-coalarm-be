@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,4 +44,16 @@ public class TickerRepositoryImpl implements TickerRepository{
                 .fetch();
     }
 
+    @Override
+    public Optional<TickerEntity> findLatestBySymbol(String symbol) {
+        QTickerEntity ticker = QTickerEntity.tickerEntity;
+
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(ticker)
+                        .where(ticker.id.symbol.startsWith(symbol + "/"))
+                        .orderBy(ticker.id.timestamp.desc()) // 최신 순으로 정렬
+                        .fetchFirst()
+        );
+    }
 }
