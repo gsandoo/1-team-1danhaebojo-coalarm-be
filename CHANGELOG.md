@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.23.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.4...v1.23.5) (2025-03-30)
+
+### 🐛 BUG FIXES
+
+* 실시간 거래체결 웹 소켓 연결 ([88818fb](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/88818fbfc72f31be1e321629dc03a9835b58d8fa))
+
 ## [1.23.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.3...v1.23.4) (2025-03-30)
 
 ### 🐛 BUG FIXES
