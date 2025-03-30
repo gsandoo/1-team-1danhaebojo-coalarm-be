@@ -135,12 +135,13 @@ public class CoinServiceImpl implements CoinService {
         return coins.stream()
                 .map(coin -> {
                     // 최신 가격 가져오기
-                    BigDecimal price = tickerRepository
-                            .findLatestBySymbol(coin.getSymbol())
-                            .map(TickerEntity::getLast)
-                            .orElse(null);
-
-                    return new CoinWithPriceDTO(coin, price);
+                    return tickerRepository.findLatestBySymbol(coin.getSymbol())
+                            .map(ticker -> new CoinWithPriceDTO(
+                                    coin,
+                                    ticker.getLast(),
+                                    ticker.getId().getTimestamp()
+                            ))
+                            .orElseGet(() -> new CoinWithPriceDTO(coin, null, null)); // 데이터 없을 경우
                 })
                 .toList();
     }
