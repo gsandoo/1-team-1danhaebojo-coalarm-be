@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.coin.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.coin.controller.response.CoinWithPriceDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinDTO;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
 
@@ -11,4 +12,5 @@ public interface CoinService {
     OffsetResponse<CoinDTO> getCoinsWithPaging(Integer offset, Integer limit);
     CoinDTO getCoinById(Long coinId);
     List<CoinDTO> searchCoinByNameOrSymbol(String term);
+    List<CoinWithPriceDTO> searchCoinWithPrice(String term);
 }

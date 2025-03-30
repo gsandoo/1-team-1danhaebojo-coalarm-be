@@ -44,6 +44,7 @@ public class AlertSSEService {
         getActiveAlertsGroupedByUser();
     }
 
+    //3초마다 큐에 있는값을 전송
     @Scheduled(fixedRateString = "#{@alarmProperties.sendQueueInterval}")
     public void sendAlertsSequentially() {
         userAlertQueue.forEach((userId, queue) -> {

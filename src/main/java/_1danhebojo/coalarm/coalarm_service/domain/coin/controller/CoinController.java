@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.coin.controller;
 
+import _1danhebojo.coalarm.coalarm_service.domain.coin.controller.response.CoinWithPriceDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.service.CoinService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.AuthService;
@@ -57,9 +58,9 @@ public class CoinController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<BaseResponse<List<CoinDTO>>> searchCoins(@RequestParam("term") String term) {
+    public ResponseEntity<BaseResponse<List<CoinWithPriceDTO>>> searchCoins(@RequestParam("term") String term) {
         return ResponseEntity.ok(BaseResponse.success(
-                coinService.searchCoinByNameOrSymbol(term)
+                coinService.searchCoinWithPrice(term)
         ));
     }
 }
