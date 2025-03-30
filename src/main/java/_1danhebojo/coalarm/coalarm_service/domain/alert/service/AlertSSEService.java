@@ -120,6 +120,7 @@ public class AlertSSEService {
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
 
+    // 1초마다 긁어와서 queue에 넣는 애
     @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
@@ -131,12 +132,16 @@ public class AlertSSEService {
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
                 if (goldCrossAndTargetPriceService.isPriceReached(alert) && goldCrossAndTargetPriceService.isPriceStillValid(alert)) {
+                    log.info("조건 부합 : 1분" + alert);
                     Queue<Alert> queue = userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
 
                     boolean alreadyQueued = queue.stream()
                             .anyMatch(a -> a.getAlertId().equals(alert.getAlertId()));
 
-                    if (!alreadyQueued) {
+                    // 이미 보냈던 애를 중복처리
+
+
+                    if (!alreadyQueued ) {
                         queue.add(alert);
                     }
                 }
@@ -195,28 +200,24 @@ public class AlertSSEService {
     // 사용자의 기존 알람 SSE 전송
     public void sendAlertToUserSSE(Long userId, Alert alert) {
         List<SseEmitter> emitters = userEmitters.get(userId);
-        if (emitters == null || emitters.isEmpty()) {
-            log.info("사용자 " + userId + " 에 대한 SSE 연결이 없습니다.");
-            return;
-        }
 
-        List<SseEmitter> deadEmitters = new ArrayList<>();
-        for (SseEmitter emitter : emitters) {
-            try {
-//                emitter.send(SseEmitter.event().name("alert").data(alert));
-                AlertSSEResponse response = new AlertSSEResponse(alert);
+        if (emitters != null) {
+            List<SseEmitter> failedEmitters = new ArrayList<>();
 
-                emitter.send(SseEmitter.event()
-                        .name("alert")
-                        .data(response)
-                );
-
-            } catch (IOException e) {
-                deadEmitters.add(emitter);
+            for (SseEmitter emitter : emitters) {
+                try {
+                    emitter.send(SseEmitter.event()
+                            .name("alert")
+                            .data(alert));
+                } catch (Exception e) {
+                    // 예외가 발생한 Emitter는 제거할 목록에 추가
+                    failedEmitters.add(emitter);
+                }
             }
-        }
 
-        emitters.removeAll(deadEmitters);
+            // 전송 실패한 Emitter를 리스트에서 제거
+            emitters.removeAll(failedEmitters);
+        }
 
         // 더 이상 연결이 없는 유저에 대해서는 Map에서 아예 지워버리고, 연결이 남아 있는 경우만 최신 상태로 다시 저장한다."
         if (emitters.isEmpty()) {
@@ -273,7 +274,6 @@ public class AlertSSEService {
     // 알림을 추가했을 때 SseEmitter에 추가하는 부분이 필요
     public void addEmitter(Long userId, Alert alert) {
         SseEmitter emitter = new SseEmitter(0L);
-
         // 내부 동작
         userEmitters.computeIfAbsent(userId, k -> Collections.synchronizedList(new ArrayList<>())).add(emitter);
         activeAlertList.computeIfAbsent(userId, k -> Collections.synchronizedList(new ArrayList<>())).add(alert);
