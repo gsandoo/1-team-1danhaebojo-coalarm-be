@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,7 @@ public class CoinServiceImpl implements CoinService {
 
         // 검색 결과가 없는 경우 처리
         if (coins.isEmpty()) {
-            throw new ApiException(AppHttpStatus.NO_SEARCH_RESULTS);
+            return Collections.emptyList();
         }
 
         // 엔티티 목록을 DTO 목록으로 변환
