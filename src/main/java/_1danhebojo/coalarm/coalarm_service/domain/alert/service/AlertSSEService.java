@@ -44,6 +44,7 @@ public class AlertSSEService {
         getActiveAlertsGroupedByUser();
     }
 
+    //3초마다 큐에 있는값을 전송
     @Scheduled(fixedRateString = "#{@alarmProperties.sendQueueInterval}")
     public void sendAlertsSequentially() {
         userAlertQueue.forEach((userId, queue) -> {
@@ -120,7 +121,8 @@ public class AlertSSEService {
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
 
-    @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
+    //1초마다 큐에 알람을 담음
+    @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}")
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
             List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
