@@ -51,7 +51,7 @@ public class TickerRepositoryImpl implements TickerRepository{
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(ticker)
-                        .where(ticker.id.symbol.startsWith(symbol + "/"))
+                        .where(ticker.id.baseSymbol.eq(symbol))
                         .orderBy(ticker.id.timestamp.desc()) // 최신 순으로 정렬
                         .fetchFirst()
         );
