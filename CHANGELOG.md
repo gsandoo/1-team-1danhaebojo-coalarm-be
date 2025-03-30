@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.23.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.3...v1.23.4) (2025-03-30)
+
+### 🐛 BUG FIXES
+
+* 코인 검색 결과 없을 때 404 대신 빈 배열 반환 ([f418663](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f41866382ea8614360272b7bb7f397e5e79fa834))
+
 ## [1.23.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.2...v1.23.3) (2025-03-27)
 
 ### 🐛 BUG FIXES
