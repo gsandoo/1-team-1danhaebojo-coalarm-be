@@ -80,11 +80,13 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
     }
 
     private void calculateAndSaveKimchiPremiumForCoin(String coinSymbol, BigDecimal exchangeRate) {
-        String krwPair = coinSymbol + "/KRW";
-        String usdtPair = coinSymbol + "/USDT";
+        String krwQuoteSymbol = "KRW";
+        String usdtQuoteSymbol ="USDT";
 
-        Optional<TickerEntity> krwTicker = tickerJpaRepository.findFirstByIdSymbolOrderByIdTimestampDesc(krwPair);
-        Optional<TickerEntity> usdtTicker = tickerJpaRepository.findFirstByIdSymbolOrderByIdTimestampDesc(usdtPair);
+        Optional<TickerEntity> krwTicker = tickerJpaRepository.findFirstByIdBaseSymbolAndIdQuoteSymbolOrderByIdTimestampDesc(
+                coinSymbol, krwQuoteSymbol);
+        Optional<TickerEntity> usdtTicker = tickerJpaRepository.findFirstByIdBaseSymbolAndIdQuoteSymbolOrderByIdTimestampDesc(
+                coinSymbol, usdtQuoteSymbol);
 
         if (krwTicker.isEmpty() || usdtTicker.isEmpty()) {
             log.warn("{}의 가격 데이터를 찾을 수 없습니다.", coinSymbol);

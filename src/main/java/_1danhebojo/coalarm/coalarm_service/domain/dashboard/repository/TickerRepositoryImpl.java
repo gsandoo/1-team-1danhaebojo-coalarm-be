@@ -32,12 +32,12 @@ public class TickerRepositoryImpl implements TickerRepository{
             return Collections.emptyList();
         }
 
-        String symbolPrefix = coinEntity.getSymbol() + "/"; // "BTC/"와 같은 형태로 검색
+        String coinSymbol = coinEntity.getSymbol();
 
         // 명확한 형태로 검색
         return queryFactory
                 .selectFrom(ticker)
-                .where(ticker.id.symbol.startsWith(symbolPrefix))
+                .where(ticker.id.baseSymbol.eq(coinSymbol))
                 .orderBy(ticker.id.timestamp.asc())
                 .limit(100)
                 .fetch();
