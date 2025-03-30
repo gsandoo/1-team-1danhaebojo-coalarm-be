@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [1.24.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.5...v1.24.0) (2025-03-30)
+
+### 🚀 NEW FEATURES
+
+* CoinWithPriceDTO에 TickerEntity의 timestamp 추가 ([9bc07e8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9bc07e8e1ad104d45d25712dcf2017d5ee37d097))
+* 코인 검색 시 최신 가격 포함된 CoinWithPriceDTO 반환 기능 추가 ([4934448](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/4934448cc661ad7a955ec7319ca656dcdf28b9bf))
+
+### 🐛 BUG FIXES
+
+* Merge branch 'feat/coinDTO' into fix/ticker ([595fdca](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/595fdcaa1fdd86ae78289859a89c816635f609ff))
+* TickerEntity 구조 변경 & 변경에 따른 김치프리미엄 변경 ([9ee54b3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9ee54b372f0cc275da36936cf6fdeb3c29b7f4f2))
+* 티커 조회 조건을 baseSymbol 기준으로 수정 ([125ff13](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/125ff13ba37462146b1f6f38c52f7db5fd27ce6b))
+
 ## [1.23.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.4...v1.23.5) (2025-03-30)
 
 ### 🐛 BUG FIXES
