@@ -35,6 +35,7 @@ public class AlertSSEService {
     private final DiscordService discordService;
 
     private final Map<Long, Queue<Alert>> userAlertQueue = new ConcurrentHashMap<>();
+
     @Lazy
     @Autowired
     private GoldCrossAndTargetPriceService goldCrossAndTargetPriceService;
@@ -50,15 +51,9 @@ public class AlertSSEService {
         userAlertQueue.forEach((userId, queue) -> {
             if (!queue.isEmpty()) {
                 Alert alert = queue.poll();
-                // 트랜잭션 분리해서 실행
-                sendSseWithinTransaction(userId, alert);
+                sendAlertToUserSSE(userId, alert);
             }
         });
-    }
-
-    @Transactional
-    public void sendSseWithinTransaction(Long userId, Alert alert) {
-        sendAlertToUserSSE(userId, alert);
     }
 
     // 전체 활성화된 사용자의 알람 저장
@@ -107,7 +102,6 @@ public class AlertSSEService {
         }
     }
 
-    @Transactional
     @Scheduled(fixedRateString = "#{@alarmProperties.sendDiscordInterval}") // 1분마다 실행
     public void discordScheduler() {
         Map<Long, List<Alert>> filteredAlerts = activeAlertList.entrySet()
@@ -121,7 +115,7 @@ public class AlertSSEService {
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
     }
 
-    // 1초마다 긁어와서 queue에 넣는 애
+    // 1초마다 긁어와서 queue에 추가
     @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
@@ -152,14 +146,30 @@ public class AlertSSEService {
 
     // 로그인한 사용자가 실행
     public SseEmitter subscribe(Long userId) {
-        SseEmitter emitter = new SseEmitter(0L);
+        // 이미 존재하는 emitter가 있으면 재사용
+        List<SseEmitter> existingEmitters = userEmitters.get(userId);
+        if (existingEmitters != null) {
+            // 살아있는 emitter만 필터링
+            for (SseEmitter emitter : existingEmitters) {
+                try {
+                    emitter.send(SseEmitter.event().name("ping").data("alive-check"));
+                    log.info("살아있는 emitter 반환 - userId: {}", userId);
+                    return emitter;
+                } catch (IOException e) {
+                    // 죽은 emitter는 건너뜀 (removeEmitter에서 자동 제거되도록 할 수도 있음)
+                    log.warn("기존 emitter 죽어있음 - userId: {}", userId);
+                }
+            }
+        }
 
+        // 새 emitter 생성
+        SseEmitter emitter = new SseEmitter(0L);
         userEmitters.computeIfAbsent(userId, k -> new ArrayList<>()).add(emitter);
 
-        // 사용자의 기존 알람을 전송
+        // 알림 전송
         sendUserAlerts(userId, emitter);
 
-        // 연결 종료 시 emitter 제거
+        // emitter 정리 로직
         emitter.onCompletion(() -> removeEmitter(userId));
         emitter.onTimeout(() -> removeEmitter(userId));
         emitter.onError((e) -> removeEmitter(userId));
@@ -272,7 +282,6 @@ public class AlertSSEService {
     }
 
     // 새로운 알람 추가
-    // 알림을 추가했을 때 SseEmitter에 추가하는 부분이 필요
     public void addEmitter(Long userId, Alert alert) {
         SseEmitter emitter = new SseEmitter(0L);
         // 내부 동작
