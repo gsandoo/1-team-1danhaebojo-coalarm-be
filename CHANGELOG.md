@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.1...v1.26.2) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* 원래 클라이언트 IP로 구분하도록 변경 ([fb4ea39](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/fb4ea3949964f88e0de1e74952ea76f5c2a77b0e))
+
 ## [1.26.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.0...v1.26.1) (2025-03-31)
 
 ### 🐛 BUG FIXES
