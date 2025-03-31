@@ -32,8 +32,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
-        // IP 주소로 클라이언트 식별 (또는 토큰이 있다면 토큰 기반으로 식별 가능)
-        String clientKey = request.getRemoteAddr();
+        // 클라이언트 식별자 가져오기
+        String clientKey = getClientIdentifier(request);
 
         // 버킷 가져오기 또는 새로 생성
         Bucket bucket = buckets.computeIfAbsent(clientKey, this::createNewBucket);
@@ -55,4 +55,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return Bucket4j.builder().addLimit(limit).build();
     }
 
+
+    private String getClientIdentifier(HttpServletRequest request) {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isEmpty()) {
+            // 첫 번째 IP 주소 사용 (원래 클라이언트 IP)
+            return forwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
+    }
 }
