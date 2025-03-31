@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.24.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.6...v1.24.7) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* Hikari 설정 변경 ([97801c5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/97801c56890488b21cc5a68a8dc3575ee382bf1b))
+
 ## [1.24.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.5...v1.24.6) (2025-03-31)
 
 ### ♻️ REFACTORING
