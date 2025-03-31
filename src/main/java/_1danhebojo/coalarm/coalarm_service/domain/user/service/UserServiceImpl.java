@@ -29,6 +29,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -202,10 +204,28 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
-        user.updateDiscordWebhook(request.getDiscordWebhook());
+        // 디스코드 웹훅 url 유효성 검사
+        String webhookUrl = request.getDiscordWebhook();
+        validateDiscordWebhookUrl(webhookUrl);
 
+        user.updateDiscordWebhook(request.getDiscordWebhook());
         userRepository.save(user);
 
         return PkResponse.of(user.getUserId());
+    }
+
+    private void validateDiscordWebhookUrl(String webhookUrl) {
+        // 빈 문자열 체크
+        if (webhookUrl == null || webhookUrl.trim().isEmpty()) {
+            throw new ApiException(AppHttpStatus.EMPTY_DISCORD_WEBHOOK);
+        }
+
+        String discordWebhookRegex = "^https://discord\\.com/api/webhooks/\\d+/[\\w-]+$";
+        Pattern pattern = Pattern.compile(discordWebhookRegex);
+        Matcher matcher = pattern.matcher(webhookUrl);
+
+        if (!matcher.matches()) {
+            throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
+        }
     }
 }
