@@ -26,12 +26,7 @@ public class AlertHistoryRepositoryImpl {
 
     @Transactional
     public Page<AlertHistory> findAlertHistoryByFilter(Long userId, Pageable pageable) {
-        List<AlertHistory> alertHistories = alertHistoryJpaRepository.findByUserId(userId);
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), alertHistories.size());
-
-        return new PageImpl<>(alertHistories.subList(start, end), pageable, alertHistories.size());
+        return alertHistoryJpaRepository.findByUserId(userId, pageable);
     }
 
     @Transactional
