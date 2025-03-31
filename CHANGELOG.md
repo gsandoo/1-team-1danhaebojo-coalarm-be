@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.24.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.2...v1.24.3) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* session.isOpen() 체크로 WebSocket 예외 방지 ([717c167](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/717c16712335fb062bdb1cfc4a998acf555de835))
+* 트랜잭션 필요 없는 부분 제거 ([9d174bb](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9d174bbaafb523990f6499f131e15f783ace685b))
+
 ## [1.24.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.1...v1.24.2) (2025-03-31)
 
 ### ♻️ REFACTORING
