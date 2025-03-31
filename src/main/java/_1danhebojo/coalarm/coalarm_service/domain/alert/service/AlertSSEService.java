@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -189,35 +190,43 @@ public class AlertSSEService {
     }
 
     // 사용자의 기존 알람을 새로운 Emitter에게 전송
-    @Transactional
     public void sendUserAlerts(Long userId, SseEmitter emitter) {
-        // TargetPrice랑 GoldenCross만 가져오기
-        List<Alert> alerts = Optional.ofNullable(activeAlertList.get(userId))
-                .orElse(Collections.emptyList()) // null이면 빈 리스트 반환
-                .stream()
-                .filter(alert -> alert.isTargetPriceFlag() || alert.isGoldenCrossFlag())
-                .collect(Collectors.toList());
+        // 먼저 트랜잭션 내에서 Alert 목록만 가져옴
+        List<Alert> alerts = getAlertsToSend(userId);
 
+        // 이후 I/O는 트랜잭션 밖에서 수행
         try {
-            if(alerts != null) {
-                List<AlertSSEResponse> responseList = alerts.stream()
-                        .map(AlertSSEResponse::new)
-                        .collect(Collectors.toList());
+            List<AlertSSEResponse> responseList = alerts.stream()
+                    .map(AlertSSEResponse::new)
+                    .toList();
 
-                emitter.send(SseEmitter.event()
-                        .name("existing-alerts")
-                        .data(responseList)
-                );
+            emitter.send(SseEmitter.event()
+                    .name("existing-alerts")
+                    .data(responseList)
+            );
 
+            // 히스토리 저장 비동기로 전환
+            alerts.forEach(alert ->
+                    saveAlertHistoryAsync(alert.getAlertId(), userId)
+            );
 
-
-                for (Alert alert : alerts) {
-                    alertHistoryService.addAlertHistory(alert.getAlertId(), userId); // 🔥 기존 Alert ID 활용
-                }
-            }
         } catch (IOException e) {
             removeEmitter(userId);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Alert> getAlertsToSend(Long userId) {
+        return Optional.ofNullable(activeAlertList.get(userId))
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(alert -> alert.isTargetPriceFlag() || alert.isGoldenCrossFlag())
+                .collect(Collectors.toList());
+    }
+
+    @Async
+    public void saveAlertHistoryAsync(Long alertId, Long userId) {
+        alertHistoryService.addAlertHistory(alertId, userId);
     }
 
     // 사용자의 기존 알람 SSE 전송
@@ -249,7 +258,7 @@ public class AlertSSEService {
         }
 
         // 알람 히스토리 저장
-        alertHistoryService.addAlertHistory(alert.getAlertId(), Long.valueOf(userId));
+        saveAlertHistoryAsync(alert.getAlertId(), userId);
     }
 
     // 사용자의 기존 알람 discord 전송
