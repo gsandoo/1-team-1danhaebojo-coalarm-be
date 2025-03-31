@@ -21,27 +21,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class RateLimitFilter extends OncePerRequestFilter {
-    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final RateLimitProperties properties;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // API 경로에만 레이트 리밋 적용
         if (!request.getRequestURI().startsWith("/api/v1/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 클라이언트 식별: X-Forwarded-For → RemoteAddr fallback
         String clientKey = extractClientIp(request);
-        log.info("Client IP: " + clientKey);
 
-        // 버킷 가져오기 또는 새로 생성
-        Bucket bucket = buckets.computeIfAbsent(clientKey, this::createNewBucket);
+        // 버킷을 매번 새로 생성 (비효율적이지만 동작 확인용)
+        Bucket bucket = createNewBucket(clientKey);
 
-        // 토큰 소비 시도
         if (bucket.tryConsume(1)) {
             System.out.println("Allowed for IP: " + clientKey);
             filterChain.doFilter(request, response);
@@ -51,7 +46,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.getWriter().write("{\"message\":\"API 호출 횟수가 제한을 초과했습니다. 잠시 후 다시 시도해주세요.\"}");
         }
-
     }
 
     private Bucket createNewBucket(String key) {
