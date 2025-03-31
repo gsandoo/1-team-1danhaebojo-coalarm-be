@@ -112,13 +112,10 @@ public class UpbitSseService {
         }
 
         try {
-            if (session.isOpen()) {
-                String json = "[{\"ticket\":\"trade-sse\"},{\"type\":\"trade\",\"codes\":[\"KRW-" + symbol + "\"]}]";
-                session.sendMessage(new TextMessage(json));
-                log.info("✅ 업비트 WebSocket 심볼 구독: {}", symbol);
-
-            }
-        }catch (IOException e) {
+            String json = "[{\"ticket\":\"trade-sse\"},{\"type\":\"trade\",\"codes\":[\"KRW-" + symbol + "\"]}]";
+            session.sendMessage(new TextMessage(json));
+            log.info("✅ 업비트 WebSocket 심볼 구독: {}", symbol);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
