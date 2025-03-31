@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.24.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.7...v1.24.8) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* SSE 알림 및 WebSocket 구독 로직 비동기 처리로 성능 개선 ([ec8e1b0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ec8e1b07de120dff765ec60279fde8cb656253e2))
+
 ## [1.24.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.6...v1.24.7) (2025-03-31)
 
 ### 🐛 BUG FIXES
