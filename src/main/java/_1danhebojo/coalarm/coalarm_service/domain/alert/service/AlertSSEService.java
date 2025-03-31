@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class AlertSSEService {
     private final AlertHistoryService alertHistoryService;
     private final AlertRepositoryImpl alertRepositoryImpl;
@@ -41,6 +40,7 @@ public class AlertSSEService {
     private GoldCrossAndTargetPriceService goldCrossAndTargetPriceService;
 
     @PostConstruct
+    @Transactional(readOnly = true)
     public void init() {
         getActiveAlertsGroupedByUser();
     }
@@ -57,6 +57,7 @@ public class AlertSSEService {
     }
 
     // 전체 활성화된 사용자의 알람 저장
+    @Transactional(readOnly = true)
     public void getActiveAlertsGroupedByUser() {
         List<Alert> activeAlerts = alertRepositoryImpl.findAllActiveAlerts();
 
@@ -70,6 +71,7 @@ public class AlertSSEService {
 
     // 중간중간 전체 알람 상태 재로딩
     @Scheduled(fixedRateString = "#{@alarmProperties.refreshActive}") // 3분마다 실행
+    @Transactional(readOnly = true)
     public void refreshActiveAlerts() {
         log.info("전체 알람 상태 재로딩 시작");
         getActiveAlertsGroupedByUser();
@@ -117,6 +119,7 @@ public class AlertSSEService {
 
     // 1초마다 긁어와서 queue에 추가
     @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
+    @Transactional(readOnly = true)
     public void checkAlertsForSubscribedUsers() {
         for (Long userId : userEmitters.keySet()) {
             List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
@@ -178,6 +181,7 @@ public class AlertSSEService {
     }
 
     // 사용자의 기존 알람을 새로운 Emitter에게 전송
+    @Transactional
     public void sendUserAlerts(Long userId, SseEmitter emitter) {
         // TargetPrice랑 GoldenCross만 가져오기
         List<Alert> alerts = Optional.ofNullable(activeAlertList.get(userId))
@@ -209,6 +213,7 @@ public class AlertSSEService {
     }
 
     // 사용자의 기존 알람 SSE 전송
+    @Transactional
     public void sendAlertToUserSSE(Long userId, Alert alert) {
         List<SseEmitter> emitters = userEmitters.get(userId);
 
