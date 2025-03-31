@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.24.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.1...v1.24.2) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* SSE 재사용 처리 ([cff8c1d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/cff8c1d29de8c8009d85384b2eb001e422fc98d8))
+
 ## [1.24.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.0...v1.24.1) (2025-03-31)
 
 ### ♻️ REFACTORING
