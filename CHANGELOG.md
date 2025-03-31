@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.24.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.0...v1.24.1) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* 알람 히스토리 조회 수정 ([833302b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/833302be752cec44a27eef3a53aa6fd619e80a9d))
+
 ## [1.24.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.5...v1.24.0) (2025-03-30)
 
 ### 🚀 NEW FEATURES
