@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.0...v1.26.1) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* rate-limit 설정값 변경 ([90286ee](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/90286eed27bfdd02aaade9048e00eed2207ceb27))
+
 ## [1.26.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.25.0...v1.26.0) (2025-03-31)
 
 ### 🚀 NEW FEATURES
