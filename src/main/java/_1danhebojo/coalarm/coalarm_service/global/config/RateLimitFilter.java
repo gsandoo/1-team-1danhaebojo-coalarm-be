@@ -43,12 +43,15 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         // 토큰 소비 시도
         if (bucket.tryConsume(1)) {
+            System.out.println("Allowed for IP: " + clientKey);
             filterChain.doFilter(request, response);
         } else {
+            System.out.println("Too Many Requests for IP: " + clientKey);
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"message\":\"API 호출 횟수가 제한을 초과했습니다. 잠시 후 다시 시도해주세요.\"}");
         }
+
     }
 
     private Bucket createNewBucket(String key) {
