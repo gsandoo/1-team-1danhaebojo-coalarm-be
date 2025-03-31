@@ -146,6 +146,9 @@ public class AlertSSEService {
 
     // 로그인한 사용자가 실행
     public SseEmitter subscribe(Long userId) {
+
+        removeEmitter(userId);
+
         // 이미 존재하는 emitter가 있으면 재사용
         List<SseEmitter> existingEmitters = userEmitters.get(userId);
         if (existingEmitters != null) {
@@ -173,6 +176,11 @@ public class AlertSSEService {
         emitter.onCompletion(() -> removeEmitter(userId));
         emitter.onTimeout(() -> removeEmitter(userId));
         emitter.onError((e) -> removeEmitter(userId));
+
+        log.info("🧪 [subscribe] userId={} 의 emitter 초기화 완료 후 새 emitter 생성", userId);
+        log.info("📊 [subscribe] 현재 전체 userEmitters 수: {}", userEmitters.size());
+        log.info("📊 [subscribe] userId={} 의 emitter 수: {}", userId, userEmitters.get(userId).size());
+
 
         return emitter;
     }
