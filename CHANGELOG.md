@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.3...v1.26.4) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* 실시간 체결 내역 안보이는 현상 해결 ([65665d2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/65665d2ee3c9984c1e494c2c645d90e1074036b0))
+
 ## [1.26.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.2...v1.26.3) (2025-03-31)
 
 ### 🐛 BUG FIXES
