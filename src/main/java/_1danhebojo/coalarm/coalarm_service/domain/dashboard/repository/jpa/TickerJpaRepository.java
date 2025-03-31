@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface TickerJpaRepository extends JpaRepository<TickerEntity, TickerCompositeKey> {
 
-    Optional<TickerEntity> findFirstByIdSymbolOrderByIdTimestampDesc(String symbol);
+    Optional<TickerEntity> findFirstByIdBaseSymbolAndIdQuoteSymbolOrderByIdTimestampDesc(
+            String baseSymbol, String quoteSymbol);
 }

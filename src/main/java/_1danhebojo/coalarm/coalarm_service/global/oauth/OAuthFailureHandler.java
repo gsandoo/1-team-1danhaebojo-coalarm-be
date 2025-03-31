@@ -36,6 +36,6 @@ public class OAuthFailureHandler extends SimpleUrlAuthenticationFailureHandler {
         response.getWriter().write(body);
 
         // 로그인 페이지로 리디렉션
-		response.sendRedirect(oAuthProperties.getUrl().getLogin());
+		response.sendRedirect(oAuthProperties.getWeb().getUrl().getLogin());
 	}
 }

@@ -31,7 +31,7 @@ public class AlertSSERepositoryImpl {
         return alertSSEJpaRepository.findBySymbolAndDateRangeAndExchange(symbol, startDate, exchange);
     }
 
-    public List<VolumeSpikeAlert> findAllVolumeSpikeAlertByStatus() {
+    public List<Alert> findAllVolumeSpikeAlertByStatus() {
         return volumeSpikeJpaRepository.findAllVolumeSpikeAlertByStatus();
     }
 }

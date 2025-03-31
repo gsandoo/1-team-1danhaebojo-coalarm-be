@@ -19,12 +19,15 @@ import java.time.OffsetDateTime;
 @Builder
 public class TickerCompositeKey implements Serializable {
 
-    @Column(name = "timestamp", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @Column(name = "timestamp", nullable = false)
     private OffsetDateTime timestamp;
 
     @Column(name = "exchange", nullable = false)
     private String exchange;
 
-    @Column(name = "symbol", nullable = false)
-    private String symbol;
+    @Column(name = "base_symbol", nullable = false)
+    private String baseSymbol;
+
+    @Column(name = "quote_symbol", nullable = false)
+    private String quoteSymbol;
 }

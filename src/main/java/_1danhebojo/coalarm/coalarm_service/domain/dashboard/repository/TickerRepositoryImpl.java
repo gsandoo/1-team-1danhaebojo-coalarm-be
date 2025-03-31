@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,15 +33,27 @@ public class TickerRepositoryImpl implements TickerRepository{
             return Collections.emptyList();
         }
 
-        String symbolPrefix = coinEntity.getSymbol() + "/"; // "BTC/"와 같은 형태로 검색
+        String coinSymbol = coinEntity.getSymbol();
 
         // 명확한 형태로 검색
         return queryFactory
                 .selectFrom(ticker)
-                .where(ticker.id.symbol.startsWith(symbolPrefix))
+                .where(ticker.id.baseSymbol.eq(coinSymbol))
                 .orderBy(ticker.id.timestamp.asc())
                 .limit(100)
                 .fetch();
     }
 
+    @Override
+    public Optional<TickerEntity> findLatestBySymbol(String symbol) {
+        QTickerEntity ticker = QTickerEntity.tickerEntity;
+
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(ticker)
+                        .where(ticker.id.baseSymbol.eq(symbol))
+                        .orderBy(ticker.id.timestamp.desc()) // 최신 순으로 정렬
+                        .fetchFirst()
+        );
+    }
 }

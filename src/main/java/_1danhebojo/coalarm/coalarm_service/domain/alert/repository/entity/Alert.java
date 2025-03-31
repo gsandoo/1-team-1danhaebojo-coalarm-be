@@ -26,14 +26,14 @@ public class Alert {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private boolean isGoldenCross;
+    @Column(name="is_golden_cross", nullable = false)
+    private boolean isGoldenCrossFlag;
 
-    @Column(nullable = false)
-    private boolean isTargetPrice;
+    @Column(name="is_target_price",nullable = false)
+    private boolean isTargetPriceFlag;
 
-    @Column(nullable = false)
-    private boolean isVolumeSpike;
+    @Column(name="is_volume_spike",nullable = false)
+    private boolean isVolumeSpikeFlag;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coin_id", referencedColumnName = "coin_id")
