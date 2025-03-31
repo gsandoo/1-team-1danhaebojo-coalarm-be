@@ -6,8 +6,11 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.service.AuthService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserService;
 import _1danhebojo.coalarm.coalarm_service.global.api.BaseResponse;
 import _1danhebojo.coalarm.coalarm_service.global.api.PkResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -51,14 +54,20 @@ public class UserController {
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<Void>> logout() {
-//        userService.logout();
         return ResponseEntity.ok(BaseResponse.success());
     }
 
     // 회원 탈퇴
     @DeleteMapping("")
-    public ResponseEntity<BaseResponse<Void>> withdraw() {
-//        userService.deleteUser();
+    public ResponseEntity<BaseResponse<Void>> withdraw(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        userService.deleteUser(
+                authService.getLoginUserId(),
+                request,
+                response
+        );
         return ResponseEntity.ok(BaseResponse.success());
     }
 

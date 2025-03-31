@@ -1,5 +1,171 @@
 # CHANGELOG
 
+## [1.24.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.0...v1.24.1) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* 알람 히스토리 조회 수정 ([833302b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/833302be752cec44a27eef3a53aa6fd619e80a9d))
+
+## [1.24.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.5...v1.24.0) (2025-03-30)
+
+### 🚀 NEW FEATURES
+
+* CoinWithPriceDTO에 TickerEntity의 timestamp 추가 ([9bc07e8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9bc07e8e1ad104d45d25712dcf2017d5ee37d097))
+* 코인 검색 시 최신 가격 포함된 CoinWithPriceDTO 반환 기능 추가 ([4934448](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/4934448cc661ad7a955ec7319ca656dcdf28b9bf))
+
+### 🐛 BUG FIXES
+
+* Merge branch 'feat/coinDTO' into fix/ticker ([595fdca](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/595fdcaa1fdd86ae78289859a89c816635f609ff))
+* TickerEntity 구조 변경 & 변경에 따른 김치프리미엄 변경 ([9ee54b3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9ee54b372f0cc275da36936cf6fdeb3c29b7f4f2))
+* 티커 조회 조건을 baseSymbol 기준으로 수정 ([125ff13](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/125ff13ba37462146b1f6f38c52f7db5fd27ce6b))
+
+## [1.23.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.4...v1.23.5) (2025-03-30)
+
+### 🐛 BUG FIXES
+
+* 실시간 거래체결 웹 소켓 연결 ([88818fb](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/88818fbfc72f31be1e321629dc03a9835b58d8fa))
+
+## [1.23.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.3...v1.23.4) (2025-03-30)
+
+### 🐛 BUG FIXES
+
+* 코인 검색 결과 없을 때 404 대신 빈 배열 반환 ([f418663](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f41866382ea8614360272b7bb7f397e5e79fa834))
+
+## [1.23.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.2...v1.23.3) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* SSE 요청 시 GlobalExceptionHandler에서 BaseResponse 반환으로 인한 예외 분기 처리 ([7a5226b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7a5226bdab1dda6daa08b2ad4b1d1941474bb933))
+
+### ♻️ REFACTORING
+
+* SSE 알람 response 추가 ([edc70c4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/edc70c43f12830980974ad935476191e51e35123))
+* 사용하지 않는 값 제거 ([613e7b7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/613e7b72427561167bfad782042d56fc095eafe4))
+* 임시 AlertDto 제거 및 AlertSSEResponse로 반환 변경 ([c3f9f92](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c3f9f92de9a06c3720b8045990a3f9fe7b164da8))
+
+## [1.23.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.1...v1.23.2) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* 알람 관련 수정 ([6946fab](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6946fab944a2266f27ee76fce6a78ebdf0e77eb7))
+
+## [1.23.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.23.0...v1.23.1) (2025-03-27)
+
+### ♻️ REFACTORING
+
+* 알람 관련 스케줄러 주기 yml 파일 관리 ([652ac90](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/652ac90527493e89f2f60f4fd546307e18d23bf4))
+* 알람 메세지 전송 큐로 관리 ([0a15f7a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0a15f7ad5b816bceef5f3e9c2efbc5bdbbe726ca))
+
+## [1.23.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.22.0...v1.23.0) (2025-03-27)
+
+### 🚀 NEW FEATURES
+
+* SSE 연결 관련 수정 ([afeda01](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/afeda014cb5d50bc15c7d6d2d197472ec1ab0296))
+
+## [1.22.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.3...v1.22.0) (2025-03-27)
+
+### 🚀 NEW FEATURES
+
+* 여러 코인 검색이 가능하도록 API 수정하고 에러 처리 추가 ([ed1fa42](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ed1fa42107e50b75eb3d950091fcaf09246d8e23))
+
+## [1.21.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.2...v1.21.3) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* 알람 삭제 수정 ([42e90cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/42e90cd434c7326e39acad09021b454bcf372b8e))
+
+## [1.21.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.1...v1.21.2) (2025-03-27)
+
+### ♻️ REFACTORING
+
+* addEmitter 수정 ([f9432e2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f9432e27d20edb9f17241f4336df168e4f1dfac9))
+* 알람 수정 조회 수정 ([480a4d8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/480a4d8fe8140ac936b8e0191b947a2ce9cdb4f7))
+* 알람 추가 시 알람 정보 반환 ([179963f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/179963f0c4f87e699cc813d6c2b387133b5262fc))
+
+## [1.21.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.21.0...v1.21.1) (2025-03-27)
+
+### 🐛 BUG FIXES
+
+* Jwt 스케줄러에 transactional 추가 ([450270f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/450270f515554a354ee3fc80f8090cb337c993ec))
+* 골든크로스 예외 처리 추가 ([f37142b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f37142b6e1c7e20ca435cfa4e7c5936e8e83f850))
+* 알람 정보 저장 시 refresh 추가 ([55a220a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/55a220aef27cbf9879275b90516b39b0cb1ff646))
+
+### ♻️ REFACTORING
+
+* exception 관련 수정 ([808f8b7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/808f8b73595e3dc2f80453f9833a2e560ec273c1))
+* VolumeSpike 전체 조회 관련 수정 ([75cb717](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/75cb717420f15a76e12c045813c0b57be1c57987))
+* 매개변수 명 수정 ([e7d47ea](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e7d47eabd9bc07e918aa504e45c59846c97e6889))
+* 사용하지 않는 코드 제거 ([708ff39](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/708ff39c43a23acbe578dcb164e969892ad1a091))
+* 알람 중복 확인 로직 수정 ([8923386](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8923386896cb865f8a9dd477bc4dc7fab20edb6f))
+* 예외 처리 코드 추가 ([9b44921](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9b44921b05dd7d0802f1b8b5b54389df0fb8d45f))
+
+## [1.21.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.20.0...v1.21.0) (2025-03-26)
+
+### 🚀 NEW FEATURES
+
+* 김치 프리미엄 리팩토링 ([fa7c73b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/fa7c73bf072044a0c18b19137da1972d3e85d8f5))
+
+### 🐛 BUG FIXES
+
+* sse 컨트롤러 수정 & SSE연결 ([766f530](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/766f5301fcf9d2e660f163bfb0b28adca5bef810))
+
+## [1.20.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.6...v1.20.0) (2025-03-26)
+
+### 🚀 NEW FEATURES
+
+* 알람 테스트 URL 추가 ([9852d47](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9852d47061901b7a10c1ae8f0ac5c972269dbbd6))
+
+### 🐛 BUG FIXES
+
+* 객체 맵핑 변경 ([db1731b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/db1731b8915a26fc127ddde904b140c3aa45ffff))
+* 이름 충돌로 인한 변수명 수정 ([2df809a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2df809a4be032f880603692e8c1b8f849c754763))
+
+## [1.19.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.5...v1.19.6) (2025-03-26)
+
+### 📚 DOCUMENTATION
+
+* 개발환경 deploy.yml 명칭 수정-2 ([55e3a80](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/55e3a80d07b7b00f235d4c0da65530fa3999426b))
+
+## [1.19.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.4...v1.19.5) (2025-03-26)
+
+### 📚 DOCUMENTATION
+
+* 개발환경 deploy.yml 명칭 수정 ([3240eae](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3240eaef90b54e5a407a40fba5b416d0e837e884))
+
+## [1.19.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.3...v1.19.4) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 병합중 발생한 오류 수정 ([24efc51](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/24efc51db61855eba4a5b4bf750814f64ed3cb5c))
+
+## [1.19.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.2...v1.19.3) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 알람 Emitter 로직 수정 ([55bc4d1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/55bc4d1a2219d89d0f2e1c08e4a19108cc2724bc))
+
+## [1.19.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.1...v1.19.2) (2025-03-25)
+
+### 🐛 BUG FIXES
+
+* 충돌 해결 ([4021661](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/402166174b0fa18fcd3ad1e3c050e0bebd0b05d2))
+
+## [1.19.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.19.0...v1.19.1) (2025-03-25)
+
+### ♻️ REFACTORING
+
+* goldenCross, VolumeSpike에서 필수값 제거 ([1b2593d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/1b2593dd12514c3513a5e8fa16f330a13e52008f))
+* user 정보 조회 추가 ([21e997e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/21e997ef1361c0a4ed9425afe4418ca1ef24da36))
+* volumeSpike user 정보 조회 추가 ([dbf17b4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/dbf17b43e3cd1b0503c6b9bff539f25ed0d38839))
+* 알람 추가시 userId 추가 ([41d2368](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/41d2368910a5d49eec9594d54fa0745773066421))
+* 코인 심볼 추가 ([f9bdeb8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f9bdeb83127dd6173f7df571aa34f335e2d13938))
+
+## [1.19.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.2...v1.19.0) (2025-03-25)
+
+### 🚀 NEW FEATURES
+
+* 롱숏 비율 계산 방식 longStrength 기반으로 변경 ([8ff0bf2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8ff0bf27ed54076d584a057999259ff5ba6440e1))
+
 ## [1.18.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.18.1...v1.18.2) (2025-03-24)
 
 ### ♻️ REFACTORING

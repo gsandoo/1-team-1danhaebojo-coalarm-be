@@ -24,13 +24,13 @@ public class AlertResponse {
         this.userId = alert.getUser().getUserId();
         this.active = alert.isActive();
         // `is_*` 값 중 `true`인 값을 기준으로 alertType 설정
-        if (alert.isGoldenCross()) {
+        if (alert.isGoldenCrossFlag()) {
             this.alertType = "GOLDEN_CROSS";
             this.goldenCross = new GoldenCrossResponse(alert.getGoldenCross());
-        } else if (alert.isTargetPrice()) {
+        } else if (alert.isTargetPriceFlag()) {
             this.alertType = "TARGET_PRICE";
             this.targetPrice = new TargetPriceResponse(alert.getTargetPrice());
-        } else if (alert.isVolumeSpike()) {
+        } else if (alert.isVolumeSpikeFlag()) {
             this.alertType = "VOLUME_SPIKE";
             this.volumeSpike = new VolumeSpikeResponse(alert.getVolumeSpike());
         }

@@ -10,6 +10,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertReposito
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistory;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
+import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
+import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlertHistoryService {
 
-    private final AlertHistoryRepositoryImpl alertHistoryRepository;
+    private final AlertHistoryRepositoryImpl alertHistoryRepositoryImpl;
 
     // 알람 리스트 조회
     @Transactional(readOnly = true)
@@ -37,7 +39,7 @@ public class AlertHistoryService {
         int offset = paginationRequest.getOffset();
         int limit = paginationRequest.getLimit();
         Pageable pageable = PageRequest.of(offset, limit);
-        Page<AlertHistory> historyPage = alertHistoryRepository.findAlertHistoryByFilter(userId, pageable);
+        Page<AlertHistory> historyPage = alertHistoryRepositoryImpl.findAlertHistoryByFilter(userId, pageable);
 
         List<AlertHistoryListResponse.AlertHistoryContent> contents = historyPage.getContent().stream()
                 .map(AlertHistoryListResponse.AlertHistoryContent::new)
@@ -54,8 +56,8 @@ public class AlertHistoryService {
 
     // 알람 정보 조회
     public AlertHistoryResponse getAlertHistory(Long alertHistoryId) {
-        AlertHistory alertHistory = alertHistoryRepository.findById(alertHistoryId)
-                .orElseThrow(() -> new RuntimeException("해당 알람 히스토리를 찾을 수 없습니다."));
+        AlertHistory alertHistory = alertHistoryRepositoryImpl.findById(alertHistoryId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT_HISTORY));
 
         return new AlertHistoryResponse(alertHistory);
     }
@@ -76,6 +78,6 @@ public class AlertHistoryService {
         alertHistory.setAlert(alert);
         alertHistory.setRegisteredDate(LocalDateTime.now());
 
-        alertHistoryRepository.save(alertHistory);
+        alertHistoryRepositoryImpl.save(alertHistory);
     }
 }

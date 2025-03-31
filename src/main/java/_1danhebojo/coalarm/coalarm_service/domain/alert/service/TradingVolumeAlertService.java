@@ -1,6 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertSSERepositoryImpl;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.VolumeSpikeAlert;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.util.FormatUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -91,26 +92,17 @@ public class TradingVolumeAlertService {
         return CoinList.contains(symbol);
 }
 
-    // "KRW-BTC" → "BTC/KRW" 변환하는 메서드
-//    private String convertMarketFormat(String market) {
-//        String[] parts = market.split("-");
-//        if (parts.length == 2) {
-//            return parts[1] + "/" + parts[0]; // "BTC/KRW"
-//        }
-//        return market;
-//    }
-
     // 전체 사용자에게 거래량 급등 알림 전송
     private void sendVolumeToUser() {
-        List<VolumeSpikeAlert> volumeSpikeAlerts = alertSSERepositoryImpl.findAllVolumeSpikeAlertByStatus();
+        List<Alert> volumeSpikeAlerts = alertSSERepositoryImpl.findAllVolumeSpikeAlertByStatus();
         if (!volumeSpikeAlerts.isEmpty()) {
-            for (VolumeSpikeAlert volumeSpike : volumeSpikeAlerts) {
-                String symbol = volumeSpike.getAlert().getCoin().getSymbol() + "/KRW";
+            for (Alert alert : volumeSpikeAlerts) {
+                String symbol = alert.getCoin().getSymbol() + "/KRW";
                 boolean tradingVolume = hasVolumeSpike(symbol);
 
                 if (tradingVolume) {
-                    alertSSEService.sendAlertToUserSSE(volumeSpike.getAlert().getUser().getUserId(), volumeSpike.getAlert());
-                    alertSSEService.sendAlertToUserDiscord(volumeSpike.getAlert().getUser().getUserId(), volumeSpike.getAlert());
+                    alertSSEService.sendAlertToUserSSE(alert.getUser().getUserId(), alert);
+                    alertSSEService.sendAlertToUserDiscord(alert.getUser().getUserId(), alert);
                     log.info("거래량 급등 알림 전송: " + symbol);
                 }
             }
