@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
+@Slf4j
 public class RateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final RateLimitProperties properties;
@@ -34,6 +36,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         // 클라이언트 식별: X-Forwarded-For → RemoteAddr fallback
         String clientKey = extractClientIp(request);
+        log.info("Client IP: " + clientKey);
 
         // 버킷 가져오기 또는 새로 생성
         Bucket bucket = buckets.computeIfAbsent(clientKey, this::createNewBucket);
@@ -58,9 +61,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private String extractClientIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader != null && !xfHeader.isEmpty()) {
-            // 여러 IP가 있을 경우 첫 번째가 실제 클라이언트 IP
-            return xfHeader.split(",")[0].trim();
+            String[] parts = xfHeader.split(",");
+            // 맨 처음 값이 가장 바깥(클라이언트)의 IP
+            return parts[0].trim();
         }
+
+        // fallback (단일 인스턴스 테스트용)
         return request.getRemoteAddr();
     }
+
 }
