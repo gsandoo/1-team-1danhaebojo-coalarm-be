@@ -3,6 +3,7 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.controller;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.UpbitSseService;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,7 @@ class UpbitSseController {
 
     private final UpbitSseService upbitService;
 
-    @GetMapping("/{symbol}")
+    @GetMapping(value = "/{symbol}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@PathVariable String symbol) {
         upbitService.subscribeSymbol(symbol);
         return upbitService.addEmitter(symbol);
