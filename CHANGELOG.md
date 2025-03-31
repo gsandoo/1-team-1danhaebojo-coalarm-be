@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.25.0...v1.26.0) (2025-03-31)
+
+### 🚀 NEW FEATURES
+
+* 디스코드 웹훅 url 유효성 검사 로직 추가 ([16530d5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/16530d5e75cb045389988be7438accf7442581ef))
+
 ## [1.25.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.8...v1.25.0) (2025-03-31)
 
 ### 🚀 NEW FEATURES
