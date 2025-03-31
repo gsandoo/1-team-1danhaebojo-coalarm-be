@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.24.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.5...v1.24.6) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* Upbit SSE subscribe API에 produces 명시 및 예외 처리 추가 ([ca290c2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ca290c2e871a685270bd6f248790cf7fca78a6d2))
+
 ## [1.24.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.4...v1.24.5) (2025-03-31)
 
 ### 🐛 BUG FIXES
