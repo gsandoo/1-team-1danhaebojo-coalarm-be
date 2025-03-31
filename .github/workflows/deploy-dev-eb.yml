@@ -1,4 +1,4 @@
-name: deploy_dev.eb
+name: deploy dev
 
 on:
   push:
