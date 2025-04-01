@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.Aler
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryListResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlertHistoryService {
 
-    private final AlertHistoryRepositoryImpl alertHistoryRepositoryImpl;
+    private final AlertHistoryRepository alertHistoryRepository;
 
     // 알람 리스트 조회
     @Transactional(readOnly = true)
@@ -39,7 +40,7 @@ public class AlertHistoryService {
         int offset = paginationRequest.getOffset();
         int limit = paginationRequest.getLimit();
         Pageable pageable = PageRequest.of(offset, limit);
-        Page<AlertHistory> historyPage = alertHistoryRepositoryImpl.findAlertHistoryByFilter(userId, pageable);
+        Page<AlertHistory> historyPage = alertHistoryRepository.findAlertHistoryByFilter(userId, pageable);
 
         List<AlertHistoryListResponse.AlertHistoryContent> contents = historyPage.getContent().stream()
                 .map(AlertHistoryListResponse.AlertHistoryContent::new)
@@ -56,7 +57,7 @@ public class AlertHistoryService {
 
     // 알람 정보 조회
     public AlertHistoryResponse getAlertHistory(Long alertHistoryId) {
-        AlertHistory alertHistory = alertHistoryRepositoryImpl.findById(alertHistoryId)
+        AlertHistory alertHistory = alertHistoryRepository.findById(alertHistoryId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT_HISTORY));
 
         return new AlertHistoryResponse(alertHistory);
@@ -78,6 +79,6 @@ public class AlertHistoryService {
         alertHistory.setAlert(alert);
         alertHistory.setRegisteredDate(LocalDateTime.now());
 
-        alertHistoryRepositoryImpl.save(alertHistory);
+        alertHistoryRepository.save(alertHistory);
     }
 }
