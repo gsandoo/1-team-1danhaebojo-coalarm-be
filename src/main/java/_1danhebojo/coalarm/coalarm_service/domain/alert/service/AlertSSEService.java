@@ -281,7 +281,7 @@ public class AlertSSEService {
         }
 
         // 더 이상 연결이 없는 유저에 대해서는 Map에서 아예 지워버리고, 연결이 남아 있는 경우만 최신 상태로 다시 저장한다."
-        if (emitters.isEmpty()) {
+        if (emitters != null && !emitters.isEmpty()) {
             userEmitters.remove(userId);
         }
 
