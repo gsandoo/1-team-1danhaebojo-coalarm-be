@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.8...v1.26.9) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* rete-limit 로직 변경 ([416845b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/416845bd75d5ba24fc28fff11024aadc3a9a241c))
+
 ## [1.26.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.7...v1.26.8) (2025-04-01)
 
 ### 🐛 BUG FIXES
