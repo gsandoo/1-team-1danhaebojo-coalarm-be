@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.5...v1.26.6) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* Merge branch 'develop' into fix/ratelimit ([3e2ec23](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3e2ec23f52bfaf877e3a85b47d791b60b22e538b))
+
 ## [1.26.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.4...v1.26.5) (2025-04-01)
 
 ### 🐛 BUG FIXES
