@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [1.26.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.6...v1.26.7) (2025-04-01)
+
+### ♻️ REFACTORING
+
+* goldenCroess shortMa, longMa 기본 값 적용 ([477b18c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/477b18c58705576abd7bcc23a4fa3ccc030a28c3))
+* 알람 체크 시 사용자 알람 이력 일괄 조회로 성능 개선 ([8f3504c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8f3504c51d71bfe63e3036647542ca9a31e0ae75))
+* 알람 히스토리 인터페이스 연결 ([67d2d08](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/67d2d08adfd74fc8790bbf626b81336afe3e995f))
+* 알람 히스토리 인터페이스 추가 ([df23781](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/df23781b47b56fe414ea5275602b50f7cf07f8f9))
+
 ## [1.26.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.5...v1.26.6) (2025-04-01)
 
 ### 🐛 BUG FIXES
