@@ -36,22 +36,23 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         // 클라이언트 식별: X-Forwarded-For → RemoteAddr fallback
         String clientKey = extractClientIp(request);
-        log.info("Client IP: " + clientKey);
+        log.debug("Rate Limit - Client IP: {}", clientKey);
 
         // 버킷 가져오기 또는 새로 생성
         Bucket bucket = buckets.computeIfAbsent(clientKey, this::createNewBucket);
 
         // 토큰 소비 시도
         if (bucket.tryConsume(1)) {
-            System.out.println("Allowed for IP: " + clientKey);
+            log.debug("Rate Limit - Request allowed for IP: {}", clientKey);
             filterChain.doFilter(request, response);
         } else {
-            System.out.println("Too Many Requests for IP: " + clientKey);
+            log.warn("Rate Limit - Too Many Requests for IP: {}", clientKey);
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"message\":\"API 호출 횟수가 제한을 초과했습니다. 잠시 후 다시 시도해주세요.\"}");
+            // 다른 필터가 실행되지 않도록 여기서 종료 - return 추가
+            return;
         }
-
     }
 
     private Bucket createNewBucket(String key) {
@@ -64,13 +65,17 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private String extractClientIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader != null && !xfHeader.isEmpty()) {
-            String[] parts = xfHeader.split(",");
-            // 맨 처음 값이 가장 바깥(클라이언트)의 IP
-            return parts[0].trim();
+            // 첫 번째 IP만 추출 (클라이언트에 가장 가까운 IP)
+            return xfHeader.split(",")[0].trim();
         }
 
-        // fallback (단일 인스턴스 테스트용)
+        // X-Real-IP 헤더 확인
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isEmpty()) {
+            return realIp.trim();
+        }
+
+        // fallback
         return request.getRemoteAddr();
     }
-
 }
