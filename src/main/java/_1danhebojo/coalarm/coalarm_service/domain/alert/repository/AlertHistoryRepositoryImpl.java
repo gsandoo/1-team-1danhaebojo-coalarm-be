@@ -26,7 +26,6 @@ public class AlertHistoryRepositoryImpl implements AlertHistoryRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Transactional
     public Page<AlertHistory> findAlertHistoryByFilter(Long userId, Pageable pageable) {
         return alertHistoryJpaRepository.findByUserId(userId, pageable);
     }
@@ -42,6 +41,19 @@ public class AlertHistoryRepositoryImpl implements AlertHistoryRepository {
 
     public boolean findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo) {
         return alertHistoryJpaRepository.findRecentHistory(userId, alertId, minutesAgo);
+    }
+
+    @Override
+    public List<Long> findRecentHistories(LocalDateTime minutesAgo) {
+        QAlertHistory alertHistory = QAlertHistory.alertHistory;
+
+        return new JPAQuery<Long>(entityManager)
+                .select(alertHistory.alert.alertId)
+                .from(alertHistory)
+                .where(
+                        alertHistory.registeredDate.goe(minutesAgo)
+                )
+                .fetch();
     }
 
     public List<Long> findRecentAlertIdsByUser(Long userId, LocalDateTime since) {

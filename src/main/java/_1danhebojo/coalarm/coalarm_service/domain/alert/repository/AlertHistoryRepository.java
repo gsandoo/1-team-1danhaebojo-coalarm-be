@@ -13,5 +13,6 @@ public interface AlertHistoryRepository {
     void save(AlertHistory alertHistory);
     Optional<AlertHistory> findById(Long alertHistoryId);
     boolean findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo);
+    List<Long> findRecentHistories(LocalDateTime minutesAgo);
     List<Long> findRecentAlertIdsByUser(Long userId, LocalDateTime since);
 }
