@@ -1,4 +1,4 @@
-name: deploy dev with eb
+name: deploy developments
 
 on:
   push:

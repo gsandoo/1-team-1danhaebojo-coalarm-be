@@ -32,8 +32,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        if (!request.getRequestURI().startsWith("/api/v1")) {
+      
+        // API 경로에만 레이트 리밋 적용
+        if (!request.getRequestURI().startsWith("/api/v1/")) {
             filterChain.doFilter(request, response);
             return;
         }
