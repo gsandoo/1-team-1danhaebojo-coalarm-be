@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class RateLimitProperties {
-    private int capacity = 100;
-    private int refillTokens = 100;
-    private int refillDurationMinutes = 1;
+    private long capacity;
+    private long refillTokens;
+    private long refillDurationMinutes;
 }
