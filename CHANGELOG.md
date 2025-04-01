@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.26.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.4...v1.26.5) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* 웹 소켓 재 연결 로직 추가 ([e44dddd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e44dddd117fb451318db55fc46e2038170e9bd6d))
+
 ## [1.26.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.3...v1.26.4) (2025-03-31)
 
 ### 🐛 BUG FIXES
