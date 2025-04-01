@@ -126,25 +126,24 @@ public class AlertSSEService {
     @Scheduled(fixedRateString = "#{@alarmProperties.sendSubscription}") // 1초마다 실행
     @Transactional(readOnly = true)
     public void checkAlertsForSubscribedUsers() {
+        // 티커 테이블에서 코인의 최신 값을 한번에 불러와서 조회 후 비교
+        List<String> allSymbols = activeAlertList.values().stream()
+                .flatMap(List::stream) // List<Alert> -> Alert
+                .map(alert -> alert.getCoin().getSymbol())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        List<TickerEntity> tickerList = alertRepositoryImpl.findLatestTickersBySymbolList(allSymbols);
+
+        // 최근 알람 히스토리를 한 번에 조회
+        LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
+        List<Long> recentAlertIds = alertHistoryRepository.findRecentHistories(minutesAgo);
+        Set<Long> recentAlertIdSet = new HashSet<>(recentAlertIds);
         for (Long userId : userEmitters.keySet()) {
             List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
 
             // 유효성 추가
             if (activeAlerts == null || activeAlerts.isEmpty()) continue;
-
-            // 티커 테이블에서 코인의 최신 값을 한번에 불러와서 조회 후 비교
-            List<String> uniqueSymbols = activeAlerts.stream()
-                    .map(alert -> alert.getCoin().getSymbol())
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .toList();
-            List<TickerEntity> tickerList = alertRepositoryImpl.findLatestTickersBySymbolList(uniqueSymbols);
-
-            LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
-
-            // 2. 최근 알람 히스토리를 한 번에 조회
-            List<Long> recentAlertIds = alertHistoryRepository.findRecentAlertIdsByUser(userId, minutesAgo);
-            Set<Long> recentAlertIdSet = new HashSet<>(recentAlertIds);
 
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
@@ -153,7 +152,7 @@ public class AlertSSEService {
                 TickerEntity ticker = tickerList.stream()
                         .filter(t -> t.getId().getQuoteSymbol().equals(symbol))
                         .findFirst()
-                        .orElse(null); // 못 찾으면 null
+                        .orElse(null);
                 if (ticker != null) {
                     if (goldCrossAndTargetPriceService.isPriceReached(alert, ticker)) {
                         if (goldCrossAndTargetPriceService.isPriceStillValid(alert, recentAlertIdSet)) {
