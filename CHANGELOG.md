@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [1.26.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.7...v1.26.8) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* SSE 알림 전송 시 NullPointerException 방지 처리 ([a8e51e0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/a8e51e0206eaca41feb4cd6047a8e2dc7dd74812))
+
+### ♻️ REFACTORING
+
+* 알림 히스토리 및 티커 조회 로직 전체 조회 방식으로 개선 ([822789f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/822789f52cee4fae212558349df2daf53ec4c89a))
+
 ## [1.26.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.6...v1.26.7) (2025-04-01)
 
 ### ♻️ REFACTORING
