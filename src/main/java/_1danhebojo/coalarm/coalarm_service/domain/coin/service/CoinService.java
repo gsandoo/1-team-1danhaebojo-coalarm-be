@@ -12,5 +12,5 @@ public interface CoinService {
     OffsetResponse<CoinDTO> getCoinsWithPaging(Integer offset, Integer limit);
     CoinDTO getCoinById(Long coinId);
     List<CoinDTO> searchCoinByNameOrSymbol(String term);
-    List<CoinWithPriceDTO> searchCoinWithPrice(String term);
+    List<CoinWithPriceDTO> searchCoinWithPrice(String keyword, String quoteSymbol);
 }
