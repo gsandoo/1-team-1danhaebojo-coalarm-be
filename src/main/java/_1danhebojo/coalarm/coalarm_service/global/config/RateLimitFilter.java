@@ -28,15 +28,23 @@ public class RateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        if (request.getRequestURI().startsWith("/api/v1/")) {
+            String remoteAddr = request.getRemoteAddr();
+            String xForwardedFor = request.getHeader("X-Forwarded-For");
+            String xRealIp = request.getHeader("X-Real-IP");
+            String userAgent = request.getHeader("User-Agent");
+
+            log.info("IP 디버깅 - RemoteAddr: {}, X-Forwarded-For: {}, X-Real-IP: {}, User-Agent: {}",
+                    remoteAddr, xForwardedFor, xRealIp, userAgent);
+
+            // 헤더 추출 로직 테스트
+            String extractedIp = extractClientIp(request);
+            log.info("추출된 IP: {}", extractedIp);
+        }
+        
+        String path = request.getRequestURI();
         // API 경로에만 레이트 리밋 적용
         if (!request.getRequestURI().startsWith("/api/v1/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 헬스 체크 및 핵심 기능은 레이트 리밋에서 제외
-        String path = request.getRequestURI();
-        if (path.contains("/health") || path.contains("/auth") || path.contains("/sse")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -74,8 +82,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private String extractClientIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader != null && !xfHeader.isEmpty()) {
-            // 첫 번째 IP 추출 (클라이언트에 가장 가까운 IP)
+            log.info("전체 X-Forwarded-For 헤더: {}", xfHeader);
+
             String[] ips = xfHeader.split(",");
+            // 모든 IP를 로그로 출력
+            for (int i = 0; i < ips.length; i++) {
+                log.info("IP[{}]: {}", i, ips[i].trim());
+            }
+
             return ips[0].trim();
         }
 
@@ -83,12 +97,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String realIp = request.getHeader("X-Real-IP");
         if (realIp != null && !realIp.isEmpty()) {
             return realIp.trim();
-        }
-
-        // CF-Connecting-IP 확인
-        String cfIp = request.getHeader("CF-Connecting-IP");
-        if (cfIp != null && !cfIp.isEmpty()) {
-            return cfIp.trim();
         }
 
         // fallback
