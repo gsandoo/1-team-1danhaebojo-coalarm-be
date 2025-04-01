@@ -28,47 +28,38 @@ public class RateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (request.getRequestURI().startsWith("/api/v1/")) {
-            String remoteAddr = request.getRemoteAddr();
-            String xForwardedFor = request.getHeader("X-Forwarded-For");
-            String xRealIp = request.getHeader("X-Real-IP");
-            String userAgent = request.getHeader("User-Agent");
-
-            log.info("IP 디버깅 - RemoteAddr: {}, X-Forwarded-For: {}, X-Real-IP: {}, User-Agent: {}",
-                    remoteAddr, xForwardedFor, xRealIp, userAgent);
-
-            // 헤더 추출 로직 테스트
-            String extractedIp = extractClientIp(request);
-            log.info("추출된 IP: {}", extractedIp);
-        }
-
-        String path = request.getRequestURI();
         // API 경로에만 레이트 리밋 적용
         if (!request.getRequestURI().startsWith("/api/v1/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 클라이언트 식별: X-Forwarded-For → RemoteAddr fallback
-        String clientKey = extractClientIp(request);
-        log.debug("Rate Limit - Client IP: {}, Path: {}", clientKey, path);
+        String path = request.getRequestURI();
+
+        // 클라이언트 복합 식별자 생성
+        String clientIp = extractClientIp(request);
+        String userAgent = request.getHeader("User-Agent");
+        String sessionId = request.getSession(true).getId();
+
+        // 복합 키 생성 (IP + User-Agent 해시 + 세션 ID 해시)
+        String clientKey = clientIp + ":" +
+                (userAgent != null ? Math.abs(userAgent.hashCode() % 1000) : "0") + ":" +
+                (sessionId.hashCode() % 10000);
+
+        log.info("생성된 클라이언트 키: {}, 경로: {}", clientKey, path);
 
         // 버킷 가져오기 또는 새로 생성
         Bucket bucket = buckets.computeIfAbsent(clientKey, this::createNewBucket);
 
         // 토큰 소비 시도
         if (bucket.tryConsume(1)) {
-            log.debug("Rate Limit - Request allowed for IP: {}", clientKey);
             filterChain.doFilter(request, response);
         } else {
-            log.warn("Rate Limit - Too Many Requests for IP: {}, Path: {}", clientKey, path);
+            log.warn("Rate Limit - Too Many Requests for Client: {}, Path: {}", clientKey, path);
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Expires", "0");
             response.getWriter().write("{\"message\":\"API 호출 횟수가 제한을 초과했습니다. 잠시 후 다시 시도해주세요.\"}");
-            return;
         }
     }
 
