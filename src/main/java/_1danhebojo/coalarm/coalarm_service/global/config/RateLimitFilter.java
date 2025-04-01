@@ -34,9 +34,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 헬스 체크 및 핵심 기능은 레이트 리밋에서 제외
+        String path = request.getRequestURI();
+        if (path.contains("/health") || path.contains("/auth") || path.contains("/sse")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 클라이언트 식별: X-Forwarded-For → RemoteAddr fallback
         String clientKey = extractClientIp(request);
-        log.debug("Rate Limit - Client IP: {}", clientKey);
+        log.debug("Rate Limit - Client IP: {}, Path: {}", clientKey, path);
 
         // 버킷 가져오기 또는 새로 생성
         Bucket bucket = buckets.computeIfAbsent(clientKey, this::createNewBucket);
@@ -46,11 +53,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
             log.debug("Rate Limit - Request allowed for IP: {}", clientKey);
             filterChain.doFilter(request, response);
         } else {
-            log.warn("Rate Limit - Too Many Requests for IP: {}", clientKey);
+            log.warn("Rate Limit - Too Many Requests for IP: {}, Path: {}", clientKey, path);
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
             response.getWriter().write("{\"message\":\"API 호출 횟수가 제한을 초과했습니다. 잠시 후 다시 시도해주세요.\"}");
-            // 다른 필터가 실행되지 않도록 여기서 종료 - return 추가
             return;
         }
     }
@@ -65,14 +74,21 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private String extractClientIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader != null && !xfHeader.isEmpty()) {
-            // 첫 번째 IP만 추출 (클라이언트에 가장 가까운 IP)
-            return xfHeader.split(",")[0].trim();
+            // 첫 번째 IP 추출 (클라이언트에 가장 가까운 IP)
+            String[] ips = xfHeader.split(",");
+            return ips[0].trim();
         }
 
         // X-Real-IP 헤더 확인
         String realIp = request.getHeader("X-Real-IP");
         if (realIp != null && !realIp.isEmpty()) {
             return realIp.trim();
+        }
+
+        // CF-Connecting-IP 확인
+        String cfIp = request.getHeader("CF-Connecting-IP");
+        if (cfIp != null && !cfIp.isEmpty()) {
+            return cfIp.trim();
         }
 
         // fallback
