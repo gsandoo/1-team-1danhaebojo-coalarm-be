@@ -129,8 +129,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateNickname(String nickname) {
-        if (nickname.length() < 2) {
-            throw new ApiException(AppHttpStatus.BAD_REQUEST);
+        if (nickname.length() < 2 || nickname.length() > 10) {
+            throw new ApiException(AppHttpStatus.INVALID_NICKNAME_LENGTH);
         }
 
     }
