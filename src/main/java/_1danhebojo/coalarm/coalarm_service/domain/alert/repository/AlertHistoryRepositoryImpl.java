@@ -1,7 +1,9 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.repository;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistory;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.QAlertHistory;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.AlertHistoryJpaRepository;
+import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class AlertHistoryRepositoryImpl {
+public class AlertHistoryRepositoryImpl implements AlertHistoryRepository {
 
     private final AlertHistoryJpaRepository alertHistoryJpaRepository;
 
@@ -40,5 +42,18 @@ public class AlertHistoryRepositoryImpl {
 
     public boolean findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo) {
         return alertHistoryJpaRepository.findRecentHistory(userId, alertId, minutesAgo);
+    }
+
+    public List<Long> findRecentAlertIdsByUser(Long userId, LocalDateTime since) {
+        QAlertHistory alertHistory = QAlertHistory.alertHistory;
+
+        return new JPAQuery<Long>(entityManager)
+                .select(alertHistory.alert.alertId)
+                .from(alertHistory)
+                .where(
+                        alertHistory.user.userId.eq(userId),
+                        alertHistory.registeredDate.goe(since)
+                )
+                .fetch();
     }
 }

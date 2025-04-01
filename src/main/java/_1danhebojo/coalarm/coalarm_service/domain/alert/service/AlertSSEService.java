@@ -1,9 +1,11 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertSSEResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -30,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AlertSSEService {
     private final AlertHistoryService alertHistoryService;
     private final AlertRepositoryImpl alertRepositoryImpl;
+    private final AlertHistoryRepository alertHistoryRepository;
     private final Map<Long, List<SseEmitter>> userEmitters = new ConcurrentHashMap<>();
     private final Map<Long, List<Alert>> activeAlertList = new ConcurrentHashMap<>();
     private final DiscordService discordService;
@@ -128,20 +132,44 @@ public class AlertSSEService {
             // 유효성 추가
             if (activeAlerts == null || activeAlerts.isEmpty()) continue;
 
+            // 티커 테이블에서 코인의 최신 값을 한번에 불러와서 조회 후 비교
+            List<String> uniqueSymbols = activeAlerts.stream()
+                    .map(alert -> alert.getCoin().getSymbol())
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .toList();
+            List<TickerEntity> tickerList = alertRepositoryImpl.findLatestTickersBySymbolList(uniqueSymbols);
+
+            LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
+
+            // 2. 최근 알람 히스토리를 한 번에 조회
+            List<Long> recentAlertIds = alertHistoryRepository.findRecentAlertIdsByUser(userId, minutesAgo);
+            Set<Long> recentAlertIdSet = new HashSet<>(recentAlertIds);
+
             // 활성화된 알람 SSE로 보내기
             for (Alert alert : activeAlerts) {
-                if (goldCrossAndTargetPriceService.isPriceReached(alert) && goldCrossAndTargetPriceService.isPriceStillValid(alert)) {
-                    log.info("조건 부합 : 1분" + alert);
-                    Queue<Alert> queue = userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
+                String symbol = alert.getCoin().getSymbol();
 
-                    boolean alreadyQueued = queue.stream()
-                            .anyMatch(a -> a.getAlertId().equals(alert.getAlertId()));
+                TickerEntity ticker = tickerList.stream()
+                        .filter(t -> t.getId().getQuoteSymbol().equals(symbol))
+                        .findFirst()
+                        .orElse(null); // 못 찾으면 null
+                if (ticker != null) {
+                    if (goldCrossAndTargetPriceService.isPriceReached(alert, ticker)) {
+                        if (goldCrossAndTargetPriceService.isPriceStillValid(alert, recentAlertIdSet)) {
+                            log.info("조건 부합 : 1분" + alert);
+                            Queue<Alert> queue = userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
 
-                    // 이미 보냈던 애를 중복처리
+                            boolean alreadyQueued = queue.stream()
+                                    .anyMatch(a -> a.getAlertId().equals(alert.getAlertId()));
+
+                            // 이미 보냈던 애를 중복처리
 
 
-                    if (!alreadyQueued ) {
-                        queue.add(alert);
+                            if (!alreadyQueued) {
+                                queue.add(alert);
+                            }
+                        }
                     }
                 }
             }
@@ -150,7 +178,7 @@ public class AlertSSEService {
 
     // 로그인한 사용자가 실행
     public SseEmitter subscribe(Long userId) {
-
+        if(userId == null) { return null;}
         removeEmitter(userId);
 
         // 이미 존재하는 emitter가 있으면 재사용

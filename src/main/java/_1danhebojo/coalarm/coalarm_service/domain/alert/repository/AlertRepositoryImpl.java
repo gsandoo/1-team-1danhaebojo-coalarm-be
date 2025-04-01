@@ -9,8 +9,12 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.GoldenCro
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.TargetPriceJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.VolumeSpikeJpaRepository;
 
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.QTickerEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -154,6 +158,23 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType) {
         return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType);
+    }
+
+    public List<TickerEntity> findLatestTickersBySymbolList(List<String> symbolList) {
+        QTickerEntity ticker = QTickerEntity.tickerEntity;
+        QTickerEntity tickerSub = new QTickerEntity("tickerSub");
+
+        return query.selectFrom(ticker)
+                .where(
+                        ticker.id.quoteSymbol.in(symbolList),
+                        ticker.id.timestamp.eq(
+                                JPAExpressions
+                                        .select(tickerSub.id.timestamp.max())
+                                        .from(tickerSub)
+                                        .where(tickerSub.id.quoteSymbol.eq(ticker.id.quoteSymbol))
+                        )
+                )
+                .fetch();
     }
 }
 

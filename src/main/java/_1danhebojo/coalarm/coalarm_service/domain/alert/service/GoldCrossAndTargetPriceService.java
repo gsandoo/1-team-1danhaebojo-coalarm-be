@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertSSERepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.util.FormatUtil;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,59 +24,51 @@ public class GoldCrossAndTargetPriceService {
     private final AlertHistoryRepositoryImpl alertHistoryRepositoryImpl;
 
     // 알람 설정에 도달했는지 체크
-    boolean isPriceReached(Alert alert) {
+    boolean isPriceReached(Alert alert, TickerEntity ticker) {
         // 가격 지정가 알람 확인
         if (alert.isTargetPriceFlag()) {
-            return checkTargetPrice(alert);
+            return checkTargetPrice(alert, ticker);
         }
 
         // 골든 크로스 알람 확인
         else if (alert.isGoldenCrossFlag()) {
-            return checkGoldenCross(alert);
+            return checkGoldenCross(alert, ticker);
         }
 
         return false;
     }
 
-    private boolean checkTargetPrice(Alert alert) {
+    private boolean checkTargetPrice(Alert alert, TickerEntity tickerEntity) {
         TargetPriceAlert targetPrice = alert.getTargetPrice();
-        if (targetPrice == null) return false;
+        if (targetPrice == null || tickerEntity == null) return false;
 
-        BigDecimal price = BigDecimal.valueOf(targetPrice.getPrice());
+        BigDecimal targetPriceValue = BigDecimal.valueOf(targetPrice.getPrice());
         int percent = targetPrice.getPercentage();
+        BigDecimal lastPrice = tickerEntity.getLast(); // ticker에서 최신 가격 가져오기
 
-        // 마지막 데이터 가져와서 비교.
-        String convertedMarket = FormatUtil.convertMarketFormat(alert.getCoin().getSymbol());
-        Optional<Ticker> tickers = alertSSERepositoryImpl.findLatestBySymbol(convertedMarket,"upbit");
-        if (tickers.isEmpty()) return false;
+        if (lastPrice == null) return false;
 
-        // 퍼센트가 음수면 하락지점이라서 그 값보다 작을 때로 비교
         boolean targetPriceReached = false;
-        if(percent > 0){
-            BigDecimal max = tickers.stream()
-                    .map(Ticker::getLast)        // last 값만 추출
-                    .max(BigDecimal::compareTo)  // 최대값 찾기
-                    .orElse(BigDecimal.ZERO);    // 값이 없으면 0 반환
-            if(max.compareTo(price) >= 0){
-                targetPriceReached = true;
-            }
 
-        }
-        // 퍼센트가 양수면 상승지점이라서 그 값보다 클 때로 비교
-        else if(percent < 0){
-            BigDecimal min = tickers.stream()
-                    .map(Ticker::getLast)
-                    .min(BigDecimal::compareTo)  // 최소값 찾기
-                    .orElse(BigDecimal.ZERO);
-            if(min.compareTo(price) <= 0){
+        // 퍼센트가 양수면 상승 → 가격이 목표 이상이면 도달
+        if (percent > 0) {
+            if (lastPrice.compareTo(targetPriceValue) >= 0) {
                 targetPriceReached = true;
             }
         }
+
+        // 퍼센트가 음수면 하락 → 가격이 목표 이하이면 도달
+        else if (percent < 0) {
+            if (lastPrice.compareTo(targetPriceValue) <= 0) {
+                targetPriceReached = true;
+            }
+        }
+
         return targetPriceReached;
     }
 
     // 골든 크로스 가격 비교 확인 필요
-    private boolean checkGoldenCross(Alert alert) {
+    private boolean checkGoldenCross(Alert alert, TickerEntity tickerEntity) {
         GoldenCrossAlert goldenCross = alert.getGoldenCross();
         if (goldenCross == null) return false;
 
@@ -109,13 +102,9 @@ public class GoldCrossAndTargetPriceService {
         return shortMA.compareTo(longMA) > 0;
     }
 
-    boolean isPriceStillValid(Alert alert) {
-        // 1분 뒤에도 가격 유지 여부 확인
-        LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
-        boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUser().getUserId(), alert.getAlertId(), minutesAgo);
-
-        // 1분 내 동일한 알람이 있음 → 알람 전송 안함
-        return !recentHistory;
+    boolean isPriceStillValid(Alert alert, Set<Long> recentAlertIdSet) {
+        // recentAlertIdSet에 해당 alertId가 있으면 → 1분 내에 이미 알림 전송됨 → false
+        return !recentAlertIdSet.contains(alert.getAlertId());
     }
 
     // 이동 평균 계산
