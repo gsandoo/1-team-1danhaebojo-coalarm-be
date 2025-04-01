@@ -51,7 +51,7 @@ public class UpbitSseService {
                         payload = message.getPayload().toString(); // fallback
                     }
 
-                    log.info("📥 WebSocket 수신 payload: {}", payload);
+//                    log.info("📥 WebSocket 수신 payload: {}", payload);
 
                     String code = extractCodeFromPayload(payload);
                     if (code == null) {
@@ -64,7 +64,7 @@ public class UpbitSseService {
                     emitterMap.getOrDefault(symbol, List.of()).forEach(emitter -> {
                         try {
                             emitter.send(SseEmitter.event().data(payload));
-                            log.info("📤 SSE 전송: {}", symbol);
+//                            log.info("📤 SSE 전송: {}", symbol);
                         } catch (IOException e) {
                             emitter.completeWithError(e);
                         }
