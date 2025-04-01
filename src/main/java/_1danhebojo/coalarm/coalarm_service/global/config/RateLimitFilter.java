@@ -41,7 +41,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             String extractedIp = extractClientIp(request);
             log.info("추출된 IP: {}", extractedIp);
         }
-        
+
         String path = request.getRequestURI();
         // API 경로에만 레이트 리밋 적용
         if (!request.getRequestURI().startsWith("/api/v1/")) {
