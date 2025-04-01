@@ -16,10 +16,10 @@ public class GoldenCrossAlert {
     private Long goldenCrossId;
 
     @Column(nullable = true)
-    private Long shortMa;  // 단기 이동평균선
+    private Long shortMa = 7L;  // 단기 이동평균선
 
     @Column(nullable = true)
-    private Long longMa;   // 장기 이동평균선
+    private Long longMa = 20L;   // 장기 이동평균선
 
     @JsonIgnore
     @OneToOne
