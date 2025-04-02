@@ -89,22 +89,15 @@ public class AlertSSEService {
             Long userId = entry.getKey();
             List<SseEmitter> emitters = entry.getValue();
 
-            List<SseEmitter> deadEmitters = new ArrayList<>();
-
             for (SseEmitter emitter : emitters) {
                 try {
                     emitter.send(SseEmitter.event()
                             .name("heartbeat")
                             .data("keep-alive")); // 클라이언트에선 로그로만 찍어도 OK
                 } catch (IOException e) {
-                    deadEmitters.add(emitter);
                     log.warn("heartbeat 전송 실패 - userId: " + userId);
+                    removeSingleEmitter(userId, emitter);
                 }
-            }
-
-            emitters.removeAll(deadEmitters);
-            if (emitters == null || emitters.isEmpty()) {
-                userEmitters.remove(userId);
             }
         }
     }
@@ -183,8 +176,10 @@ public class AlertSSEService {
         // 이미 존재하는 emitter가 있으면 재사용
         List<SseEmitter> existingEmitters = userEmitters.get(userId);
         if (existingEmitters != null) {
+            Iterator<SseEmitter> iterator = existingEmitters.iterator();
             // 살아있는 emitter만 필터링
-            for (SseEmitter emitter : existingEmitters) {
+            while (iterator.hasNext()) {
+                SseEmitter emitter = iterator.next();
                 try {
                     emitter.send(SseEmitter.event().name("ping").data("alive-check"));
                     log.info("살아있는 emitter 반환 - userId: {}", userId);
@@ -238,7 +233,7 @@ public class AlertSSEService {
             );
 
         } catch (IOException e) {
-            removeEmitter(userId);
+            removeSingleEmitter(userId, emitter);
         }
     }
 
@@ -273,17 +268,9 @@ public class AlertSSEService {
                             .data(response));
                 } catch (Exception e) {
                     // 예외가 발생한 Emitter는 제거할 목록에 추가
-                    failedEmitters.add(emitter);
+                    removeSingleEmitter(userId, emitter);
                 }
             }
-
-            // 전송 실패한 Emitter를 리스트에서 제거
-            emitters.removeAll(failedEmitters);
-        }
-
-        // 더 이상 연결이 없는 유저에 대해서는 Map에서 아예 지워버리고, 연결이 남아 있는 경우만 최신 상태로 다시 저장한다."
-        if (emitters != null && !emitters.isEmpty()) {
-            userEmitters.remove(userId);
         }
 
         // 알람 히스토리 저장
