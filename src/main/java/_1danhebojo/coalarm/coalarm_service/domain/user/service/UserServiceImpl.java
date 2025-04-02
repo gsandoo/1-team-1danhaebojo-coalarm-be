@@ -129,8 +129,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateNickname(String nickname) {
-        if (nickname.length() < 2) {
-            throw new ApiException(AppHttpStatus.BAD_REQUEST);
+        if (nickname.length() < 2 || nickname.length() > 10) {
+            throw new ApiException(AppHttpStatus.INVALID_NICKNAME_LENGTH);
         }
 
     }
@@ -225,6 +225,38 @@ public class UserServiceImpl implements UserService {
         Matcher matcher = pattern.matcher(webhookUrl);
 
         if (!matcher.matches()) {
+            throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
+        }
+
+        // 실제 유효한 URL인지 테스트 메시지 보내기
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            String payload = """
+        {
+            "content": "코알람에 오신 걸 환영합니다! 🎉\\n이제 디스코드에서 실시간 알림을 받아보실 수 있어요.",
+            "username": "코알람"
+        }
+        """;
+
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    webhookUrl,
+                    HttpMethod.POST,
+                    request,
+                    String.class
+            );
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
+            }
+
+        } catch (Exception e) {
+            log.error("디스코드 웹훅 테스트 실패: {}", e.getMessage());
             throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
         }
     }
