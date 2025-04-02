@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.27.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.9...v1.27.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* RateLimitFilter에 재시도 대기 시간 안내 기능 추가 ([3ce13cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3ce13cd33138a584810ea4a77b89d07f618ab1fc))
+
+### 🐛 BUG FIXES
+
+* 닉네임 유효성 검사 로직 추가 ([8acf454](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8acf45420cfd2a55cd3e053a4abd7320370b1fc3))
+* 디스코드 웹훅 url 유효성 검사 로직 개선 ([facc191](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/facc191ea500f0b17c20a363b1b2f77f35d88800))
+
 ## [1.26.9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.8...v1.26.9) (2025-04-01)
 
 ### 🐛 BUG FIXES
