@@ -3,25 +3,30 @@ package _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Entity
 @Table(name = "coins")
 @Getter
 @NoArgsConstructor
 public class CoinEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coin_id")
-    private Long coinId;
+    @Column(name = "id")
+    private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
+    @Column(name = "symbol", unique = true)
     private String symbol;
 
-    public CoinEntity(String name, String symbol){
-        this.name = name;
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Builder
+    public CoinEntity(Long id, String symbol, String name) {
+        this.id = id;
         this.symbol = symbol;
+        this.name = name;
     }
 }
+

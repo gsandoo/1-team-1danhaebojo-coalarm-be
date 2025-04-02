@@ -1,8 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertSSERepositoryImpl;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.VolumeSpikeAlert;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.util.FormatUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,15 +93,15 @@ public class TradingVolumeAlertService {
 
     // 전체 사용자에게 거래량 급등 알림 전송
     private void sendVolumeToUser() {
-        List<Alert> volumeSpikeAlerts = alertSSERepositoryImpl.findAllVolumeSpikeAlertByStatus();
+        List<AlertEntity> volumeSpikeAlerts = alertSSERepositoryImpl.findAllVolumeSpikeAlertByStatus();
         if (!volumeSpikeAlerts.isEmpty()) {
-            for (Alert alert : volumeSpikeAlerts) {
+            for (AlertEntity alert : volumeSpikeAlerts) {
                 String symbol = alert.getCoin().getSymbol() + "/KRW";
                 boolean tradingVolume = hasVolumeSpike(symbol);
 
                 if (tradingVolume) {
-                    alertSSEService.sendAlertToUserSSE(alert.getUser().getUserId(), alert);
-                    alertSSEService.sendAlertToUserDiscord(alert.getUser().getUserId(), alert);
+                    alertSSEService.sendAlertToUserSSE(alert.getUser().getId(), alert);
+                    alertSSEService.sendAlertToUserDiscord(alert.getUser().getId(), alert);
                     log.info("거래량 급등 알림 전송: " + symbol);
                 }
             }
