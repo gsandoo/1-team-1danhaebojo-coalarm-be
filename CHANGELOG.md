@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.30.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.0...v1.30.1) (2025-04-02)
+
+### 🐛 BUG FIXES
+
+* 엔티티 수정으로 발생한 Hibernate 인스턴스화 오류 해결 (기본 생성자 추가) ([8dcf944](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8dcf944109d74ce855e08f24584f91e3e6cb64da))
+* 엔티티 수정으로 발생한 Instant → LocalDateTime 변환 오류 처리 (ZoneId 추가) ([b774ac4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b774ac4d61ab04097e530c900124b83ac16432af))
+
+### ♻️ REFACTORING
+
+* discord 알림 리스트 전송 방식 개선 - embed 개별 카드화 ([9379707](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9379707288904510d5e59285a10448a173d5d0eb))
+
 ## [1.30.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.29.0...v1.30.0) (2025-04-02)
 
 ### 🚀 NEW FEATURES
