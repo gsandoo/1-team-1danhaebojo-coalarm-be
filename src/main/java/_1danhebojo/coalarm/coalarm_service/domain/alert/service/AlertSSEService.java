@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -287,44 +288,25 @@ public class AlertSSEService {
 
     // 사용자의 기존 알람 discord 전송
     public void sendAlertToUserDiscord(Long userId, AlertEntity alert) {
-        // 최종 메시지 생성
-        if(alert == null) {
-            return;
-        }
+        if (alert == null || alert.getUser() == null || alert.getUser().getDiscordWebhook() == null) return;
 
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("👤 사용자 닉네임: ").append(alert.getUser().getNickname()).append("\n");
-        messageBuilder.append("📢(코인) ").append(alert.getCoin().getName());
-        messageBuilder.append(", (제목) " + alert.getTitle()).append("\n");
-        if (alert.getUser().getDiscordWebhook() != null && !alert.getUser().getDiscordWebhook().isEmpty()) {
-            discordService.sendDiscordAlert(alert.getUser().getDiscordWebhook(), messageBuilder.toString());
-        }
+        List<Map<String, Object>> embeds = List.of(discordService.buildEmbedMapFromAlert(alert));
+        discordService.sendDiscordEmbed(alert.getUser().getDiscordWebhook(), embeds);
     }
 
     // 사용자의 알람 스케줄러 discord 전송
     public void sendAlertListToUserDiscord(Long userId, List<AlertEntity> alerts) {
-        StringBuilder messageBuilder = new StringBuilder();
+        if (alerts.isEmpty()) return;
 
-        if (alerts.isEmpty()) {
-            return;
-        }
-        if (alerts.get(0).getUser() == null) {
-            return;
-        }
-        String nickname = alerts.get(0).getUser().getNickname();
-        messageBuilder.append("👤 사용자 닉네임: ").append(alerts.get(0).getUser().getNickname()).append("\n");
+        AlertEntity firstAlert = alerts.get(0);
+        UserEntity user = firstAlert.getUser();
+        if (user == null || user.getDiscordWebhook() == null || user.getDiscordWebhook().isEmpty()) return;
 
-        alerts.forEach(alert -> {
-            messageBuilder.append("📢(코인) ").append(alert.getCoin().getSymbol())
-                    .append(", (제목) ").append(alert.getTitle()).append("\n");
-        });
+        List<Map<String, Object>> embeds = alerts.stream()
+                .map(discordService::buildEmbedMapFromAlert)
+                .collect(Collectors.toList());
 
-        String message = messageBuilder.toString();
-
-        // 디스코드로 메시지 전송
-        if (alerts.get(0).getUser().getDiscordWebhook() != null && !alerts.get(0).getUser().getDiscordWebhook().isEmpty()) {
-            discordService.sendDiscordAlert(alerts.get(0).getUser().getDiscordWebhook(), message);
-        }
+        discordService.sendDiscordEmbed(user.getDiscordWebhook(), embeds);
     }
 
     // 새로운 알람 추가
