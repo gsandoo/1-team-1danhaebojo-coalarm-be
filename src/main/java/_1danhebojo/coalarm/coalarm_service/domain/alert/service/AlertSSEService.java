@@ -69,9 +69,6 @@ public class AlertSSEService {
                 activeAlerts.stream()
                         .collect(Collectors.groupingBy(alert -> alert.getUser().getId()))
         );
-
-
-        System.out.println("Active alerts count: " + activeAlertList.size());
     }
 
     // 중간중간 전체 알람 상태 재로딩
