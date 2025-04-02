@@ -214,6 +214,18 @@ public class UserServiceImpl implements UserService {
         return PkResponse.of(user.getId());
     }
 
+    @Override
+    @Transactional
+    public PkResponse removeDiscordWebhook(Long userId) {
+        UserEntity user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        user.updateDiscordWebhook(null);
+        userRepository.save(user);
+
+        return PkResponse.of(user.getId());
+    }
+
     private void validateDiscordWebhookUrl(String webhookUrl) {
         // 빈 문자열 체크
         if (webhookUrl == null || webhookUrl.trim().isEmpty()) {
