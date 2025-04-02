@@ -44,6 +44,10 @@ public class GoldenCrossEntity {
         this.alert = alert;
     }
 
+    public GoldenCrossEntity() {
+
+    }
+
     @PrePersist
     private void prePersist() {
         this.regDt = Instant.now();
