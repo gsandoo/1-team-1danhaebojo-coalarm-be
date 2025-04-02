@@ -389,6 +389,7 @@ public class AlertSSEService {
     }
 
     public void updateUserNicknameInAlerts(Long userId, String newNickname) {
+        // 1. activeAlertList 내 수정
         List<AlertEntity> alerts = activeAlertList.get(userId);
         if (alerts != null) {
             for (AlertEntity alert : alerts) {
@@ -396,11 +397,24 @@ public class AlertSSEService {
                     alert.getUser().updateNickname(newNickname);
                 }
             }
-            log.info("✅ 유저 닉네임 갱신 완료: userId={}, newNickname={}", userId, newNickname);
         }
+
+        // 2. userAlertQueue 내 수정
+        Queue<AlertEntity> alertQueue = userAlertQueue.get(userId);
+        if (alertQueue != null) {
+            for (AlertEntity alert : alertQueue) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateNickname(newNickname);
+                }
+            }
+        }
+
+        log.info("✅ 유저 닉네임 갱신 완료: userId={}, newNickname={}", userId, newNickname);
     }
 
+
     public void updateUserWebhookInAlerts(Long userId, String newWebhook) {
+        // 1. activeAlertList 내 수정
         List<AlertEntity> alerts = activeAlertList.get(userId);
         if (alerts != null) {
             for (AlertEntity alert : alerts) {
@@ -408,9 +422,19 @@ public class AlertSSEService {
                     alert.getUser().updateDiscordWebhook(newWebhook);
                 }
             }
-            log.info("✅ 유저 웹훅 갱신 완료: userId={}, newWebhook={}", userId, newWebhook);
         }
-    }
 
+        // 2. userAlertQueue 내 수정
+        Queue<AlertEntity> alertQueue = userAlertQueue.get(userId);
+        if (alertQueue != null) {
+            for (AlertEntity alert : alertQueue) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateDiscordWebhook(newWebhook);
+                }
+            }
+        }
+
+        log.info("✅ 유저 웹훅 갱신 완료: userId={}, newWebhook={}", userId, newWebhook);
+    }
 }
 
