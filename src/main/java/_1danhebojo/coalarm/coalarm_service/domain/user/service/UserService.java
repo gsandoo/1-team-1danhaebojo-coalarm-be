@@ -16,4 +16,5 @@ public interface UserService {
     void logout(UserDetails userDetails, String authorizationHeader);
     void deleteUser(Long userId, HttpServletRequest request, HttpServletResponse response);
     PkResponse updateDiscordWebhook(Long userId, DiscordWebhookRequest request);
+    PkResponse removeDiscordWebhook(Long userId);
 }
