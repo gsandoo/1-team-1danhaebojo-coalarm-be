@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,22 +86,15 @@ public class AlertSSEService {
             Long userId = entry.getKey();
             List<SseEmitter> emitters = entry.getValue();
 
-            List<SseEmitter> deadEmitters = new ArrayList<>();
-
             for (SseEmitter emitter : emitters) {
                 try {
                     emitter.send(SseEmitter.event()
                             .name("heartbeat")
                             .data("keep-alive")); // 클라이언트에선 로그로만 찍어도 OK
                 } catch (IOException e) {
-                    deadEmitters.add(emitter);
                     log.warn("heartbeat 전송 실패 - userId: " + userId);
+                    removeSingleEmitter(userId, emitter);
                 }
-            }
-
-            emitters.removeAll(deadEmitters);
-            if (emitters.isEmpty()) {
-                userEmitters.remove(userId);
             }
         }
     }
@@ -147,7 +141,7 @@ public class AlertSSEService {
                 String symbol = alert.getCoin().getSymbol();
 
                 TickerEntity ticker = tickerList.stream()
-                        .filter(t -> t.getId().getQuoteSymbol().equals(symbol))
+                        .filter(t -> t.getId().getBaseSymbol().equals(symbol))
                         .findFirst()
                         .orElse(null);
                 if (ticker != null) {
@@ -175,13 +169,14 @@ public class AlertSSEService {
     // 로그인한 사용자가 실행
     public SseEmitter subscribe(Long userId) {
         if(userId == null) { return null;}
-        removeEmitter(userId);
 
         // 이미 존재하는 emitter가 있으면 재사용
         List<SseEmitter> existingEmitters = userEmitters.get(userId);
         if (existingEmitters != null) {
+            Iterator<SseEmitter> iterator = existingEmitters.iterator();
             // 살아있는 emitter만 필터링
-            for (SseEmitter emitter : existingEmitters) {
+            while (iterator.hasNext()) {
+                SseEmitter emitter = iterator.next();
                 try {
                     emitter.send(SseEmitter.event().name("ping").data("alive-check"));
                     log.info("살아있는 emitter 반환 - userId: {}", userId);
@@ -189,6 +184,7 @@ public class AlertSSEService {
                 } catch (IOException e) {
                     // 죽은 emitter는 건너뜀 (removeEmitter에서 자동 제거되도록 할 수도 있음)
                     log.warn("기존 emitter 죽어있음 - userId: {}", userId);
+                    removeSingleEmitter(userId, emitter);
                 }
             }
         }
@@ -196,9 +192,6 @@ public class AlertSSEService {
         // 새 emitter 생성
         SseEmitter emitter = new SseEmitter(0L);
         userEmitters.computeIfAbsent(userId, k -> new ArrayList<>()).add(emitter);
-
-        // 알림 전송
-        sendUserAlerts(userId, emitter);
 
         // emitter 정리 로직
         emitter.onCompletion(() -> removeEmitter(userId));
@@ -209,6 +202,8 @@ public class AlertSSEService {
         log.info("📊 [subscribe] 현재 전체 userEmitters 수: {}", userEmitters.size());
         log.info("📊 [subscribe] userId={} 의 emitter 수: {}", userId, userEmitters.get(userId).size());
 
+        // 알림 전송
+        sendUserAlerts(userId, emitter);
 
         return emitter;
     }
@@ -235,17 +230,18 @@ public class AlertSSEService {
             );
 
         } catch (IOException e) {
-            removeEmitter(userId);
+            removeSingleEmitter(userId, emitter);
         }
     }
 
     @Transactional(readOnly = true)
     public List<AlertEntity> getAlertsToSend(Long userId) {
-        return Optional.ofNullable(activeAlertList.get(userId))
+        List<AlertEntity> alertList =  Optional.ofNullable(activeAlertList.get(userId))
                 .orElse(Collections.emptyList())
                 .stream()
                 .filter(alert -> alert.getIsTargetPrice() || alert.getIsGoldenCross())
                 .collect(Collectors.toList());
+        return alertList;
     }
 
     @Async
@@ -260,25 +256,18 @@ public class AlertSSEService {
 
         if (emitters != null) {
             List<SseEmitter> failedEmitters = new ArrayList<>();
+            AlertSSEResponse response = new AlertSSEResponse(alert);
 
             for (SseEmitter emitter : emitters) {
                 try {
                     emitter.send(SseEmitter.event()
                             .name("alert")
-                            .data(alert));
+                            .data(response));
                 } catch (Exception e) {
                     // 예외가 발생한 Emitter는 제거할 목록에 추가
-                    failedEmitters.add(emitter);
+                    removeSingleEmitter(userId, emitter);
                 }
             }
-
-            // 전송 실패한 Emitter를 리스트에서 제거
-            emitters.removeAll(failedEmitters);
-        }
-
-        // 더 이상 연결이 없는 유저에 대해서는 Map에서 아예 지워버리고, 연결이 남아 있는 경우만 최신 상태로 다시 저장한다."
-        if (emitters != null && !emitters.isEmpty()) {
-            userEmitters.remove(userId);
         }
 
         // 알람 히스토리 저장
@@ -356,7 +345,7 @@ public class AlertSSEService {
     // SSE 구독 취소
     public void removeEmitter(Long userId) {
         List<SseEmitter> emitters = userEmitters.remove(userId); // 해당 userId의 모든 SSE 제거
-        activeAlertList.remove(userId);
+
         if (emitters != null) {
             for (SseEmitter emitter : emitters) {
                 try {
@@ -367,6 +356,69 @@ public class AlertSSEService {
             }
         }
         log.info("사용자 " + userId + " 의 모든 SSE 구독 취소 완료");
+    }
+
+    public void removeSingleEmitter(Long userId, SseEmitter emitter) {
+        List<SseEmitter> emitters = userEmitters.get(userId);
+        if (emitters != null) {
+            emitters.remove(emitter);
+            try {
+                emitter.complete();
+            } catch (Exception ignored) {}
+
+            if (emitters.isEmpty()) {
+                userEmitters.remove(userId);
+            }
+        }
+    }
+
+    public void updateUserNicknameInAlerts(Long userId, String newNickname) {
+        // 1. activeAlertList 내 수정
+        List<AlertEntity> alerts = activeAlertList.get(userId);
+        if (alerts != null) {
+            for (AlertEntity alert : alerts) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateNickname(newNickname);
+                }
+            }
+        }
+
+        // 2. userAlertQueue 내 수정
+        Queue<AlertEntity> alertQueue = userAlertQueue.get(userId);
+        if (alertQueue != null) {
+            for (AlertEntity alert : alertQueue) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateNickname(newNickname);
+                }
+            }
+        }
+
+        log.info("✅ 유저 닉네임 갱신 완료: userId={}, newNickname={}", userId, newNickname);
+    }
+
+
+    public void updateUserWebhookInAlerts(Long userId, String newWebhook) {
+        // 1. activeAlertList 내 수정
+        List<AlertEntity> alerts = activeAlertList.get(userId);
+        if (alerts != null) {
+            for (AlertEntity alert : alerts) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateDiscordWebhook(newWebhook);
+                }
+            }
+        }
+
+        // 2. userAlertQueue 내 수정
+        Queue<AlertEntity> alertQueue = userAlertQueue.get(userId);
+        if (alertQueue != null) {
+            for (AlertEntity alert : alertQueue) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateDiscordWebhook(newWebhook);
+                }
+            }
+        }
+
+        log.info("✅ 유저 웹훅 갱신 완료: userId={}, newWebhook={}", userId, newWebhook);
     }
 }
 

@@ -51,14 +51,14 @@ public class GoldCrossAndTargetPriceService {
 
         // 퍼센트가 양수면 상승 → 가격이 목표 이상이면 도달
         if (percent > 0) {
-            if (lastPrice.compareTo(targetPriceValue) >= 0) {
+            if (lastPrice.compareTo(targetPriceValue) <= 0) {
                 targetPriceReached = true;
             }
         }
 
         // 퍼센트가 음수면 하락 → 가격이 목표 이하이면 도달
         else if (percent < 0) {
-            if (lastPrice.compareTo(targetPriceValue) <= 0) {
+            if (lastPrice.compareTo(targetPriceValue) >= 0) {
                 targetPriceReached = true;
             }
         }
