@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## [1.29.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.28.0...v1.29.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* userAlertQueue 내 유저 nickname/webhook 실시간 동기화 처리 ([11165d0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/11165d0db374a7b0872cdc7fe147af4eaf24cfcb))
+* 알림 캐시(alertList) 내 유저 닉네임 및 웹훅 필드 동기화 메서드 추가 ([1bda9cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/1bda9cd4e78a8c0a971cc784720b9c0f8296857b))
+
+### 🐛 BUG FIXES
+
+* SSE 관련 수정 ([271c0f5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/271c0f5597fcc90d9c98d7a47dead8be72f7cfe4))
+* 중복 코드 제거 ([0363af5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0363af55e8024d2a777dc5a62119e6d2f3db5bfb))
+
+### ♻️ REFACTORING
+
+* 사용하지 않는 코드 제거 ([49cddcf](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/49cddcfcd5c546cd775578c8f75400b1d0d98b63))
+* 알람 removeEmitter 통일 ([9a31c95](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9a31c958d5a03b99585d1160c1affd17f2c1c19a))
+
 ## [1.28.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.27.0...v1.28.0) (2025-04-02)
 
 ### 🚀 NEW FEATURES
