@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.30.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.29.0...v1.30.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* 닉네임 및 디스코드 웹훅 수정 시 알림 정보 동기화 ([cccf341](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/cccf3415445322093fbe8128c90f5ad726055e4c))
+
 ## [1.29.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.28.0...v1.29.0) (2025-04-02)
 
 ### 🚀 NEW FEATURES
