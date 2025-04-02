@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity savedUser = userRepository.save(newUser);
 
-        alertSSEService.subscribe(savedUser.getUserId());
+        alertSSEService.subscribe(savedUser.getId());
 
         return UserDTO.fromEntity(savedUser);
     }
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
-        return PkResponse.of(user.getUserId());
+        return PkResponse.of(user.getId());
     }
 
     private void validateNickname(String nickname) {
@@ -211,7 +211,19 @@ public class UserServiceImpl implements UserService {
         user.updateDiscordWebhook(request.getDiscordWebhook());
         userRepository.save(user);
 
-        return PkResponse.of(user.getUserId());
+        return PkResponse.of(user.getId());
+    }
+
+    @Override
+    @Transactional
+    public PkResponse removeDiscordWebhook(Long userId) {
+        UserEntity user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        user.updateDiscordWebhook(null);
+        userRepository.save(user);
+
+        return PkResponse.of(user.getId());
     }
 
     private void validateDiscordWebhookUrl(String webhookUrl) {

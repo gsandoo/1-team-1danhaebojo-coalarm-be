@@ -1,8 +1,10 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.math.BigDecimal;
 
 @Getter
 @AllArgsConstructor
@@ -17,16 +19,16 @@ public class AlertSSEResponse {
 
     private TargetPriceDetail targetPrice;
 
-    public AlertSSEResponse(Alert alert) {
-        this.alertId = alert.getAlertId();
+    public AlertSSEResponse(AlertEntity alert) {
+        this.alertId = alert.getId();
         this.title = alert.getTitle();
         this.coinName = alert.getCoin().getName();
 
-        this.targetPriceFlag = alert.isTargetPriceFlag();
-        this.goldenCrossFlag = alert.isGoldenCrossFlag();
-        this.volumeSpikeFlag = alert.isVolumeSpikeFlag();
+        this.targetPriceFlag = alert.getIsTargetPrice();
+        this.goldenCrossFlag = alert.getIsGoldenCross();
+        this.volumeSpikeFlag = alert.getIsVolumeSpike();
 
-        if (alert.isTargetPriceFlag() && alert.getTargetPrice() != null) {
+        if (alert.getIsTargetPrice() && alert.getTargetPrice() != null) {
             this.targetPrice = new TargetPriceDetail(
                     alert.getTargetPrice().getPrice(),
                     alert.getTargetPrice().getPercentage()
@@ -35,15 +37,15 @@ public class AlertSSEResponse {
     }
 
     public static class TargetPriceDetail {
-        private double price;
+        private BigDecimal price;
         private double percentage;
 
-        public TargetPriceDetail(double price, double percentage) {
+        public TargetPriceDetail(BigDecimal price, double percentage) {
             this.price = price;
             this.percentage = percentage;
         }
 
-        public double getPrice() { return price; }
+        public BigDecimal getPrice() { return price; }
         public double getPercentage() { return percentage; }
     }
 }
