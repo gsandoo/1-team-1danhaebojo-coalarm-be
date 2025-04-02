@@ -4,6 +4,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertE
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistoryEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import lombok.Getter;
+
+import java.time.ZoneId;
 import java.util.List;
 
 import java.time.LocalDateTime;
@@ -38,7 +40,7 @@ public class AlertHistoryListResponse {
             this.userId = alertHistory.getUser().getId();
             this.coin = alertHistory.getAlert().getCoin(); // 코인 정보 포함
             this.alert = new AlertInfo(alertHistory.getAlert());
-            this.registeredDate = LocalDateTime.from(alertHistory.getRegDt());
+            this.registeredDate = LocalDateTime.ofInstant(alertHistory.getRegDt(), ZoneId.of("Asia/Seoul"));
         }
     }
 
