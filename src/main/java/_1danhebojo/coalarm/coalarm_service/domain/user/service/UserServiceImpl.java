@@ -113,6 +113,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.hasText(nickname)) {
             validateNickname(nickname);
             user.updateNickname(nickname);
+            alertSSEService.updateUserNicknameInAlerts(userId, nickname);
         }
 
         // 프로필 이미지 업데이트
@@ -210,6 +211,8 @@ public class UserServiceImpl implements UserService {
 
         user.updateDiscordWebhook(request.getDiscordWebhook());
         userRepository.save(user);
+
+        alertSSEService.updateUserWebhookInAlerts(userId, webhookUrl);
 
         return PkResponse.of(user.getId());
     }
