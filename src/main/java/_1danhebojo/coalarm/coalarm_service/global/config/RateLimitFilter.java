@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
+import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.Refill;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -52,18 +53,29 @@ public class RateLimitFilter extends OncePerRequestFilter {
         // 버킷 가져오기 또는 생성
         Bucket bucket = getBucket(clientId);
 
-        // 요청 처리 가능 여부 확인
-        if (bucket.tryConsume(1)) {
+        // ConsumptionProbe를 사용해 대기 시간 계산 (남은 토큰 수 및 재충전까지 남은 시간)
+        ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
+
+        if (probe.isConsumed()) {
+            // 요청 처리 허용
             filterChain.doFilter(request, response);
         } else {
             // 요청 제한 초과 응답
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
+            // 대략적인 대기 시간 계산 (분 단위)
+            long nanosToWait = probe.getNanosToWaitForRefill();
+            long minutesToWait = Math.max(1, nanosToWait / (60 * 1_000_000_000L));
+
+            // Retry-After 헤더 추가 (초 단위)
+            response.addHeader("Retry-After", String.valueOf(nanosToWait / 1_000_000_000L));
+
             Map<String, Object> errorDetails = Map.of(
                     "status", HttpStatus.TOO_MANY_REQUESTS.value(),
                     "error", "Too Many Requests",
-                    "message", "API 요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요."
+                    "message", "API 요청 한도를 초과했습니다. 약 " + minutesToWait + "분 후에 다시 시도해주세요.",
+                    "waitMinutes", minutesToWait
             );
 
             response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
