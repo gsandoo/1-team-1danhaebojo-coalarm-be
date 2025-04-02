@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.28.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.27.0...v1.28.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* 디스코드 웹훅 url 연동 해제 엔드포인트 추가 ([7c42028](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7c420283fbb63175ba1e115647b898d204d42a88))
+
 ## [1.27.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.9...v1.27.0) (2025-04-02)
 
 ### 🚀 NEW FEATURES
