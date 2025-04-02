@@ -1,8 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.CoinResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistory;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistoryEntity;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -14,10 +13,10 @@ public class AlertHistoryResponse {
     private AlertResponse alert;
     private LocalDateTime registeredDate;
 
-    public AlertHistoryResponse(AlertHistory alertHistory) {
-        this.alertHistoryId = alertHistory.getAlertHistoryId();
-        this.userId = alertHistory.getAlert().getUser().getUserId();
+    public AlertHistoryResponse(AlertHistoryEntity alertHistory) {
+        this.alertHistoryId = alertHistory.getId();
+        this.userId = alertHistory.getAlert().getUser().getId();
         this.alert = new AlertResponse(alertHistory.getAlert()); // Alert 정보 포함
-        this.registeredDate = alertHistory.getRegisteredDate();
+        this.registeredDate = LocalDateTime.from(alertHistory.getRegDt());
     }
 }

@@ -34,7 +34,7 @@ public class CoalarmOAuth2UserService extends DefaultOAuth2UserService {
 		UserEntity user = userRepository.findByKakaoId(response.getProviderId()).orElse(null);
 
 		if (user != null) {
-			return CoalarmOAuth2User.of(user.getUserId(), response, false);
+			return CoalarmOAuth2User.of(user.getId(), response, false);
 		}
 
 		String randomNickname = NicknameGenerator.generateNickname(); // 랜덤 닉네임 생성
@@ -47,6 +47,6 @@ public class CoalarmOAuth2UserService extends DefaultOAuth2UserService {
 
         newbie = userRepository.save(newbie);
 
-        return CoalarmOAuth2User.of(newbie.getUserId(), response, true);
+        return CoalarmOAuth2User.of(newbie.getId(), response, true);
 	}
 }

@@ -34,7 +34,7 @@ public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
                                 JPAExpressions
                                         .select(subKp.regDt.max())
                                         .from(subKp)
-                                        .where(subKp.coin.coinId.eq(kp.coin.coinId))
+                                        .where(subKp.coin.id.eq(kp.coin.id))
                         )
                 )
                 .orderBy(kp.kimchiPremium.desc())
@@ -73,7 +73,7 @@ public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
 
         // 중복 없이 코인 ID의 종류 수 카운트
         Long count = queryFactory
-                .select(kp.coin.coinId.countDistinct())
+                .select(kp.coin.id.countDistinct())
                 .from(kp)
                 .fetchOne();
         // (null 처리 추가)

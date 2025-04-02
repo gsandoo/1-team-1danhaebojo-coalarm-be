@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertSSERepositoryImpl;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.util.FormatUtil;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,37 +24,37 @@ public class GoldCrossAndTargetPriceService {
     private final AlertHistoryRepositoryImpl alertHistoryRepositoryImpl;
 
     // 알람 설정에 도달했는지 체크
-    boolean isPriceReached(Alert alert) {
+    boolean isPriceReached(AlertEntity alert) {
         // 가격 지정가 알람 확인
-        if (alert.isTargetPriceFlag()) {
+        if (alert.getIsTargetPrice()) {
             return checkTargetPrice(alert);
         }
 
         // 골든 크로스 알람 확인
-        else if (alert.isGoldenCrossFlag()) {
+        else if (alert.getIsGoldenCross()) {
             return checkGoldenCross(alert);
         }
 
         return false;
     }
 
-    private boolean checkTargetPrice(Alert alert) {
-        TargetPriceAlert targetPrice = alert.getTargetPrice();
+    private boolean checkTargetPrice(AlertEntity alert) {
+        TargetPriceEntity targetPrice = alert.getTargetPrice();
         if (targetPrice == null) return false;
 
-        BigDecimal price = BigDecimal.valueOf(targetPrice.getPrice());
+        BigDecimal price = targetPrice.getPrice();
         int percent = targetPrice.getPercentage();
 
         // 마지막 데이터 가져와서 비교.
         String convertedMarket = FormatUtil.convertMarketFormat(alert.getCoin().getSymbol());
-        Optional<Ticker> tickers = alertSSERepositoryImpl.findLatestBySymbol(convertedMarket,"upbit");
+        Optional<TickerEntity> tickers = alertSSERepositoryImpl.findLatestBySymbol(convertedMarket,"upbit");
         if (tickers.isEmpty()) return false;
 
         // 퍼센트가 음수면 하락지점이라서 그 값보다 작을 때로 비교
         boolean targetPriceReached = false;
         if(percent > 0){
             BigDecimal max = tickers.stream()
-                    .map(Ticker::getLast)        // last 값만 추출
+                    .map(TickerEntity::getLast)        // last 값만 추출
                     .max(BigDecimal::compareTo)  // 최대값 찾기
                     .orElse(BigDecimal.ZERO);    // 값이 없으면 0 반환
             if(max.compareTo(price) >= 0){
@@ -64,7 +65,7 @@ public class GoldCrossAndTargetPriceService {
         // 퍼센트가 양수면 상승지점이라서 그 값보다 클 때로 비교
         else if(percent < 0){
             BigDecimal min = tickers.stream()
-                    .map(Ticker::getLast)
+                    .map(TickerEntity::getLast)
                     .min(BigDecimal::compareTo)  // 최소값 찾기
                     .orElse(BigDecimal.ZERO);
             if(min.compareTo(price) <= 0){
@@ -75,14 +76,14 @@ public class GoldCrossAndTargetPriceService {
     }
 
     // 골든 크로스 가격 비교 확인 필요
-    private boolean checkGoldenCross(Alert alert) {
-        GoldenCrossAlert goldenCross = alert.getGoldenCross();
+    private boolean checkGoldenCross(AlertEntity alert) {
+        GoldenCrossEntity goldenCross = alert.getGoldenCross();
         if (goldenCross == null) return false;
 
         Instant startDate = Instant.now().minusSeconds(20 * 86400); // 최근 20일 데이터 조회
         String convertedMarket = FormatUtil.convertMarketFormat(alert.getCoin().getSymbol());
 
-        List<Ticker> tickers = alertSSERepositoryImpl.findBySymbolAndDateRangeAndExchange(convertedMarket, startDate, "upbit");
+        List<TickerEntity> tickers = alertSSERepositoryImpl.findBySymbolAndDateRangeAndExchange(convertedMarket, startDate, "upbit");
 
         if (tickers.size() < 20) {
             return false; // 20일치 데이터가 부족하면 계산 불가능
@@ -109,10 +110,10 @@ public class GoldCrossAndTargetPriceService {
         return shortMA.compareTo(longMA) > 0;
     }
 
-    boolean isPriceStillValid(Alert alert) {
+    boolean isPriceStillValid(AlertEntity alert) {
         // 1분 뒤에도 가격 유지 여부 확인
         LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
-        boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUser().getUserId(), alert.getAlertId(), minutesAgo);
+        boolean recentHistory = alertHistoryRepositoryImpl.findRecentHistory(alert.getUser().getId(), alert.getId(), minutesAgo);
 
         // 1분 내 동일한 알람이 있음 → 알람 전송 안함
         return !recentHistory;
@@ -129,11 +130,11 @@ public class GoldCrossAndTargetPriceService {
     }
 
     // 날짜별 종가 계산
-    private Map<LocalDate, BigDecimal> calculateDailyAverages(List<Ticker> tickers) {
+    private Map<LocalDate, BigDecimal> calculateDailyAverages(List<TickerEntity> tickers) {
         Map<LocalDate, List<BigDecimal>> dailyPrices = new HashMap<>();
 
-        for (Ticker ticker : tickers) {
-            LocalDate date = Instant.ofEpochMilli(ticker.getTimestamp().toEpochMilli())
+        for (TickerEntity ticker : tickers) {
+            LocalDate date = Instant.ofEpochMilli(ticker.getId().getTimestamp().toEpochMilli())
                     .atZone(ZoneId.systemDefault()).toLocalDate();
 
             dailyPrices.computeIfAbsent(date, k -> new ArrayList<>()).add(ticker.getClose());
