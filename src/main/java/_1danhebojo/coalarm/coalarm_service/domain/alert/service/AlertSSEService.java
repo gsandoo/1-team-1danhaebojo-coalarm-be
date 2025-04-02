@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -384,6 +385,30 @@ public class AlertSSEService {
             if (emitters.isEmpty()) {
                 userEmitters.remove(userId);
             }
+        }
+    }
+
+    public void updateUserNicknameInAlerts(Long userId, String newNickname) {
+        List<AlertEntity> alerts = activeAlertList.get(userId);
+        if (alerts != null) {
+            for (AlertEntity alert : alerts) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateNickname(newNickname);
+                }
+            }
+            log.info("✅ 유저 닉네임 갱신 완료: userId={}, newNickname={}", userId, newNickname);
+        }
+    }
+
+    public void updateUserWebhookInAlerts(Long userId, String newWebhook) {
+        List<AlertEntity> alerts = activeAlertList.get(userId);
+        if (alerts != null) {
+            for (AlertEntity alert : alerts) {
+                if (alert.getUser() != null) {
+                    alert.getUser().updateDiscordWebhook(newWebhook);
+                }
+            }
+            log.info("✅ 유저 웹훅 갱신 완료: userId={}, newWebhook={}", userId, newWebhook);
         }
     }
 
