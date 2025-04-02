@@ -3,9 +3,9 @@ package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.ResponseKimchiPremium;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.KimchiPremiumRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.KimchiPremiumEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.KimchiPreminumJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.TickerJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
@@ -127,6 +127,9 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
             throw new ApiException(AppHttpStatus.NOT_FOUND);
         }
 
+        CoinEntity coin = coinJpaRepository.findBySymbol(coinSymbol)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
+
         // 어제 자정 시간 계산
         LocalDateTime yesterday = LocalDate.now().minusDays(1).atStartOfDay();
         LocalDateTime today = LocalDate.now().atStartOfDay();
@@ -139,14 +142,14 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
         BigDecimal dailyChange = calculateDailyChange(kimchiPremium, yesterdayPremium);
 
         // 김치 프리미엄 엔티티 생성 및 저장
-        KimchiPremiumEntity kimchiPremiumEntity = new KimchiPremiumEntity(
-                coinEntity.get(),
-                krwPrice,
-                usdtPrice,
-                exchangeRate,
-                kimchiPremium,
-                dailyChange
-        );
+        KimchiPremiumEntity kimchiPremiumEntity = KimchiPremiumEntity.builder()
+                .coin(coin)
+                .domesticPrice(krwPrice)
+                .globalPrice(usdtPrice)
+                .exchangeRate(exchangeRate)
+                .kimchiPremium(kimchiPremium)
+                .dailyChange(dailyChange)
+                .build();
 
         kimchiPreminumJpaRepository.save(kimchiPremiumEntity);
         log.info("{} 김치 프리미엄 저장 완료: {}%, 일별 변동률: {}%", coinSymbol, kimchiPremium, dailyChange);

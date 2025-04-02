@@ -1,10 +1,7 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.GoldenCrossAlertRequest;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.TargetPriceAlertRequest;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.VolumeSpikeAlertRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,51 +14,51 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AlertJpaRepository extends JpaRepository<Alert, Long> {
+public interface AlertJpaRepository extends JpaRepository<AlertEntity, Long> {
 
     @Query("SELECT a " +
-            "FROM Alert a " +
+            "FROM AlertEntity a " +
             "JOIN FETCH a.coin c " +
             "JOIN FETCH a.user u " +
             "WHERE (:active IS NULL OR a.active = :active) " +
             "AND (:filter IS NULL OR c.symbol = :filter)")
-    Page<Alert> findAlertsByFilter(@Param("active") Boolean active, @Param("filter") String filter, Pageable pageable);
+    Page<AlertEntity> findAlertsByFilter(@Param("active") Boolean active, @Param("filter") String filter, Pageable pageable);
 
     // 사용자가 등록한 모든 활성화된 알람 조회
     @Query("SELECT a " +
-            "FROM Alert a " +
+            "FROM AlertEntity a " +
             "JOIN FETCH a.coin c " +
             "JOIN FETCH a.user u " +
-            "WHERE a.user.userId = :userId AND a.active = true")
-    List<Alert> findActiveAlertsByUserId(Long userId);
+            "WHERE a.user.id = :userId AND a.active = true")
+    List<AlertEntity> findActiveAlertsByUserId(Long userId);
 
     @Query("SELECT a " +
-            "FROM Alert a " +
+            "FROM AlertEntity a " +
             "JOIN FETCH a.coin c " +
             "JOIN FETCH a.user u " +
             "LEFT JOIN FETCH a.targetPrice " +
             "LEFT JOIN FETCH a.goldenCross " +
             "LEFT JOIN FETCH a.volumeSpike " +
             "WHERE a.active = true")
-    List<Alert> findAllActiveAlerts();
+    List<AlertEntity> findAllActiveAlerts();
 
     @Modifying
-    @Query("DELETE FROM Alert a WHERE a.user.userId = :userId")
+    @Query("DELETE FROM AlertEntity a WHERE a.user.id = :userId")
     void deleteAlertByUserId(Long userId);
 
     @Query("SELECT c " +
-            "FROM Coin c " +
+            "FROM CoinEntity c " +
             "WHERE c.symbol = :symbol")
-    Optional<Coin> findCoinBySymbol(String symbol);
+    Optional<CoinEntity> findCoinBySymbol(String symbol);
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END " +
-            "FROM Alert a " +
-            "WHERE a.user.userId = :userId " +
+            "FROM AlertEntity a " +
+            "WHERE a.user.id = :userId " +
             "AND a.coin.symbol = :symbol " +
-            "      AND ((:alertType = 'GOLDEN_CROSS' AND a.isGoldenCrossFlag = true) " +
-            "        OR (:alertType = 'VOLUME_SPIKE' AND a.isVolumeSpikeFlag = true))")
+            "      AND ((:alertType = 'GOLDEN_CROSS' AND a.isGoldenCross = true) " +
+            "        OR (:alertType = 'VOLUME_SPIKE' AND a.isVolumeSpike = true))")
     boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
 
-    @Query("SELECT a FROM Alert a JOIN FETCH a.coin WHERE a.alertId = :alertId")
-    Optional<Alert> findByIdWithCoin(Long alertId);
+    @Query("SELECT a FROM AlertEntity a JOIN FETCH a.coin WHERE a.id = :alertId")
+    Optional<AlertEntity> findByIdWithCoin(Long alertId);
 }

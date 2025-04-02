@@ -1,30 +1,22 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.PaginationRequest;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertListResponse;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.alertHistory.AlertHistoryListResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepositoryImpl;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistory;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistoryEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +32,7 @@ public class AlertHistoryService {
         int offset = paginationRequest.getOffset();
         int limit = paginationRequest.getLimit();
         Pageable pageable = PageRequest.of(offset, limit);
-        Page<AlertHistory> historyPage = alertHistoryRepository.findAlertHistoryByFilter(userId, pageable);
+        Page<AlertHistoryEntity> historyPage = alertHistoryRepository.findAlertHistoryByFilter(userId, pageable);
 
         List<AlertHistoryListResponse.AlertHistoryContent> contents = historyPage.getContent().stream()
                 .map(AlertHistoryListResponse.AlertHistoryContent::new)
@@ -57,7 +49,7 @@ public class AlertHistoryService {
 
     // 알람 정보 조회
     public AlertHistoryResponse getAlertHistory(Long alertHistoryId) {
-        AlertHistory alertHistory = alertHistoryRepository.findById(alertHistoryId)
+        AlertHistoryEntity alertHistory = alertHistoryRepository.findById(alertHistoryId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT_HISTORY));
 
         return new AlertHistoryResponse(alertHistory);
@@ -66,18 +58,18 @@ public class AlertHistoryService {
     // 알람 히스토리 저장
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void addAlertHistory(Long alertId, Long userId) {
-        AlertHistory alertHistory = new AlertHistory();
-
-        Alert alert = new Alert();
-        alert.setAlertId(alertId);
-
-        UserEntity user = UserEntity.builder()
-                .userId(userId)
+        AlertEntity alert = AlertEntity.builder()
+                .id(alertId)
                 .build();
 
-        alertHistory.setUser(user);
-        alertHistory.setAlert(alert);
-        alertHistory.setRegisteredDate(LocalDateTime.now());
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .build();
+
+        AlertHistoryEntity alertHistory = AlertHistoryEntity.builder()
+                        .user(user)
+                        .alert(alert)
+                        .build();
 
         alertHistoryRepository.save(alertHistory);
     }

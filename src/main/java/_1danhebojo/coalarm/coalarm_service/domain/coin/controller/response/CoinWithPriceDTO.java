@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -13,5 +14,5 @@ public class CoinWithPriceDTO {
     private final String name;
     private final String symbol;
     private final BigDecimal price;
-    private final OffsetDateTime timestamp;
+    private final Instant timestamp;
 }

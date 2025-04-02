@@ -11,7 +11,7 @@ public class CoinDTO {
     private final String symbol;
 
     public CoinDTO(CoinEntity entity) {
-        this.coinId = entity.getCoinId();
+        this.coinId = entity.getId();
         this.name = entity.getName();
         this.symbol = entity.getSymbol();
     }

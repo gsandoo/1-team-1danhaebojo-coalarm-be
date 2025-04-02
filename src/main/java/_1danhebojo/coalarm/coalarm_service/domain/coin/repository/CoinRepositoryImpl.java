@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.QAlert.alert;
+import static _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.QAlertEntity.alertEntity;
 import static _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.QCoinEntity.coinEntity;
 import static _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.QTickerEntity.tickerEntity;
 
@@ -26,10 +26,10 @@ public class CoinRepositoryImpl implements CoinRepository {
     @Override
     public List<CoinEntity> findAlertCoinsByUserId(Long userId) {
         return query.selectDistinct(coinEntity)
-                .from(alert)
-                .join(coinEntity).on(coinEntity.coinId.eq(alert.coin.coinId))
-                .where(alert.user.userId.eq(userId))
-                .orderBy(coinEntity.coinId.asc())
+                .from(alertEntity)
+                .join(coinEntity).on(coinEntity.id.eq(alertEntity.coin.id))
+                .where(alertEntity.user.id.eq(userId))
+                .orderBy(coinEntity.id.asc())
                 .fetch();
     }
 
@@ -40,7 +40,7 @@ public class CoinRepositoryImpl implements CoinRepository {
         return query
                 .select(Projections.constructor(
                         CoinWithPriceDTO.class,
-                        coinEntity.coinId,
+                        coinEntity.id,
                         coinEntity.name,
                         coinEntity.symbol,
                         tickerEntity.last,

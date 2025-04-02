@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Null;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class TargetPriceAlertRequest extends BaseAlertRequest {
@@ -15,7 +17,7 @@ public class TargetPriceAlertRequest extends BaseAlertRequest {
 
     @NotNull
     @JsonProperty("target_price")
-    private Double price;
+    private BigDecimal price;
 
     @NotNull
     @JsonProperty("percentage")
