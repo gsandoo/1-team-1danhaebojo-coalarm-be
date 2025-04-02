@@ -38,7 +38,7 @@ public class AlertEntity {
     private Boolean isVolumeSpike;
 
     @Column(name = "reg_dt", nullable = false, updatable = false)
-    private Instant regDt = Instant.now();
+    private Instant regDt;
 
     @Column(name = "chg_dt")
     private Instant chgDt;
