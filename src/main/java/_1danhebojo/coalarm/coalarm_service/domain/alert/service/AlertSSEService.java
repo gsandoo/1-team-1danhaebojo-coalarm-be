@@ -2,22 +2,18 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertSSEResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepositoryImpl;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
@@ -32,13 +28,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class AlertSSEService {
     private final AlertHistoryService alertHistoryService;
-    private final AlertRepositoryImpl alertRepositoryImpl;
+    private final AlertRepository alertRepository;
     private final AlertHistoryRepository alertHistoryRepository;
     private final Map<Long, List<SseEmitter>> userEmitters = new ConcurrentHashMap<>();
-    private final Map<Long, List<Alert>> activeAlertList = new ConcurrentHashMap<>();
+    private final Map<Long, List<AlertEntity>> activeAlertList = new ConcurrentHashMap<>();
     private final DiscordService discordService;
 
-    private final Map<Long, Queue<Alert>> userAlertQueue = new ConcurrentHashMap<>();
+    private final Map<Long, Queue<AlertEntity>> userAlertQueue = new ConcurrentHashMap<>();
 
     @Lazy
     @Autowired
@@ -55,7 +51,7 @@ public class AlertSSEService {
     public void sendAlertsSequentially() {
         userAlertQueue.forEach((userId, queue) -> {
             if (!queue.isEmpty()) {
-                Alert alert = queue.poll();
+                AlertEntity alert = queue.poll();
                 sendAlertToUserSSE(userId, alert);
             }
         });
@@ -64,13 +60,13 @@ public class AlertSSEService {
     // 전체 활성화된 사용자의 알람 저장
     @Transactional(readOnly = true)
     public void getActiveAlertsGroupedByUser() {
-        List<Alert> activeAlerts = alertRepositoryImpl.findAllActiveAlerts();
+        List<AlertEntity> activeAlerts = alertRepository.findAllActiveAlerts();
 
         // userId를 key로, List<Alert>을 value로 하는 Map 생성
         activeAlertList.clear(); // 기존 데이터 삭제
         activeAlertList.putAll(
                 activeAlerts.stream()
-                        .collect(Collectors.groupingBy(alert -> alert.getUser().getUserId()))
+                        .collect(Collectors.groupingBy(alert -> alert.getUser().getId()))
         );
     }
 
@@ -111,12 +107,12 @@ public class AlertSSEService {
 
     @Scheduled(fixedRateString = "#{@alarmProperties.sendDiscordInterval}") // 1분마다 실행
     public void discordScheduler() {
-        Map<Long, List<Alert>> filteredAlerts = activeAlertList.entrySet()
+        Map<Long, List<AlertEntity>> filteredAlerts = activeAlertList.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, // 사용자 ID 유지 (key)
                         entry -> entry.getValue().stream() // value(알람 리스트) 필터링
-                                .filter(alert -> alert.isTargetPriceFlag() || alert.isGoldenCrossFlag())
+                                .filter(alert -> alert.getIsTargetPrice() || alert.getIsGoldenCross())
                                 .collect(Collectors.toList())
                 ));
         filteredAlerts.forEach(this::sendAlertListToUserDiscord);
@@ -133,20 +129,21 @@ public class AlertSSEService {
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
-        List<TickerEntity> tickerList = alertRepositoryImpl.findLatestTickersBySymbolList(allSymbols);
+        List<TickerEntity> tickerList = alertRepository.findLatestTickersBySymbolList(allSymbols);
 
         // 최근 알람 히스토리를 한 번에 조회
         LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
         List<Long> recentAlertIds = alertHistoryRepository.findRecentHistories(minutesAgo);
         Set<Long> recentAlertIdSet = new HashSet<>(recentAlertIds);
         for (Long userId : userEmitters.keySet()) {
-            List<Alert> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
+            List<AlertEntity> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
 
             // 유효성 추가
             if (activeAlerts == null || activeAlerts.isEmpty()) continue;
 
             // 활성화된 알람 SSE로 보내기
-            for (Alert alert : activeAlerts) {
+
+            for (AlertEntity alert : activeAlerts) {
                 String symbol = alert.getCoin().getSymbol();
 
                 TickerEntity ticker = tickerList.stream()
@@ -157,10 +154,10 @@ public class AlertSSEService {
                     if (goldCrossAndTargetPriceService.isPriceReached(alert, ticker)) {
                         if (goldCrossAndTargetPriceService.isPriceStillValid(alert, recentAlertIdSet)) {
                             log.info("조건 부합 : 1분" + alert);
-                            Queue<Alert> queue = userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
+                            Queue<AlertEntity> queue = userAlertQueue.computeIfAbsent(userId, k -> new ConcurrentLinkedQueue<>());
 
                             boolean alreadyQueued = queue.stream()
-                                    .anyMatch(a -> a.getAlertId().equals(alert.getAlertId()));
+                                    .anyMatch(a -> a.getId().equals(alert.getId()));
 
                             // 이미 보냈던 애를 중복처리
 
@@ -219,7 +216,7 @@ public class AlertSSEService {
     // 사용자의 기존 알람을 새로운 Emitter에게 전송
     public void sendUserAlerts(Long userId, SseEmitter emitter) {
         // 먼저 트랜잭션 내에서 Alert 목록만 가져옴
-        List<Alert> alerts = getAlertsToSend(userId);
+        List<AlertEntity> alerts = getAlertsToSend(userId);
 
         // 이후 I/O는 트랜잭션 밖에서 수행
         try {
@@ -234,7 +231,7 @@ public class AlertSSEService {
 
             // 히스토리 저장 비동기로 전환
             alerts.forEach(alert ->
-                    saveAlertHistoryAsync(alert.getAlertId(), userId)
+                    saveAlertHistoryAsync(alert.getId(), userId)
             );
 
         } catch (IOException e) {
@@ -243,11 +240,11 @@ public class AlertSSEService {
     }
 
     @Transactional(readOnly = true)
-    public List<Alert> getAlertsToSend(Long userId) {
+    public List<AlertEntity> getAlertsToSend(Long userId) {
         return Optional.ofNullable(activeAlertList.get(userId))
                 .orElse(Collections.emptyList())
                 .stream()
-                .filter(alert -> alert.isTargetPriceFlag() || alert.isGoldenCrossFlag())
+                .filter(alert -> alert.getIsTargetPrice() || alert.getIsGoldenCross())
                 .collect(Collectors.toList());
     }
 
@@ -258,7 +255,7 @@ public class AlertSSEService {
 
     // 사용자의 기존 알람 SSE 전송
     @Transactional
-    public void sendAlertToUserSSE(Long userId, Alert alert) {
+    public void sendAlertToUserSSE(Long userId, AlertEntity alert) {
         List<SseEmitter> emitters = userEmitters.get(userId);
 
         if (emitters != null) {
@@ -285,11 +282,11 @@ public class AlertSSEService {
         }
 
         // 알람 히스토리 저장
-        saveAlertHistoryAsync(alert.getAlertId(), userId);
+        saveAlertHistoryAsync(alert.getId(), userId);
     }
 
     // 사용자의 기존 알람 discord 전송
-    public void sendAlertToUserDiscord(Long userId, Alert alert) {
+    public void sendAlertToUserDiscord(Long userId, AlertEntity alert) {
         // 최종 메시지 생성
         if(alert == null) {
             return;
@@ -305,7 +302,7 @@ public class AlertSSEService {
     }
 
     // 사용자의 알람 스케줄러 discord 전송
-    public void sendAlertListToUserDiscord(Long userId, List<Alert> alerts) {
+    public void sendAlertListToUserDiscord(Long userId, List<AlertEntity> alerts) {
         StringBuilder messageBuilder = new StringBuilder();
 
         if (alerts.isEmpty()) {
@@ -331,7 +328,7 @@ public class AlertSSEService {
     }
 
     // 새로운 알람 추가
-    public void addEmitter(Long userId, Alert alert) {
+    public void addEmitter(Long userId, AlertEntity alert) {
         SseEmitter emitter = new SseEmitter(0L);
         // 내부 동작
         userEmitters.computeIfAbsent(userId, k -> Collections.synchronizedList(new ArrayList<>())).add(emitter);
@@ -345,10 +342,10 @@ public class AlertSSEService {
     }
 
     // SSE 알람 제거
-    public void deleteEmitter(Long userId, Alert alert) {
+    public void deleteEmitter(Long userId, AlertEntity alert) {
         // 사용자의 알람 리스트에서 해당 알람 제거
         activeAlertList.computeIfPresent(userId, (k, alerts) -> {
-            alerts.removeIf(a -> a.getAlertId().equals(alert.getAlertId())); // ✅ alertId가 동일한 경우만 삭제
+            alerts.removeIf(a -> a.getId().equals(alert.getId())); // ✅ alertId가 동일한 경우만 삭제
             return alerts.isEmpty() ? null : alerts; // 리스트가 비면 null 반환해서 Map에서 삭제
         });
 

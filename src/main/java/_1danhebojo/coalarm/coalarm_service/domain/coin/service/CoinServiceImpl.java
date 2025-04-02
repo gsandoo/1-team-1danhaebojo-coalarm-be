@@ -5,7 +5,6 @@ import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.CoinRepository
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.CoinDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
@@ -26,7 +25,6 @@ public class CoinServiceImpl implements CoinService {
 
     private final CoinJpaRepository coinJpaRepository;
     private final CoinRepository coinRepository;
-    private final TickerRepository tickerRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,7 +87,7 @@ public class CoinServiceImpl implements CoinService {
             throw new ApiException(AppHttpStatus.INVALID_COIN_ID);
         }
 
-        CoinEntity coinEntity = coinJpaRepository.findByCoinId(coinId)
+        CoinEntity coinEntity = coinJpaRepository.findById(coinId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_COIN));
 
         return new CoinDTO(coinEntity);
