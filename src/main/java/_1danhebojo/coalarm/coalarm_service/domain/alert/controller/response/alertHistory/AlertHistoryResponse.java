@@ -5,6 +5,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertH
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 public class AlertHistoryResponse {
@@ -17,6 +18,6 @@ public class AlertHistoryResponse {
         this.alertHistoryId = alertHistory.getId();
         this.userId = alertHistory.getAlert().getUser().getId();
         this.alert = new AlertResponse(alertHistory.getAlert()); // Alert 정보 포함
-        this.registeredDate = LocalDateTime.from(alertHistory.getRegDt());
+        this.registeredDate = LocalDateTime.ofInstant(alertHistory.getRegDt(), ZoneId.of("Asia/Seoul"));
     }
 }
