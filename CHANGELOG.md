@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.30.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.3...v1.30.4) (2025-04-03)
+
+### 🐛 BUG FIXES
+
+* 알람 정보 관련 수정 > getter 제거 ([650edc4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/650edc49db730eee4572ca0874bcee2aa1f3cc1d))
+
 ## [1.30.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.2...v1.30.3) (2025-04-03)
 
 ### 🐛 BUG FIXES
