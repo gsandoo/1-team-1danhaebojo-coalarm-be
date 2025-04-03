@@ -1,4 +1,4 @@
-name: deploy on dev env.
+name: deploy on prd env.
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
         run: |
           echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application.yml
 
-      - name: Create dev yml File
+      - name: Create prd yml File
         run: |
           echo '${{ secrets.APP_PRD_YML }}' > src/main/resources/application-dev.yml
 
@@ -132,5 +132,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
-          EB_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
-          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
+          EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
+          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
