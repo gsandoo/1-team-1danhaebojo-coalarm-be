@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.30.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.1...v1.30.2) (2025-04-03)
+
+### 🐛 BUG FIXES
+
+* 디스코드 연동 해제 시에 updateUserWebhookInAlerts 메서드 호출하도록 변경 ([f14edd3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f14edd3896a50c208d96ea733b9d09cc012381db))
+
 ## [1.30.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.0...v1.30.1) (2025-04-02)
 
 ### 🐛 BUG FIXES
