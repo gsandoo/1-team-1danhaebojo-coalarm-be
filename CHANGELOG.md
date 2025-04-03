@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## [1.30.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.2...v1.30.3) (2025-04-03)
+
+### 🐛 BUG FIXES
+
+* RequestMapping 주소 수정 ([1fb5c01](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/1fb5c01f7dc8115748c2b2a2af0307fb8be5cbb2))
+
+### ♻️ REFACTORING
+
+* AlertHistoryController 분리 ([c96c505](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c96c5057216ae99a80de4bea6457a447fa98b2ab))
+* AlertSSEController 분리 ([8af67a6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8af67a630aea51f8a5e49835823a2828720e7829))
+* AlertSSERepository 추가 ([db4059e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/db4059ebdbe2d90309a5d8dee7815921d42bee79))
+* 코드 통합 및 정리 ([67e3532](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/67e3532a71ccfa2ef3de44810bbaf5b275a9815d))
+* 파일 통합 ([d6dd1ff](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d6dd1ffe6b38864f55d3aa1200875de5ba98d477))
+
 ## [1.30.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.1...v1.30.2) (2025-04-03)
 
 ### 🐛 BUG FIXES
