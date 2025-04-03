@@ -225,6 +225,7 @@ public class UserServiceImpl implements UserService {
 
         user.updateDiscordWebhook(null);
         userRepository.save(user);
+        alertSSEService.updateUserWebhookInAlerts(userId, "");
 
         return PkResponse.of(user.getId());
     }
