@@ -83,4 +83,12 @@ public class UserController {
                 )
         ));
     }
+
+    // 디스코드 웹훅 URL 연동 해제
+    @DeleteMapping("/discord")
+    public ResponseEntity<BaseResponse<PkResponse>> removeDiscordWebhook() {
+        return ResponseEntity.ok(BaseResponse.success(
+                userService.removeDiscordWebhook(authService.getLoginUserId())
+        ));
+    }
 }

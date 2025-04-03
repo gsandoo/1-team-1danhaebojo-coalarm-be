@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Alert;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
@@ -17,20 +17,20 @@ public class AlertResponse {
     private VolumeSpikeResponse volumeSpike;
     private TargetPriceResponse targetPrice;
 
-    public AlertResponse(Alert alert) {
-        this.alertId = alert.getAlertId();
+    public AlertResponse(AlertEntity alert) {
+        this.alertId = alert.getId();
         this.title = alert.getTitle();
         this.coin = new CoinResponse(alert.getCoin());
-        this.userId = alert.getUser().getUserId();
-        this.active = alert.isActive();
+        this.userId = alert.getUser().getId();
+        this.active = alert.getActive();
         // `is_*` 값 중 `true`인 값을 기준으로 alertType 설정
-        if (alert.isGoldenCrossFlag()) {
+        if (alert.getIsGoldenCross()) {
             this.alertType = "GOLDEN_CROSS";
             this.goldenCross = new GoldenCrossResponse(alert.getGoldenCross());
-        } else if (alert.isTargetPriceFlag()) {
+        } else if (alert.getIsTargetPrice()) {
             this.alertType = "TARGET_PRICE";
             this.targetPrice = new TargetPriceResponse(alert.getTargetPrice());
-        } else if (alert.isVolumeSpikeFlag()) {
+        } else if (alert.getIsVolumeSpike()) {
             this.alertType = "VOLUME_SPIKE";
             this.volumeSpike = new VolumeSpikeResponse(alert.getVolumeSpike());
         }

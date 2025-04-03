@@ -37,8 +37,8 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
     private static final String BINANCE_BASE_URL = "https://fapi.binance.com";
 
     public CoinIndicatorResponse getDashboardIndicators(Long coinId) {
-        Optional<CoinIndicatorEntity> latestIndicator = coinIndicatorJpaRepository.findTopByCoinCoinIdOrderByCreatedAtDesc(coinId);
-        Optional<CoinEntity> coinEntity = coinJpaRepository.findByCoinId(coinId);
+        Optional<CoinIndicatorEntity> latestIndicator = coinIndicatorJpaRepository.findTopByCoinIdOrderByRegDtDesc(coinId);
+        Optional<CoinEntity> coinEntity = coinJpaRepository.findById(coinId);
 
         if(latestIndicator.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
         if(coinEntity.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
