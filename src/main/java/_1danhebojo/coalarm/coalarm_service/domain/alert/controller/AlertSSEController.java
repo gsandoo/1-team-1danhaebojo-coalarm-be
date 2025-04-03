@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/subscribe")
+@RequestMapping("/api/v1/alerts/subscribe")
 public class AlertSSEController {
 
     private final AlertSSEService alertSSEService;

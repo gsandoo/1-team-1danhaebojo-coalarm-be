@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/history")
+@RequestMapping("/api/v1/alerts/history")
 public class AlertHistoryController {
     private final AlertService alertService;
     private final AlertSSEService alertSSEService;
