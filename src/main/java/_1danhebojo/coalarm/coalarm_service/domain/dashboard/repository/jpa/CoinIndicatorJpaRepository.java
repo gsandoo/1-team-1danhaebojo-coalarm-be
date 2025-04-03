@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface CoinIndicatorJpaRepository extends JpaRepository<CoinIndicatorEntity,Long> {
-    Optional<CoinIndicatorEntity> findTopByCoinCoinIdOrderByCreatedAtDesc(Long coinId);
+    Optional<CoinIndicatorEntity> findTopByCoinIdOrderByRegDtDesc(Long coinId);
 }

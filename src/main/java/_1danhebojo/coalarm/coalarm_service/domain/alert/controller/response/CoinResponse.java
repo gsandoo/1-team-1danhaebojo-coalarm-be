@@ -1,6 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response;
 
-import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.Coin;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +13,9 @@ public class CoinResponse {
     private String name;
     private String symbol;
 
-    public CoinResponse(Coin coin) {
+    public CoinResponse(CoinEntity coin) {
         if (coin != null) {
-            this.id = coin.getCoinId();
+            this.id = coin.getId();
             this.name = coin.getName();
             this.symbol = coin.getSymbol();
         }

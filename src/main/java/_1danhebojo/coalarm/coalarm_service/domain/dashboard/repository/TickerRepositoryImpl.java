@@ -26,7 +26,7 @@ public class TickerRepositoryImpl implements TickerRepository{
         // 코인 정보 먼저 조회
         CoinEntity coinEntity = queryFactory
                 .selectFrom(coin)
-                .where(coin.coinId.eq(coinId))
+                .where(coin.id.eq(coinId))
                 .fetchOne();
 
         if (coinEntity == null) {

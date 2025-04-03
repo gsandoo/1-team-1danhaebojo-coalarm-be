@@ -16,7 +16,7 @@ public class UserDTO {
 
     public static UserDTO fromEntity(UserEntity user) {
         return UserDTO.builder()
-                .userId(user.getUserId())
+                .userId(user.getId())
                 .kakaoId(user.getKakaoId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())

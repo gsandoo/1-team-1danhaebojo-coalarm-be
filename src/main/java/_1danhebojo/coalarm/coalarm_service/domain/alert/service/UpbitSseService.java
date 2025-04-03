@@ -5,7 +5,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -52,7 +51,7 @@ public class UpbitSseService {
                         payload = message.getPayload().toString(); // fallback
                     }
 
-                    log.info("📥 WebSocket 수신 payload: {}", payload);
+//                    log.info("📥 WebSocket 수신 payload: {}", payload);
 
                     String code = extractCodeFromPayload(payload);
                     if (code == null) {
@@ -65,7 +64,7 @@ public class UpbitSseService {
                     emitterMap.getOrDefault(symbol, List.of()).forEach(emitter -> {
                         try {
                             emitter.send(SseEmitter.event().data(payload));
-                            log.info("📤 SSE 전송: {}", symbol);
+//                            log.info("📤 SSE 전송: {}", symbol);
                         } catch (IOException e) {
                             emitter.completeWithError(e);
                         }
@@ -75,6 +74,8 @@ public class UpbitSseService {
                     log.error("❌ WebSocket 메시지 처리 중 오류", e);
                 }
             }
+
+
 
             private String extractCodeFromPayload(String payload) {
                 int idx = payload.indexOf("\"code\":\"");
@@ -91,9 +92,16 @@ public class UpbitSseService {
 
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-                System.out.println("❌ WebSocket 연결 종료");
+                System.out.println("❌ WebSocket 연결 종료: " + closeStatus);
                 UpbitSseService.this.session = null;
-                // 재연결 로직을 추가할 수도 있음
+
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        System.out.println("🔁 WebSocket 재연결 시도...");
+                        connectToUpbit();
+                    }
+                }, 3000);
             }
 
             @Override

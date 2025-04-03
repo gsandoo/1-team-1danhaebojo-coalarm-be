@@ -1,5 +1,198 @@
 # CHANGELOG
 
+## [1.30.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.3...v1.30.4) (2025-04-03)
+
+### 🐛 BUG FIXES
+
+* 알람 정보 관련 수정 > getter 제거 ([650edc4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/650edc49db730eee4572ca0874bcee2aa1f3cc1d))
+
+## [1.30.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.2...v1.30.3) (2025-04-03)
+
+### 🐛 BUG FIXES
+
+* RequestMapping 주소 수정 ([1fb5c01](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/1fb5c01f7dc8115748c2b2a2af0307fb8be5cbb2))
+
+### ♻️ REFACTORING
+
+* AlertHistoryController 분리 ([c96c505](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c96c5057216ae99a80de4bea6457a447fa98b2ab))
+* AlertSSEController 분리 ([8af67a6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8af67a630aea51f8a5e49835823a2828720e7829))
+* AlertSSERepository 추가 ([db4059e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/db4059ebdbe2d90309a5d8dee7815921d42bee79))
+* 코드 통합 및 정리 ([67e3532](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/67e3532a71ccfa2ef3de44810bbaf5b275a9815d))
+* 파일 통합 ([d6dd1ff](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d6dd1ffe6b38864f55d3aa1200875de5ba98d477))
+
+## [1.30.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.1...v1.30.2) (2025-04-03)
+
+### 🐛 BUG FIXES
+
+* 디스코드 연동 해제 시에 updateUserWebhookInAlerts 메서드 호출하도록 변경 ([f14edd3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f14edd3896a50c208d96ea733b9d09cc012381db))
+
+## [1.30.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.0...v1.30.1) (2025-04-02)
+
+### 🐛 BUG FIXES
+
+* 엔티티 수정으로 발생한 Hibernate 인스턴스화 오류 해결 (기본 생성자 추가) ([8dcf944](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8dcf944109d74ce855e08f24584f91e3e6cb64da))
+* 엔티티 수정으로 발생한 Instant → LocalDateTime 변환 오류 처리 (ZoneId 추가) ([b774ac4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/b774ac4d61ab04097e530c900124b83ac16432af))
+
+### ♻️ REFACTORING
+
+* discord 알림 리스트 전송 방식 개선 - embed 개별 카드화 ([9379707](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9379707288904510d5e59285a10448a173d5d0eb))
+
+## [1.30.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.29.0...v1.30.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* 닉네임 및 디스코드 웹훅 수정 시 알림 정보 동기화 ([cccf341](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/cccf3415445322093fbe8128c90f5ad726055e4c))
+
+## [1.29.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.28.0...v1.29.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* userAlertQueue 내 유저 nickname/webhook 실시간 동기화 처리 ([11165d0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/11165d0db374a7b0872cdc7fe147af4eaf24cfcb))
+* 알림 캐시(alertList) 내 유저 닉네임 및 웹훅 필드 동기화 메서드 추가 ([1bda9cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/1bda9cd4e78a8c0a971cc784720b9c0f8296857b))
+
+### 🐛 BUG FIXES
+
+* SSE 관련 수정 ([271c0f5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/271c0f5597fcc90d9c98d7a47dead8be72f7cfe4))
+* 중복 코드 제거 ([0363af5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0363af55e8024d2a777dc5a62119e6d2f3db5bfb))
+
+### ♻️ REFACTORING
+
+* 사용하지 않는 코드 제거 ([49cddcf](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/49cddcfcd5c546cd775578c8f75400b1d0d98b63))
+* 알람 removeEmitter 통일 ([9a31c95](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9a31c958d5a03b99585d1160c1affd17f2c1c19a))
+
+## [1.28.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.27.0...v1.28.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* 디스코드 웹훅 url 연동 해제 엔드포인트 추가 ([7c42028](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/7c420283fbb63175ba1e115647b898d204d42a88))
+
+## [1.27.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.9...v1.27.0) (2025-04-02)
+
+### 🚀 NEW FEATURES
+
+* RateLimitFilter에 재시도 대기 시간 안내 기능 추가 ([3ce13cd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3ce13cd33138a584810ea4a77b89d07f618ab1fc))
+
+### 🐛 BUG FIXES
+
+* 닉네임 유효성 검사 로직 추가 ([8acf454](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8acf45420cfd2a55cd3e053a4abd7320370b1fc3))
+* 디스코드 웹훅 url 유효성 검사 로직 개선 ([facc191](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/facc191ea500f0b17c20a363b1b2f77f35d88800))
+
+## [1.26.9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.8...v1.26.9) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* rete-limit 로직 변경 ([416845b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/416845bd75d5ba24fc28fff11024aadc3a9a241c))
+
+## [1.26.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.7...v1.26.8) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* SSE 알림 전송 시 NullPointerException 방지 처리 ([a8e51e0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/a8e51e0206eaca41feb4cd6047a8e2dc7dd74812))
+
+### ♻️ REFACTORING
+
+* 알림 히스토리 및 티커 조회 로직 전체 조회 방식으로 개선 ([822789f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/822789f52cee4fae212558349df2daf53ec4c89a))
+
+## [1.26.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.6...v1.26.7) (2025-04-01)
+
+### ♻️ REFACTORING
+
+* goldenCroess shortMa, longMa 기본 값 적용 ([477b18c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/477b18c58705576abd7bcc23a4fa3ccc030a28c3))
+* 알람 체크 시 사용자 알람 이력 일괄 조회로 성능 개선 ([8f3504c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8f3504c51d71bfe63e3036647542ca9a31e0ae75))
+* 알람 히스토리 인터페이스 연결 ([67d2d08](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/67d2d08adfd74fc8790bbf626b81336afe3e995f))
+* 알람 히스토리 인터페이스 추가 ([df23781](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/df23781b47b56fe414ea5275602b50f7cf07f8f9))
+
+## [1.26.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.5...v1.26.6) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* Merge branch 'develop' into fix/ratelimit ([3e2ec23](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3e2ec23f52bfaf877e3a85b47d791b60b22e538b))
+
+## [1.26.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.4...v1.26.5) (2025-04-01)
+
+### 🐛 BUG FIXES
+
+* 웹 소켓 재 연결 로직 추가 ([e44dddd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e44dddd117fb451318db55fc46e2038170e9bd6d))
+
+## [1.26.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.3...v1.26.4) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* 실시간 체결 내역 안보이는 현상 해결 ([65665d2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/65665d2ee3c9984c1e494c2c645d90e1074036b0))
+
+## [1.26.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.2...v1.26.3) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* rate limit 통합 버킷 사용 ([f4519af](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f4519afe4a0cdec0339ed610db408143f09e5b75))
+
+## [1.26.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.1...v1.26.2) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* 원래 클라이언트 IP로 구분하도록 변경 ([fb4ea39](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/fb4ea3949964f88e0de1e74952ea76f5c2a77b0e))
+
+## [1.26.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.26.0...v1.26.1) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* rate-limit 설정값 변경 ([90286ee](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/90286eed27bfdd02aaade9048e00eed2207ceb27))
+
+## [1.26.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.25.0...v1.26.0) (2025-03-31)
+
+### 🚀 NEW FEATURES
+
+* 디스코드 웹훅 url 유효성 검사 로직 추가 ([16530d5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/16530d5e75cb045389988be7438accf7442581ef))
+
+## [1.25.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.8...v1.25.0) (2025-03-31)
+
+### 🚀 NEW FEATURES
+
+* rate-limit 추가 ([0569d8c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0569d8c5007ef037b31ffd3aec0662acb43534e7))
+
+## [1.24.8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.7...v1.24.8) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* SSE 알림 및 WebSocket 구독 로직 비동기 처리로 성능 개선 ([ec8e1b0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ec8e1b07de120dff765ec60279fde8cb656253e2))
+
+## [1.24.7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.6...v1.24.7) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* Hikari 설정 변경 ([97801c5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/97801c56890488b21cc5a68a8dc3575ee382bf1b))
+
+## [1.24.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.5...v1.24.6) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* Upbit SSE subscribe API에 produces 명시 및 예외 처리 추가 ([ca290c2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ca290c2e871a685270bd6f248790cf7fca78a6d2))
+
+## [1.24.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.4...v1.24.5) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* Hikari 설정 추가 ([2ff2951](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/2ff29510e4eafca95c2becfbce8f2ee006028990))
+
+## [1.24.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.3...v1.24.4) (2025-03-31)
+
+### 🐛 BUG FIXES
+
+* Hikari 설정 추가 ([fd40e6f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/fd40e6fcac762da0852ce7d56e200becd84845e7))
+
+## [1.24.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.2...v1.24.3) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* session.isOpen() 체크로 WebSocket 예외 방지 ([717c167](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/717c16712335fb062bdb1cfc4a998acf555de835))
+* 트랜잭션 필요 없는 부분 제거 ([9d174bb](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9d174bbaafb523990f6499f131e15f783ace685b))
+
+## [1.24.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.1...v1.24.2) (2025-03-31)
+
+### ♻️ REFACTORING
+
+* SSE 재사용 처리 ([cff8c1d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/cff8c1d29de8c8009d85384b2eb001e422fc98d8))
+
 ## [1.24.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.24.0...v1.24.1) (2025-03-31)
 
 ### ♻️ REFACTORING

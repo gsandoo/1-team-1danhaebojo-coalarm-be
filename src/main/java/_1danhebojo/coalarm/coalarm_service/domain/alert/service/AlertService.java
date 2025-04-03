@@ -4,6 +4,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepositoryImpl;
@@ -44,12 +45,12 @@ public class AlertService {
         UserEntity getMyInfo = userRepository.findByUserId(request.getUserId())
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
-        Alert alert = convertToAlertEntity(request);
-        Alert savedAlert = alertRepository.save(alert);
+        AlertEntity alert = convertToAlertEntity(request);
+        AlertEntity savedAlert = alertRepository.save(alert);
 
         alert.setUser(getMyInfo);
 
-        Long alertId = savedAlert.getAlertId();
+        Long alertId = savedAlert.getId();
         if (alertId == null) {
             throw new ApiException(AppHttpStatus.FAILED_TO_SAVE_ALERT);
         }
@@ -61,36 +62,36 @@ public class AlertService {
 
     // 알람 활성화 수정
     public Long updateAlertStatus(Long alertId, boolean active) {
-        Alert alert = alertRepository.findByIdWithCoin(alertId)
+        AlertEntity alert = alertRepository.findByIdWithCoin(alertId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
-        boolean isActive = alert.isActive();
+        boolean isActive = alert.getActive();
 
         if(active != isActive) {
             alert.setActive(active);
-            Alert saveAlert = alertRepository.save(alert);
+            AlertEntity saveAlert = alertRepository.save(alert);
             if (active) {
-                alertSSEService.addEmitter(saveAlert.getUser().getUserId(), alert);
+                alertSSEService.addEmitter(saveAlert.getUser().getId(), alert);
             } else {
-                alertSSEService.deleteEmitter(saveAlert.getUser().getUserId(), alert);
+                alertSSEService.deleteEmitter(saveAlert.getUser().getId(), alert);
             }
         }
 
-        return alert.getAlertId();
+        return alert.getId();
     }
 
     // 알람 삭제
     public void deleteAlert(Long alertId) {
-        Alert alert = alertRepository.findById(alertId)
+        AlertEntity alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
 
-        alertSSEService.deleteEmitter(alert.getUser().getUserId(), alert);
+        alertSSEService.deleteEmitter(alert.getUser().getId(), alert);
         alertRepository.deleteById(alertId);
     }
 
     // 알람 목록 조회
     @Transactional(readOnly = true)
     public OffsetResponse<AlertResponse> getMyAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit) {
-        Page<Alert> alerts = alertRepository.findAllUserAlerts(userId, symbol, active, sort, offset, limit);
+        Page<AlertEntity> alerts = alertRepository.findAllUserAlerts(userId, symbol, active, sort, offset, limit);
 
         return OffsetResponse.of(
                 alerts.getContent().stream()
@@ -102,47 +103,50 @@ public class AlertService {
         );
     }
 
-    private Alert convertToAlertEntity(BaseAlertRequest request) {
-        Alert alert = new Alert();
+    private AlertEntity convertToAlertEntity(BaseAlertRequest request) {
+        AlertEntity alert = new AlertEntity();
         alert.setActive(request.getActive());
         alert.setTitle(request.getTitle());
 
         if (request instanceof GoldenCrossAlertRequest goldenCrossRequest) {
-            GoldenCrossAlert goldenCrossAlert = new GoldenCrossAlert();
-            goldenCrossAlert.setAlert(alert); // 양방향 관계 연결
+            GoldenCrossEntity goldenCrossAlert = GoldenCrossEntity.builder()
+                    .alert(alert)
+                    .build();
 
             alert.setGoldenCross(goldenCrossAlert);
-            alert.setGoldenCrossFlag(true);
+            alert.setIsGoldenCross(true);
         }
 
         if (request instanceof TargetPriceAlertRequest targetPriceRequest) {
-            TargetPriceAlert targetPriceAlert = new TargetPriceAlert();
-            targetPriceAlert.setAlert(alert);
-            targetPriceAlert.setPrice(((TargetPriceAlertRequest) request).getPrice()); // 필드 세팅
-            targetPriceAlert.setPercentage(((TargetPriceAlertRequest) request).getPercentage());
+            TargetPriceEntity targetPriceAlert = TargetPriceEntity.builder()
+                    .alert(alert)
+                    .price(targetPriceRequest.getPrice())
+                    .percentage(targetPriceRequest.getPercentage())
+                    .build();
 
             alert.setTargetPrice(targetPriceAlert);
-            alert.setTargetPriceFlag(true);
+            alert.setIsTargetPrice(true);
         }
 
         if (request instanceof VolumeSpikeAlertRequest volumeSpikeAlertRequest) {
-            VolumeSpikeAlert volumeSpikeAlert = new VolumeSpikeAlert();
-            volumeSpikeAlert.setAlert(alert);
-            volumeSpikeAlert.setTradingVolumeSoaring(volumeSpikeAlertRequest.getTradingVolumeSoaring());
+            VolumeSpikeEntity volumeSpikeAlert = VolumeSpikeEntity.builder()
+                    .alert(alert)
+                    .tradingVolumeSoaring(volumeSpikeAlertRequest.getTradingVolumeSoaring())
+                    .build();
 
             alert.setVolumeSpike(volumeSpikeAlert);
-            alert.setVolumeSpikeFlag(true);
+            alert.setIsVolumeSpike(true);
         }
 
         UserEntity user = UserEntity.builder()
-                .userId(request.getUserId())
+                .id(request.getUserId())
                 .build();
 
         alert.setUser(user);
 
         // 우선적으로 추가 추후에 변경 필요
         if (request.getSymbol() != null) {
-            Coin coin = alertRepository.findCoinBySymbol(request.getSymbol())
+            CoinEntity coin = alertRepository.findCoinBySymbol(request.getSymbol())
                     .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_COIN));
             alert.setCoin(coin);
         }

@@ -29,6 +29,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity savedUser = userRepository.save(newUser);
 
-        alertSSEService.subscribe(savedUser.getUserId());
+        alertSSEService.subscribe(savedUser.getId());
 
         return UserDTO.fromEntity(savedUser);
     }
@@ -111,6 +113,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.hasText(nickname)) {
             validateNickname(nickname);
             user.updateNickname(nickname);
+            alertSSEService.updateUserNicknameInAlerts(userId, nickname);
         }
 
         // 프로필 이미지 업데이트
@@ -123,12 +126,12 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
-        return PkResponse.of(user.getUserId());
+        return PkResponse.of(user.getId());
     }
 
     private void validateNickname(String nickname) {
-        if (nickname.length() < 2) {
-            throw new ApiException(AppHttpStatus.BAD_REQUEST);
+        if (nickname.length() < 2 || nickname.length() > 10) {
+            throw new ApiException(AppHttpStatus.INVALID_NICKNAME_LENGTH);
         }
 
     }
@@ -202,10 +205,75 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
 
-        user.updateDiscordWebhook(request.getDiscordWebhook());
+        // 디스코드 웹훅 url 유효성 검사
+        String webhookUrl = request.getDiscordWebhook();
+        validateDiscordWebhookUrl(webhookUrl);
 
+        user.updateDiscordWebhook(request.getDiscordWebhook());
         userRepository.save(user);
 
-        return PkResponse.of(user.getUserId());
+        alertSSEService.updateUserWebhookInAlerts(userId, webhookUrl);
+
+        return PkResponse.of(user.getId());
+    }
+
+    @Override
+    @Transactional
+    public PkResponse removeDiscordWebhook(Long userId) {
+        UserEntity user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        user.updateDiscordWebhook(null);
+        userRepository.save(user);
+        alertSSEService.updateUserWebhookInAlerts(userId, "");
+
+        return PkResponse.of(user.getId());
+    }
+
+    private void validateDiscordWebhookUrl(String webhookUrl) {
+        // 빈 문자열 체크
+        if (webhookUrl == null || webhookUrl.trim().isEmpty()) {
+            throw new ApiException(AppHttpStatus.EMPTY_DISCORD_WEBHOOK);
+        }
+
+        String discordWebhookRegex = "^https://discord\\.com/api/webhooks/\\d+/[\\w-]+$";
+        Pattern pattern = Pattern.compile(discordWebhookRegex);
+        Matcher matcher = pattern.matcher(webhookUrl);
+
+        if (!matcher.matches()) {
+            throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
+        }
+
+        // 실제 유효한 URL인지 테스트 메시지 보내기
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            String payload = """
+        {
+            "content": "코알람에 오신 걸 환영합니다! 🎉\\n이제 디스코드에서 실시간 알림을 받아보실 수 있어요.",
+            "username": "코알람"
+        }
+        """;
+
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    webhookUrl,
+                    HttpMethod.POST,
+                    request,
+                    String.class
+            );
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
+            }
+
+        } catch (Exception e) {
+            log.error("디스코드 웹훅 테스트 실패: {}", e.getMessage());
+            throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
+        }
     }
 }

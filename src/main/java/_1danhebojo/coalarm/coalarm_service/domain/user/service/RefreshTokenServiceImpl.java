@@ -27,9 +27,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
         Instant expiryDate = Instant.now().plusSeconds(60 * 60 * 24 * 7);
 
         RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
-                .userId(userId)
+                .id(userId)
                 .token(refreshToken)
-                .expiryDate(expiryDate)
+                .expiresAt(expiryDate)
                 .build();
             refreshTokenJpaRepository.save(refreshTokenEntity);
 
@@ -43,7 +43,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
                 .orElseThrow(()-> new ApiException(AppHttpStatus.INVALID_REFRESH_TOKEN));
 
         // refresh token 만료 확인
-        if (refreshTokenEntity.getExpiryDate().isBefore(Instant.now())) {
+        if (refreshTokenEntity.getExpiresAt().isBefore(Instant.now())) {
             throw new ApiException(AppHttpStatus.UNAUTHORIZED);
         }
 
@@ -61,7 +61,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     @Override
     public Long getUserIdByToken(String token) {
         return refreshTokenJpaRepository.findByToken(token)
-                .map(RefreshTokenEntity::getUserId)
+                .map(RefreshTokenEntity::getId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.INVALID_ACCESS_TOKEN));
     }
 }
