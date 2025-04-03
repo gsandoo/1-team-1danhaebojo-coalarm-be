@@ -46,7 +46,7 @@ public interface AlertSSEJpaRepository extends JpaRepository<AlertEntity, Long> 
     List<TickerEntity> findBySymbolAndDateRange(String symbol, Instant startDate);
 
     // 최신 티커 데이터 조회 (특정 심볼, 최근 N개, 거래소)
-    @Query("SELECT t FROM TickerEntity t WHERE t.id.baseSymbol = :symbol AND t.id.timestamp >= :startDate AND t.id.exchange=:exchange ORDER BY t.id.timestamp ASC")
-    List<TickerEntity> findBySymbolAndDateRangeAndExchange(String symbol, Instant startDate, String exchange);
+    @Query("SELECT t FROM TickerEntity t WHERE t.id.baseSymbol = :baseSymbol AND t.id.timestamp >= :startDate AND t.id.exchange=:exchange AND t.id.quoteSymbol = :quoteSymbol ORDER BY t.id.timestamp ASC")
+    List<TickerEntity> findBySymbolAndDateRangeAndExchange(String baseSymbol, Instant startDate, String exchange, String quoteSymbol);
     // </editor-fold>
 }

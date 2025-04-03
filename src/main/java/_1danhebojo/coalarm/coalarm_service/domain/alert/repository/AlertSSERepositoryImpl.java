@@ -13,16 +13,12 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class AlertSSERepositoryImpl {
+public class AlertSSERepositoryImpl implements AlertSSERepository {
     private final AlertSSEJpaRepository alertSSEJpaRepository;
     private final VolumeSpikeJpaRepository volumeSpikeJpaRepository;
 
-    public Optional<TickerEntity> findLatestBySymbol(String symbol, String exchange) {
-        return alertSSEJpaRepository.findLatestBySymbol(symbol, exchange);
-    }
-
-    public List<TickerEntity> findBySymbolAndDateRangeAndExchange(String symbol, Instant startDate, String exchange){
-        return alertSSEJpaRepository.findBySymbolAndDateRangeAndExchange(symbol, startDate, exchange);
+    public List<TickerEntity> findBySymbolAndDateRangeAndExchange(String baseSymbol, Instant startDate, String exchange, String quoteSymbol) {
+        return alertSSEJpaRepository.findBySymbolAndDateRangeAndExchange(baseSymbol, startDate, exchange, quoteSymbol);
     }
 
     public List<AlertEntity> findAllVolumeSpikeAlertByStatus() {
