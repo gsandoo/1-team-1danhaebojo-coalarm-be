@@ -48,13 +48,9 @@ public class AlertSSEService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String UPBIT_MARKET_URL = "https://api.upbit.com/v1/market/all?is_details=true"; // 예제 URL
 
-    @Getter
     private final Map<Boolean, List<String>> volumeDatas = new HashMap<>();
-    @Getter
     private final Map<Long, List<SseEmitter>> userEmitters = new ConcurrentHashMap<>();
-    @Getter
     private final Map<Long, List<AlertEntity>> activeAlertList = new ConcurrentHashMap<>();
-    @Getter
     private final Map<Long, Queue<AlertEntity>> userAlertQueue = new ConcurrentHashMap<>();
 
     // 서버 시작 시 자동 실행 → 업비트에서 초기 데이터 가져오기
