@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.30.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.4...v1.30.5) (2025-04-04)
+
+### 🐛 BUG FIXES
+
+* 중복 배포 방지를 위해 버전명을 날짜 기반으로 변경 ([006b7dd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/006b7ddde7b0ccb012dc5ed775d691e9ee0f3e21))
+
 ## [1.30.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.3...v1.30.4) (2025-04-03)
 
 ### 🐛 BUG FIXES
