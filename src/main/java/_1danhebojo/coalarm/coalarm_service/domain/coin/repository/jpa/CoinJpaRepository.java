@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface CoinJpaRepository extends JpaRepository<CoinEntity,Long> {
     Optional<CoinEntity> findBySymbol(String symbol);
     List<CoinEntity> findByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(String searchTerm, String searchTerm2);
+    List<CoinEntity> findAllBy();
 }
