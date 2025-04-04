@@ -71,7 +71,7 @@ jobs:
               }
             ],
             "Logging": "/var/log/nginx",
-            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && while ! aws s3 cp s3://coalarm-prd-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && while ! aws s3 cp s3://coalarm-prd-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
