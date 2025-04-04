@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.31.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.5...v1.31.0) (2025-04-04)
+
+### 🚀 NEW FEATURES
+
+* 김치 프리미엄 모든 데이터 조회 후 연산 ([e1a6078](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e1a6078e6aeb7f6d584b433f834c71544e31a6c2))
+
 ## [1.30.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.4...v1.30.5) (2025-04-04)
 
 ### 🐛 BUG FIXES
