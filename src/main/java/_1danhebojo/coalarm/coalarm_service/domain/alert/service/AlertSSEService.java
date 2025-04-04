@@ -94,13 +94,16 @@ public class AlertSSEService {
             List<SseEmitter> failedEmitters = new ArrayList<>();
             Long userId = entry.getKey();
             List<SseEmitter> emitters = entry.getValue();
-            for (SseEmitter emitter : emitters) {
-                try {
-                    emitter.send(SseEmitter.event()
-                            .name("heartbeat")
-                            .data("keep-alive")); // 클라이언트에선 로그로만 찍어도 OK
-                } catch (IOException e) {
-                    failedEmitters.add(emitter);
+
+            if (emitters != null && !Objects.requireNonNull(emitters).isEmpty()) {
+                for (SseEmitter emitter : emitters) {
+                    try {
+                        emitter.send(SseEmitter.event()
+                                .name("heartbeat")
+                                .data("keep-alive")); // 클라이언트에선 로그로만 찍어도 OK
+                    } catch (IOException e) {
+                        failedEmitters.add(emitter);
+                    }
                 }
             }
 
@@ -218,7 +221,7 @@ public class AlertSSEService {
         if(userId == null) { return null;}
         // 이미 존재하는 emitter가 있으면 재사용
         List<SseEmitter> existingEmitters = userEmitters.get(userId);
-        if (existingEmitters != null) {
+        if (existingEmitters != null && !Objects.requireNonNull(existingEmitters).isEmpty()) {
             // 살아있는 emitter만 필터링
             List<SseEmitter> failedEmitters = new ArrayList<>();
 
@@ -272,7 +275,7 @@ public class AlertSSEService {
     public void sendAlertToUserSSE(Long userId, AlertEntity alert) {
         List<SseEmitter> emitters = userEmitters.get(userId);
 
-        if (emitters == null || emitters.isEmpty()) {
+        if (emitters != null && !Objects.requireNonNull(emitters).isEmpty()) {
             AlertSSEResponse response = new AlertSSEResponse(alert);
             List<SseEmitter> failedEmitters = new ArrayList<>();
 
@@ -349,7 +352,7 @@ public class AlertSSEService {
     public void removeEmitter(Long userId) {
         List<SseEmitter> emitters = userEmitters.remove(userId); // 해당 userId의 모든 SSE 제거
 
-        if (emitters != null) {
+        if (emitters != null && !Objects.requireNonNull(emitters).isEmpty()) {
             for (SseEmitter emitter : emitters) {
                 try {
                     emitter.complete(); // 안전하게 종료
@@ -364,7 +367,7 @@ public class AlertSSEService {
     // userEmitters에서 사용자 제거
     public void removeSingleEmitter(Long userId, SseEmitter emitter) {
         List<SseEmitter> emitters = userEmitters.get(userId);
-        if (emitters != null) {
+        if (emitters != null && !Objects.requireNonNull(emitters).isEmpty()) {
             emitters.remove(emitter);
             try {
                 emitter.complete();
