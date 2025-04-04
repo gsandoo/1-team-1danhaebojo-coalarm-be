@@ -12,7 +12,6 @@ import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEnt
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -75,11 +74,7 @@ public class AlertSSEService {
         userAlertQueue.forEach((userId, queue) -> {
             if (!queue.isEmpty()) {
                 AlertEntity alert = queue.poll();
-                try {
-                    sendAlertToUserSSE(userId, alert);
-                } catch (Exception e) {
-                    log.error("알람 전송 중 예외 발생 - 사용자: {}, 알람 ID: {}, 오류: {}", userId, alert.getId(), e.getMessage(), e);
-                }
+                sendAlertToUserSSE(userId, alert);
             }
         });
     }
@@ -105,7 +100,6 @@ public class AlertSSEService {
                             .name("heartbeat")
                             .data("keep-alive")); // 클라이언트에선 로그로만 찍어도 OK
                 } catch (IOException e) {
-                    log.warn("heartbeat 전송 실패 - userId: " + userId);
                     failedEmitters.add(emitter);
                 }
             }
@@ -119,15 +113,43 @@ public class AlertSSEService {
     // 특정 시간마다 디스코드 알림 전송
     @Scheduled(fixedRateString = "#{@alarmProperties.sendDiscordInterval}")
     public void discordScheduler() {
+        // 조건에 맞는 알람만 필터링 (지정가 or 골든크로스)
         Map<Long, List<AlertEntity>> filteredAlerts = activeAlertList.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey, // 사용자 ID 유지 (key)
-                        entry -> entry.getValue().stream() // value(알람 리스트) 필터링
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream()
                                 .filter(alert -> alert.getIsTargetPrice() || alert.getIsGoldenCross())
                                 .collect(Collectors.toList())
                 ));
-        filteredAlerts.forEach(this::sendAlertListToUserDiscord);
+
+        // 전체 심볼 수집 → 가격 데이터 로딩
+        List<String> allSymbols = allSymbols(filteredAlerts);
+
+        // 티커 정보 조회
+        List<TickerEntity> tickerList = alertRepository.findLatestTickersBySymbolList(allSymbols);
+
+        // 유저별 조건 체크 및 디스코드 전송
+        filteredAlerts.forEach((userId, alertList) -> {
+            List<AlertEntity> triggeredAlerts = new ArrayList<>();
+
+            for (AlertEntity alert : alertList) {
+                String symbol = alert.getCoin().getSymbol();
+
+                TickerEntity ticker = tickerList.stream()
+                        .filter(t -> t.getId().getBaseSymbol().equals(symbol))
+                        .findFirst()
+                        .orElse(null);
+
+                if (ticker != null && isPriceReached(alert, ticker)) {
+                    triggeredAlerts.add(alert);
+                }
+            }
+
+            if (!triggeredAlerts.isEmpty()) {
+                sendAlertListToUserDiscord(userId, triggeredAlerts);
+            }
+        });
     }
 
     // 특정 시간마다 긁어와서 queue에 추가
@@ -145,20 +167,10 @@ public class AlertSSEService {
     // 특정 시간마다 가격 비교해서 보낼 알람 체크 (티커 체크 + 히스토리 체크 + 조건 도달 체크)
     public void checkUserAlert(){
         // 티커 테이블에서 코인의 최신 값을 한번에 불러와서 조회 후 비교
-        List<String> allSymbols = activeAlertList.values().stream()
-                .flatMap(List::stream) // List<Alert> -> Alert
-                .map(alert -> alert.getCoin().getSymbol())
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-        log.info("심볼 리스트 조회 완료 - 심볼 개수: {}", allSymbols.size());
-
+        List<String> allSymbols = allSymbols(activeAlertList);
         List<TickerEntity> tickerList = alertRepository.findLatestTickersBySymbolList(allSymbols);
 
-        log.info("티커 데이터 조회 완료 - 티커 수: {}", tickerList.size());
-
         // 최근 알람 히스토리를 한 번에 조회
-        log.info("LocalDateTime.now() : {}",LocalDateTime.now());
         LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
         List<Long> recentAlertIds = alertHistoryRepository.findRecentHistories(minutesAgo);
         Set<Long> recentAlertIdSet = new HashSet<>(recentAlertIds);
@@ -166,12 +178,7 @@ public class AlertSSEService {
             List<AlertEntity> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
 
             // 유효성 추가
-            if (activeAlerts == null || activeAlerts.isEmpty()) {
-                log.debug("사용자 {}에게 활성 알람이 없음", userId);
-                continue;
-            }
-
-            log.debug("사용자 {} 처리 중 - 활성 알람 수: {}", userId, activeAlerts.size());
+            if (activeAlerts == null || activeAlerts.isEmpty()) continue;
 
             // 활성화된 알람 SSE로 보내기
             for (AlertEntity alert : activeAlerts) {
@@ -181,29 +188,14 @@ public class AlertSSEService {
                         .filter(t -> t.getId().getBaseSymbol().equals(symbol))
                         .findFirst()
                         .orElse(null);
-                if (ticker == null) {
-                    log.warn("심볼 {}에 대한 티커 정보 없음 (알람 ID: {})", symbol, alert.getId());
-                    continue;
-                }
-
-                try {
+                if (ticker != null) {
                     // 알람 도달 조건 체크
-                    boolean priceReached = isPriceReached(alert, ticker);
-
-                    if (priceReached) {
-                        log.debug("가격 조건 충족 - 알람 ID: {}, 심볼: {}, 현재 가격: {}",
-                                alert.getId(), symbol, ticker.getClose());
-
+                    if (isPriceReached(alert, ticker)) {
                         // 알람 히스토리 존재 여부 체크
                         if (!recentAlertIdSet.contains(alert.getId())){
-                            log.info("조건 부합 및 히스토리 없음 - 사용자: {}, 알람 ID: {}", userId, alert.getId());
                             insertUserAlertQueue(userId, alert);
-                        } else {
-                            log.debug("최근 히스토리에 이미 존재 - 알람 ID: {}", alert.getId());
                         }
                     }
-                } catch (Exception e) {
-                    log.error("알람 조건 체크 중 오류 발생 - 알람 ID: {}, 오류: {}", alert.getId(), e.getMessage(), e);
                 }
             }
         }
@@ -218,10 +210,6 @@ public class AlertSSEService {
                 .anyMatch(a -> a.getId().equals(alert.getId()));
         if (!alreadyQueued) {
             queue.add(alert);
-            log.info("큐에 알람 추가됨 - 사용자: {}, 알람 ID: {}, 현재 큐 크기: {}",
-                    userId, alert.getId(), queue.size());
-        } else {
-            log.debug("이미 큐에 있는 알람 - 사용자: {}, 알람 ID: {}", userId, alert.getId());
         }
     }
 
@@ -237,10 +225,8 @@ public class AlertSSEService {
             for (SseEmitter emitter : existingEmitters) {
                 try {
                     emitter.send(SseEmitter.event().name("ping").data("alive-check"));
-                    log.info("살아있는 emitter 반환 - userId: {}", userId);
                     return emitter;
                 } catch (IOException e) {
-                    log.warn("기존 emitter 죽어있음 - userId: {}", userId);
                     failedEmitters.add(emitter);
                 }
             }
@@ -258,10 +244,6 @@ public class AlertSSEService {
         emitter.onCompletion(() -> removeEmitter(userId));
         emitter.onTimeout(() -> removeEmitter(userId));
         emitter.onError((e) -> removeEmitter(userId));
-
-        log.info("🧪 [subscribe] userId={} 의 emitter 초기화 완료 후 새 emitter 생성", userId);
-        log.info("📊 [subscribe] 현재 전체 userEmitters 수: {}", userEmitters.size());
-        log.info("📊 [subscribe] userId={} 의 emitter 수: {}", userId, userEmitters.get(userId).size());
 
         return emitter;
     }
@@ -291,35 +273,23 @@ public class AlertSSEService {
         List<SseEmitter> emitters = userEmitters.get(userId);
 
         if (emitters == null || emitters.isEmpty()) {
-            log.warn("사용자 {}의 SSE 이미터가 없음", userId);
-            return;
-        }
+            AlertSSEResponse response = new AlertSSEResponse(alert);
+            List<SseEmitter> failedEmitters = new ArrayList<>();
 
-        log.info("사용자 {}에게 전송 - 이미터 수: {}", userId, emitters.size());
-
-
-        AlertSSEResponse response = new AlertSSEResponse(alert);
-        List<SseEmitter> failedEmitters = new ArrayList<>();
-        int successCount = 0;
-
-        for (SseEmitter emitter : emitters) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("alert")
-                        .data(response));
-                successCount++;
-            } catch (Exception e) {
-                // 예외가 발생한 Emitter는 제거할 목록에 추가
-                log.error("이미터로 전송 실패 - 사용자: {}, 오류: {}", userId, e.getMessage());
-                failedEmitters.add(emitter);
+            for (SseEmitter emitter : emitters) {
+                try {
+                    emitter.send(SseEmitter.event()
+                            .name("alert")
+                            .data(response));
+                } catch (Exception e) {
+                    // 예외가 발생한 Emitter는 제거할 목록에 추가
+                    failedEmitters.add(emitter);
+                }
             }
-        }
 
-        log.info("SSE 전송 결과 - 성공: {}, 실패: {}", successCount, failedEmitters.size());
-
-        for (SseEmitter failed : failedEmitters) {
-            log.debug("실패한 이미터 제거 중 - 사용자: {}", userId);
-            removeSingleEmitter(userId, failed);
+            for (SseEmitter failed : failedEmitters) {
+                removeSingleEmitter(userId, failed);
+            }
         }
 
         // 알람 히스토리 저장
@@ -427,8 +397,6 @@ public class AlertSSEService {
                 }
             }
         }
-
-        log.info("✅ 유저 닉네임 갱신 완료: userId={}, newNickname={}", userId, newNickname);
     }
 
     // 웹훅 변경 시 알람 정보에 업데이트
@@ -452,8 +420,6 @@ public class AlertSSEService {
                 }
             }
         }
-
-        log.info("✅ 유저 웹훅 갱신 완료: userId={}, newWebhook={}", userId, newWebhook);
     }
 
     // 알람 설정에 도달했는지 체크
@@ -596,8 +562,6 @@ public class AlertSSEService {
             // 메모리에 저장
             volumeDatas.put(true, list);
 
-            log.info("거래량 급등 데이터 업데이트 완료!");
-
             sendVolumeToUser();
         } catch (Exception e) {
             e.printStackTrace();
@@ -623,14 +587,21 @@ public class AlertSSEService {
                 boolean tradingVolume = hasVolumeSpike(symbol);
 
                 if (tradingVolume) {
-                    //insertUserAlertQueue
                     insertUserAlertQueue(alert.getUser().getId(), alert);
                     sendAlertToUserDiscord(alert.getUser().getId(), alert);
-                    log.info("거래량 급등 알림 전송: " + symbol);
                 }
             }
         }
     }
 
+    // 포함된 심볼 필터링
+    private List<String> allSymbols(Map<Long, List<AlertEntity>> filteredAlerts) {
+        return filteredAlerts.values().stream()
+                .flatMap(List::stream)
+                .map(alert -> alert.getCoin().getSymbol())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
 }
 
