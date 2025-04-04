@@ -116,6 +116,7 @@ public class AlertSSEService {
     // 특정 시간마다 디스코드 알림 전송
     @Scheduled(fixedRateString = "#{@alarmProperties.sendDiscordInterval}")
     public void discordScheduler() {
+        log.info("디스코드 알림 전송 시작");
         // 조건에 맞는 알람만 필터링 (지정가 or 골든크로스)
         Map<Long, List<AlertEntity>> filteredAlerts = activeAlertList.entrySet()
                 .stream()
@@ -153,6 +154,7 @@ public class AlertSSEService {
                 sendAlertListToUserDiscord(userId, triggeredAlerts);
             }
         });
+        log.info("디스코드 알림 종료");
     }
 
     // 특정 시간마다 긁어와서 queue에 추가
@@ -177,6 +179,8 @@ public class AlertSSEService {
         LocalDateTime minutesAgo = LocalDateTime.now().minusSeconds(30);
         List<Long> recentAlertIds = alertHistoryRepository.findRecentHistories(minutesAgo);
         Set<Long> recentAlertIdSet = new HashSet<>(recentAlertIds);
+
+        // SSE 알람 전송
         for (Long userId : userEmitters.keySet()) {
             List<AlertEntity> activeAlerts = new ArrayList<>(activeAlertList.getOrDefault(userId, Collections.emptyList()));
 
