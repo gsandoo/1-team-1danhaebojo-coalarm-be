@@ -48,6 +48,7 @@ public class AlertHistoryService {
     }
 
     // 알람 정보 조회
+    @Transactional(readOnly = true)
     public AlertHistoryResponse getAlertHistory(Long alertHistoryId) {
         AlertHistoryEntity alertHistory = alertHistoryRepository.findById(alertHistoryId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT_HISTORY));
