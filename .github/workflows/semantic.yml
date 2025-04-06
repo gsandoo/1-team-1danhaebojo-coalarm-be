@@ -9,6 +9,7 @@ on:
 
 jobs:
   semantic-release:
+    if: github.repository == '100-hours-a-week/1-team-1danhaebojo-coalarm-be'
     runs-on: ubuntu-latest
     permissions:
       contents: write
