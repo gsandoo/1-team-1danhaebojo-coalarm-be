@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## [1.32.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.31.1...v1.32.0) (2025-04-06)
+
+### 🚀 NEW FEATURES
+
+* 쿠버네티스 cicd 테스트 ([50e5490](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/50e549006e84f50b181c9c9d51999c066e4ccb3f))
+* 쿠버네티스 cicd 테스트 ([d85bfa8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/d85bfa806bfc7d27a47f5b1165d6045b6471ae29))
+* 쿠버네티스 cicd 테스트-3 ([e54aed9](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e54aed9760484c055c3dfc1f6be28376f1c7fd57))
+* 쿠버네티스 cicd 테스트-4 ([df9df12](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/df9df1250c40bdc265f1f4699e11c1403bdd1334))
+* 쿠버네티스 cicd 테스트-5 ([9df9050](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9df9050f794ae12c97c7142579d140b2adf47185))
+
+### 🐛 BUG FIXES
+
+* deployment.yaml 메모리 설정 추가 ([26e3ea2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/26e3ea2bb549e9cdd0a14823dad5892d0e72f283))
+* timezone 정의 ([da21e2b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/da21e2b36576b718084c135ffff35cebfc1ec927))
+
+### ♻️ REFACTORING
+
+* 사용자 삭제 로직 개선 및 구조화 ([61d8a5c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/61d8a5c8421cd04843b051b665616d091ca36c36))
+* 운영 환경 체리픽 ([a74a09a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/a74a09ae4fee41c7f58635dd903fcffead0b77ab))
+
 ## [1.31.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.31.0...v1.31.1) (2025-04-04)
 
 ### 🐛 BUG FIXES
