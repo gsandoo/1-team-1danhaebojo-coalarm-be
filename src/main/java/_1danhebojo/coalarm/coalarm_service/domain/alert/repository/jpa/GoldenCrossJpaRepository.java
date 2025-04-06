@@ -7,14 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface GoldenCrossJpaRepository extends JpaRepository<GoldenCrossEntity, Long> {
     @Modifying
-    @Query("DELETE FROM GoldenCrossEntity t WHERE t.alert.id = :alertId")
-    void deleteByAlertId(@Param("alertId") Long alertId);
-
+    @Query("DELETE FROM GoldenCrossEntity g WHERE g.alert.id IN :alertIds")
+    void deleteByAlertIdIn(@Param("alertIds") List<Long> alertIds);
     // 골든 크로스 감지가 있는 경우 golden_cross 정보 포함 조회
     @Query("    SELECT t" +
             "    FROM GoldenCrossEntity t" +

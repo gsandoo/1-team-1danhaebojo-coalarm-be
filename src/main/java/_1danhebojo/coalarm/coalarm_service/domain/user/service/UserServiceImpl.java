@@ -1,6 +1,10 @@
 package _1danhebojo.coalarm.coalarm_service.domain.user.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepositoryImpl;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.GoldenCrossJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.TargetPriceJpaRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.VolumeSpikeJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.service.AlertSSEService;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.request.DiscordWebhookRequest;
 import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
@@ -17,17 +21,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +42,13 @@ public class UserServiceImpl implements UserService {
     private final String REFRESH_HEADER = "Refresh";
     private final String COOKIE_HEADER = "Set-Cookie";
     private final UserRepository userRepository;
+    private final AlertHistoryRepository alertHistoryRepository;
+
+    private final TargetPriceJpaRepository targetPriceJpaRepository;
+    private final GoldenCrossJpaRepository goldenCrossJpaRepository;
+    private final VolumeSpikeJpaRepository volumeSpikeJpaRepository;
+
+    private final AuthService authService;
     private final S3Service s3Service;
     private final RefreshTokenService refreshTokenService;
     private final AlertSSEService alertSSEService;
@@ -139,65 +147,23 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long userId, HttpServletRequest request, HttpServletResponse response) {
-        // 카카오 액세스 토큰
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        OAuth2AuthenticationToken oAuthToken = (OAuth2AuthenticationToken) authentication;
-        OAuth2AuthorizedClient client = oAuth2AuthorizedClientService.loadAuthorizedClient(
-                oAuthToken.getAuthorizedClientRegistrationId(),
-                oAuthToken.getName()
-        );
-        String kakaoAccessToken = client.getAccessToken().getTokenValue();
 
-        // 카카오 로그인을 언링크
-        unlinkKakaoUser(kakaoAccessToken);
+        // 카카오 언링크
+        authService.unlinkKakaoAccount();
 
-        // 유저 조회
-        UserEntity user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
-
-        // 프로필 이미지 삭제
-        if (user.getProfileImg() != null) {
-            s3Service.deleteImage(user.getProfileImg());
-        }
+        // 프로필 이미지 처리
+        UserEntity user = processUserData(userId);
 
         // 쿠키 제거
-        response.addHeader(COOKIE_HEADER, appCookie.deleteCookie(AUTHORIZATION_HEADER));
-        response.addHeader(COOKIE_HEADER, appCookie.deleteCookie(REFRESH_HEADER));
+        removeAuthCookies(response);
 
-        //유저의 알람 삭제
-        // TODO : 유저와 관련된 데이터 모두 삭제
-        alertRepository.deleteByUserId(userId);
+        // 유저의 알림 삭제
+        deleteUserAlertData(userId);
 
         // 유저 삭제
         userRepository.deleteById(userId);
     }
 
-    private static final String UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink";
-
-    public void unlinkKakaoUser(String accessToken) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        // 1. 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken); // Authorization: Bearer ...
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        // 2. HTTP 엔티티 생성
-        HttpEntity<String> request = new HttpEntity<>("", headers);
-
-        // 3. 요청 보내기
-        ResponseEntity<String> response = restTemplate.exchange(
-                UNLINK_URL,
-                HttpMethod.POST,
-                request,
-                String.class
-        );
-
-        // 4. 응답 로깅
-        if (response.getStatusCode() == HttpStatus.OK) {
-            log.info("카카오 사용자 언링크 성공: {}", response.getBody());
-        }
-    }
 
     @Override
     @Transactional
@@ -275,5 +241,36 @@ public class UserServiceImpl implements UserService {
             log.error("디스코드 웹훅 테스트 실패: {}", e.getMessage());
             throw new ApiException(AppHttpStatus.INVALID_DISCORD_WEBHOOK);
         }
+    }
+
+    private UserEntity processUserData(Long userId) {
+        UserEntity user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_USER));
+
+        // 프로필 이미지 삭제
+        if (user.getProfileImg() != null) {
+            s3Service.deleteImage(user.getProfileImg());
+        }
+
+        return user;
+    }
+
+    private void removeAuthCookies(HttpServletResponse response) {
+        response.addHeader(COOKIE_HEADER, appCookie.deleteCookie(AUTHORIZATION_HEADER));
+        response.addHeader(COOKIE_HEADER, appCookie.deleteCookie(REFRESH_HEADER));
+    }
+
+    private void deleteUserAlertData(Long userId) {
+        List<Long> userAlertIds = alertRepository.findAlertIdsByUserId(userId);
+
+        if (!userAlertIds.isEmpty()) {
+            targetPriceJpaRepository.deleteByAlertIdIn(userAlertIds);
+            goldenCrossJpaRepository.deleteByAlertIdIn(userAlertIds);
+            volumeSpikeJpaRepository.deleteByAlertIdIn(userAlertIds);
+        }
+
+        // 사용자의 모든 알림 삭제
+        alertHistoryRepository.deleteByUserId(userId);
+        alertRepository.deleteByUserId(userId);
     }
 }
