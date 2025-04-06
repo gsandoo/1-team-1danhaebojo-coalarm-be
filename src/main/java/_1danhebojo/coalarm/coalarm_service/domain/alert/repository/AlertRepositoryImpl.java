@@ -12,6 +12,7 @@ import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.Ti
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,7 +41,6 @@ public class AlertRepositoryImpl implements AlertRepository {
     private final GoldenCrossJpaRepository goldenCrossJpaRepository;
     private final VolumeSpikeJpaRepository volumeSpikeJpaRepository;
     private final JPAQueryFactory query;
-
     @PersistenceContext
     private EntityManager entityManager; // ★ EntityManager 추가
 
@@ -97,6 +97,16 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     public List<AlertEntity> findActiveAlertsByUserId(Long userId) {
         return alertJpaRepository.findActiveAlertsByUserId(userId);
+    }
+
+    @Override
+    public List<Long> findAlertIdsByUserId(Long userId) {
+
+        return new JPAQuery<>(entityManager)
+                .select(alertEntity.id)
+                .from(alertEntity)
+                .where(alertEntity.user.id.eq(userId))
+                .fetch();
     }
 
     public List<AlertEntity> findAllActiveAlerts() {

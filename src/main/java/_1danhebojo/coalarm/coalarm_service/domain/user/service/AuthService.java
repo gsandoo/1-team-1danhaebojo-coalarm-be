@@ -8,4 +8,6 @@ import java.io.IOException;
 public interface AuthService {
 	Long getLoginUserId();
 	void logout(HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+	void unlinkKakaoAccount();
 }
