@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## [1.31.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.31.0...v1.31.1) (2025-04-04)
+
+### 🐛 BUG FIXES
+
+* 병합 시 제거된 코드 추가 및 예외 처리 추가 ([068df1e](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/068df1e92bf50d329529588b5874da3b4492db0c))
+* 알람 discord 전송시 조건 추가 및 embeds 에러 수정 ([35439ee](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/35439ee75e7db6aa209fc57d45e01a12ec6be77d))
+
+### ♻️ REFACTORING
+
+* 디스코드 알림 로그 추가 ([cff2a4b](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/cff2a4bf6ff2150490230b4efe7ac91c3b81675d))
+
+## [1.31.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.5...v1.31.0) (2025-04-04)
+
+### 🚀 NEW FEATURES
+
+* 김치 프리미엄 모든 데이터 조회 후 연산 ([e1a6078](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e1a6078e6aeb7f6d584b433f834c71544e31a6c2))
+
+## [1.30.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.4...v1.30.5) (2025-04-04)
+
+### 🐛 BUG FIXES
+
+* 중복 배포 방지를 위해 버전명을 날짜 기반으로 변경 ([006b7dd](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/006b7ddde7b0ccb012dc5ed775d691e9ee0f3e21))
+
 ## [1.30.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.30.3...v1.30.4) (2025-04-03)
 
 ### 🐛 BUG FIXES

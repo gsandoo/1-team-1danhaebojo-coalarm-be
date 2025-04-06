@@ -1,5 +1,6 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
+import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.CoinRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.ResponseKimchiPremium;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.KimchiPremiumRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +37,7 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
     private final TickerJpaRepository tickerJpaRepository;
     private final CoinJpaRepository coinJpaRepository;
     private static final String EXCHANGE_RATE_API_URL = "https://api.exchangerate-api.com/v4/latest/USD";
-    private static final List<String> SUPPORTED_COINS = Arrays.asList("BTC", "ETH", "XRP");
+    private static final List<String> SUPPORTED_COINS = new ArrayList<>();
     // 계산 시 사용할 스케일 상수 정의
     private static final int CALCULATION_SCALE = 16;
     private static final int DISPLAY_SCALE = 8;
@@ -57,8 +59,29 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
         );
     }
 
+    private void initializeSupportedCoins() {
+        try {
+            List<CoinEntity> coins = coinJpaRepository.findAllBy();
+
+            // 기존 목록 초기화 (재실행 시 중복 방지)
+            SUPPORTED_COINS.clear();
+
+            // 조회된 코인의 심볼을 리스트에 추가
+            for (CoinEntity coin : coins) {
+                if(coin.getSymbol().equals("USDT")) continue;
+                SUPPORTED_COINS.add(coin.getSymbol());
+            }
+
+            log.info("지원 코인 {}개 로드 완료: {}", SUPPORTED_COINS.size(), SUPPORTED_COINS);
+        } catch (Exception e) {
+            log.error("지원 코인 목록 초기화 중 오류 발생: {}", e.getMessage(), e);
+        }
+    }
+
     @Override
     public void calculateAndSaveKimchiPremium() {
+        initializeSupportedCoins();
+
         // USD/KRW 환율 한 번만 가져오기
         BigDecimal exchangeRate = getUsdToKrwExchangeRate();
         if (exchangeRate.compareTo(BigDecimal.ZERO) == 0) {
