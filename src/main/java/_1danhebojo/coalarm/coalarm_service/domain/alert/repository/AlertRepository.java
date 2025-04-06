@@ -25,6 +25,7 @@ public interface AlertRepository {
     AlertEntity save(AlertEntity alert);
     Page<AlertEntity> findAlertsByFilter(Boolean active, String filter, Pageable pageable);
     List<AlertEntity> findActiveAlertsByUserId(Long userId);
+    List<Long> findAlertIdsByUserId(Long userId);
     List<AlertEntity> findAllActiveAlerts();
     Page<AlertEntity> findAllUserAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit);
     Optional<CoinEntity> findCoinBySymbol(String symbol);

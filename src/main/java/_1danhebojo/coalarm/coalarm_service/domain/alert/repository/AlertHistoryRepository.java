@@ -16,7 +16,5 @@ public interface AlertHistoryRepository {
     List<Long> findRecentHistories(LocalDateTime minutesAgo);
     List<Long> findRecentAlertIdsByUser(Long userId, LocalDateTime since);
 
-    List<AlertHistoryEntity> findAllByAlertId(Long alertId);
-
-    void deleteAll(List<AlertHistoryEntity> alertHistories);
+    void deleteByUserId(Long userId);
 }
