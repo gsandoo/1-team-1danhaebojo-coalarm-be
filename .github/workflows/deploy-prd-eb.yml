@@ -1,9 +1,9 @@
-name: deploy on dev env.
+name: deploy on prd env.
 
 on:
   push:
     branches:
-      - develop
+      - main
     paths-ignore:
       - 'README.md'
       - '.gitignore'
@@ -30,27 +30,27 @@ jobs:
 
       - name: Create application yml File
         run: |
-          echo '${{ secrets.AWS_PROPERTIES }}' > src/main/resources/application.yml
+          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application.yml
 
-      - name: Create dev yml File
+      - name: Create prd yml File
         run: |
-          echo '${{ secrets.AWS_DEV_PROPERTIES }}' > src/main/resources/application-dev.yml
+          echo '${{ secrets.APP_PRD_YML }}' > src/main/resources/application-prd.yml
 
       - name: Build with Gradle
         run: ./gradlew build -x test
 
       - name: Define Version
-        run: echo "VERSION=v-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        run: echo "VERSION=v-${{ github.run_id }}" >> $GITHUB_ENV
 
       - name: Debug Environment Variables
         run: |
-          echo "AWS_S3_DEV_BUCKET_NAME is: $AWS_S3_DEV_BUCKET_NAME"
+          echo "AWS_S3_DEV_BUCKET_NAME is: $AWS_S3_PRD_BUCKET_NAME"
         env:
-          AWS_S3_DEV_BUCKET_NAME: "coalarm-deploy-bucket"
+          AWS_S3_DEV_BUCKET_NAME: "coalarm-prd-deploy-bucket"
 
       - name: Upload JAR to S3 (with versioning)
         run: |
-          aws s3 cp build/libs/coalarm-service.jar s3://coalarm-deploy-bucket/app-${{ env.VERSION }}.jar
+          aws s3 cp build/libs/coalarm-service.jar s3://coalarm-prd-deploy-bucket/app-${{ env.VERSION }}.jar
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -71,11 +71,11 @@ jobs:
               }
             ],
             "Logging": "/var/log/nginx",
-            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && while ! aws s3 cp s3://coalarm-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && while ! aws s3 cp s3://coalarm-prd-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
-                "Value": "dev"
+                "Value": "prd"
               },
               {
                 "Name": "TZ",
@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload ZIP file to S3
         run: |
-          aws s3 cp deploy-${{ env.VERSION }}.zip s3://coalarm-deploy-bucket/deploy-${{ env.VERSION }}.zip
+          aws s3 cp deploy-${{ env.VERSION }}.zip s3://coalarm-prd-deploy-bucket/deploy-${{ env.VERSION }}.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -115,12 +115,12 @@ jobs:
       - name: Check if ZIP file exists in S3
         run: |
           echo "Checking if ZIP file exists in S3..."
-          aws s3 ls s3://$AWS_S3_DEV_BUCKET_NAME/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
+          aws s3 ls s3://$AWS_S3_PRD_BUCKET_NAME/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
+          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
 
       - name: Wait for Elastic Beanstalk to Process Application Version
         run: |
@@ -129,30 +129,12 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         run: |
-          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_DEV_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
-          aws elasticbeanstalk update-environment --environment-name $EB_ENV_NAME --version-label ${{ env.VERSION }}
+          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_PRD_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
+          aws elasticbeanstalk update-environment --environment-name $EB_PRD_ENV_NAME --version-label ${{ env.VERSION }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
-          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
-          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_DEV_BUCKET_NAME }}
-
-      - name: Verify Deployment
-        run: |
-          echo "Waiting for deployment to complete..."
-          # Sleep to allow deployment to finish
-          sleep 180
-          # Get the environment health status
-          HEALTH=$(aws elasticbeanstalk describe-environments --environment-names $EB_ENV_NAME --query "Environments[0].Health" --output text)
-          if [ "$HEALTH" != "Green" ]; then
-            echo "Deployment health is not green. Current status: $HEALTH"
-            exit 1
-          fi
-          echo "Deployment successful and environment is healthy!"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+          EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
+          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
