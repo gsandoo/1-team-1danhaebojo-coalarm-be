@@ -2,6 +2,7 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.repository;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertHistoryEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.AlertHistoryJpaRepository;
+import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.QAlertHistoryEntity.alertHistoryEntity;
 
@@ -71,5 +73,30 @@ public class AlertHistoryRepositoryImpl implements AlertHistoryRepository {
                         alertHistoryEntity.regDt.goe(toInstant(since))
                 )
                 .fetch();
+    }
+
+    @Override
+    public List<AlertHistoryEntity> findAllByAlertId(Long alertId) {
+        return new JPAQuery<>(entityManager)
+                .select(alertHistoryEntity)
+                .from(alertHistoryEntity)
+                .where(alertHistoryEntity.alert.id.eq(alertId))
+                .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll(List<AlertHistoryEntity> alertHistories) {
+        if (alertHistories == null || alertHistories.isEmpty()) {
+            return;
+        }
+
+        List<Long> historyIds = alertHistories.stream()
+                .map(AlertHistoryEntity::getId)
+                .collect(Collectors.toList());
+
+        new JPADeleteClause(entityManager, alertHistoryEntity)
+                .where(alertHistoryEntity.id.in(historyIds))
+                .execute();
     }
 }

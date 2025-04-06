@@ -2,6 +2,7 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.request.*;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.controller.response.AlertResponse;
+import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +31,7 @@ import java.util.Optional;
 public class AlertService {
 
     private final AlertRepository alertRepository;
+    private final AlertHistoryRepository alertHistoryRepository;
     @Lazy
     @Autowired
     private final AlertSSEService alertSSEService;
@@ -85,6 +88,12 @@ public class AlertService {
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
 
         alertSSEService.deleteEmitter(alert.getUser().getId(), alert);
+
+        List<AlertHistoryEntity> histories = alertHistoryRepository.findAllByAlertId(alertId);
+        if (!histories.isEmpty()) {
+            alertHistoryRepository.deleteAll(histories);
+        }
+
         alertRepository.deleteById(alertId);
     }
 
