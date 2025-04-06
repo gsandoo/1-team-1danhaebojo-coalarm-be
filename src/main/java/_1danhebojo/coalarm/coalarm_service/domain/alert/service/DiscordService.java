@@ -39,17 +39,27 @@ public class DiscordService {
             return;
         }
 
-        Map<String, Object> body = Map.of(
-                "username", "코알람",
-                "embeds", embeds
-        );
+        int batchSize = 10;
+        for (int i = 0; i < embeds.size(); i += batchSize) {
+            List<Map<String, Object>> batch = embeds.subList(i, Math.min(i + batchSize, embeds.size()));
 
-        ResponseEntity<String> response = restTemplate.postForEntity(webhookUrl, body, String.class);
+            Map<String, Object> body = Map.of(
+                    "username", "코알람",
+                    "embeds", batch
+            );
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new ApiException(AppHttpStatus.FAILED_TO_SEND_DISCORD);
+            try {
+                ResponseEntity<String> response = restTemplate.postForEntity(webhookUrl, body, String.class);
+                if (!response.getStatusCode().is2xxSuccessful()) {
+                    throw new ApiException(AppHttpStatus.FAILED_TO_SEND_DISCORD);
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Discord 전송 실패 - " + e.getMessage());
+                // 필요하다면 로깅이나 슬랙 전송 등 추가 처리
+            }
         }
     }
+
 
     public Map<String, Object> buildEmbedMapFromAlert(AlertEntity alert) {
         String title;
