@@ -6,10 +6,9 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertHistoryR
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.AlertRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.*;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.user.controller.response.UserDTO;
+
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepository;
-import _1danhebojo.coalarm.coalarm_service.domain.user.repository.UserRepositoryImpl;
-import _1danhebojo.coalarm.coalarm_service.domain.user.service.UserServiceImpl;
+
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
@@ -86,14 +85,11 @@ public class AlertService {
     public void deleteAlert(Long alertId) {
         AlertEntity alert = alertRepository.findById(alertId)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND_ALERT));
+        Long userId = alert.getUser().getId();
 
-        alertSSEService.deleteEmitter(alert.getUser().getId(), alert);
+        alertSSEService.deleteEmitter(userId, alert);
 
-        List<AlertHistoryEntity> histories = alertHistoryRepository.findAllByAlertId(alertId);
-        if (!histories.isEmpty()) {
-            alertHistoryRepository.deleteAll(histories);
-        }
-
+        alertHistoryRepository.deleteByUserId(userId);
         alertRepository.deleteById(alertId);
     }
 
