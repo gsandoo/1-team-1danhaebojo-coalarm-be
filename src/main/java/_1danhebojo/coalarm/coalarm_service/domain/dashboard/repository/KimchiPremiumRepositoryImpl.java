@@ -23,20 +23,19 @@ public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
     @Override
     public List<KimchiPremiumEntity> findAllKimchiPremiums(int offset, int limit) {
         QKimchiPremiumEntity kp = QKimchiPremiumEntity.kimchiPremiumEntity;
-        QKimchiPremiumEntity subKp = new QKimchiPremiumEntity("subKp");
 
-        // 서브쿼리를 사용하여 각 코인별 최신 프리미엄 조회
+        // 코인별 최신 프리미엄 ID를 먼저 조회
+        List<Long> latestPremiumIds = queryFactory
+                .select(kp.id.max())
+                .from(kp)
+                .groupBy(kp.coin.id)
+                .fetch();
+
+        // 해당 ID로 실제 데이터 조회
         return queryFactory
                 .selectFrom(kp)
                 .join(kp.coin).fetchJoin()
-                .where(
-                        kp.regDt.eq(
-                                JPAExpressions
-                                        .select(subKp.regDt.max())
-                                        .from(subKp)
-                                        .where(subKp.coin.id.eq(kp.coin.id))
-                        )
-                )
+                .where(kp.id.in(latestPremiumIds))
                 .orderBy(kp.kimchiPremium.desc())
                 .offset(offset)
                 .limit(limit)
