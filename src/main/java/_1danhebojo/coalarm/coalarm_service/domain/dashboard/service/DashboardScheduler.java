@@ -16,7 +16,7 @@ public class DashboardScheduler {
     public void calculateAndSaveKimchiPremiumTask(){
         log.info("대시보드 데이터 계산 시작...");
         kimchiPremiumService.calculateAndSaveKimchiPremium();
-        coinIndicatorService.saveIndicators(1L);
+        coinIndicatorService.saveIndicators("BTC");
         log.info("대시보드 데이터 계산 완료.");
     }
 }
