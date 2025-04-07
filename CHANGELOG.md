@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.32.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.2...v1.32.3) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 코인 지표 가져오는 기준 coinId -> symbol 변경 ([0d9aa5c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0d9aa5c3e034a385bb4019799bf419cf61babd9c))
+
 ## [1.32.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.1...v1.32.2) (2025-04-07)
 
 ### ♻️ REFACTORING
