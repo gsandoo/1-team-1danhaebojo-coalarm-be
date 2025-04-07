@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.32.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.4...v1.32.5) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 불필요한 쿼리 삭제 ([f5c828d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f5c828dc7f11687e36a95c3d057b15f61525f637))
+
 ## [1.32.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.3...v1.32.4) (2025-04-07)
 
 ### ♻️ REFACTORING
