@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.32.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.3...v1.32.4) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 김치프리미엄 정렬순 변경 ([e3e9adf](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e3e9adfa03022326b2a62925c73ef7cfe2a22d23))
+
 ## [1.32.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.2...v1.32.3) (2025-04-07)
 
 ### ♻️ REFACTORING
