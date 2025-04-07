@@ -93,8 +93,8 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         return new CoinIndicatorResponse(macdDTO, rsiDTO, longShortStrengthDTO, coinDTO);
     }
 
-    private List<BigDecimal> getClosingPrices(Long coinId) {
-        List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(coinId);
+    private List<BigDecimal> getClosingPrices(String symbol) {
+        List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(symbol);
         return tickers.stream()
                 .map(TickerEntity::getClose)
                 .collect(Collectors.toList());
@@ -274,7 +274,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
 
         // 2. 가격 데이터 조회
-        List<BigDecimal> prices = getClosingPrices(coinEntity.getId());
+        List<BigDecimal> prices = getClosingPrices(symbol);
 
         if (prices.size() < 26) {
             throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);

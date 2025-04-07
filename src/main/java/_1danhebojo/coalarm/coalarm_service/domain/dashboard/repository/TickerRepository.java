@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TickerRepository {
-    List<TickerEntity> findByCoinIdOrderedByUtcDateTime(Long coinId);
+    List<TickerEntity> findByCoinIdOrderedByUtcDateTime(String symbol);
     Optional<TickerEntity> findLatestBySymbol(String symbol);
 }
