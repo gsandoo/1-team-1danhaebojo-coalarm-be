@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.32.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.1...v1.32.2) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* KimchiPremium 조회 쿼리 최적화 ([9f0f7ac](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9f0f7ac5937d9ca6223f4abf5f7d938b4f8b8a1e)), closes [#7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/issues/7)
+
 ## [1.32.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.0...v1.32.1) (2025-04-07)
 
 ### ♻️ REFACTORING
