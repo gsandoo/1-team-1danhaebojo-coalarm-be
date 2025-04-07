@@ -44,10 +44,16 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
 
     @Override
     public OffsetResponse<ResponseKimchiPremium> getKimchiPremiums(int offset, int limit) {
+        long startTime = System.currentTimeMillis();
+
         List<ResponseKimchiPremium> premiums = kimchiPremiumRepository.findAllKimchiPremiums(offset, limit)
                 .stream()
                 .map(ResponseKimchiPremium::fromEntity)
                 .toList();
+
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+        log.info("실행 시간: " + executionTime + "ms");
 
         long totalElements = kimchiPremiumRepository.countAllKimchiPremiums();
 
