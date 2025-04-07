@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.32.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.0...v1.32.1) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 디스코드 관련 수정 ([9b85952](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/9b859526760be2d6fd84595eb2c29a13bc78e325))
+
 ## [1.32.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.31.1...v1.32.0) (2025-04-06)
 
 ### 🚀 NEW FEATURES

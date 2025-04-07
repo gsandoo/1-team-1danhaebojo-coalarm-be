@@ -3,6 +3,7 @@ package _1danhebojo.coalarm.coalarm_service.domain.alert.service;
 import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.AlertEntity;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class DiscordService {
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -54,8 +56,8 @@ public class DiscordService {
                     throw new ApiException(AppHttpStatus.FAILED_TO_SEND_DISCORD);
                 }
             } catch (Exception e) {
-                System.err.println("❌ Discord 전송 실패 - " + e.getMessage());
-                // 필요하다면 로깅이나 슬랙 전송 등 추가 처리
+                log.info("❌ Discord 전송 실패 - {}", e.getMessage());
+                break;
             }
         }
     }
