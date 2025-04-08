@@ -1,10 +1,10 @@
 package _1danhebojo.coalarm.coalarm_service.domain.dashboard.service;
 
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.controller.response.*;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.TickerRepository;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.CandleRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
+import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CandleEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.CoinIndicatorEntity;
-import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.jpa.CoinIndicatorJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.jpa.CoinJpaRepository;
 import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
-    private final TickerRepository tickerRepository;
     private final CoinJpaRepository coinJpaRepository;
     private final CoinIndicatorJpaRepository coinIndicatorJpaRepository;
+    private final CandleRepository candleRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String BINANCE_BASE_URL = "https://fapi.binance.com";
@@ -94,10 +94,12 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
     }
 
     private List<BigDecimal> getClosingPrices(String symbol) {
-        List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(symbol);
-        return tickers.stream()
-                .map(TickerEntity::getClose)
+        List<CandleEntity> candles = candleRepository.findRecentCandles(symbol, 200);
+        List<BigDecimal> prices = candles.stream()
+                .map(CandleEntity::getClose)
                 .collect(Collectors.toList());
+        Collections.reverse(prices); // 최신순 → 오래된 순으로 변경
+        return prices;
     }
 
     private MacdDTO calculateMACD(List<BigDecimal> prices) {
