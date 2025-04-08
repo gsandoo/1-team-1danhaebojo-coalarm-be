@@ -36,7 +36,7 @@ public class KimchiPremiumRepositoryImpl implements KimchiPremiumRepository{
                 .selectFrom(kp)
                 .join(kp.coin).fetchJoin()
                 .where(kp.id.in(latestPremiumIds))
-                .orderBy(kp.kimchiPremium.desc())
+                .orderBy(kp.coin.id.asc())
                 .offset(offset)
                 .limit(limit)
                 .fetch();

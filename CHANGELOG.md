@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [1.32.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.4...v1.32.5) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 불필요한 쿼리 삭제 ([f5c828d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/f5c828dc7f11687e36a95c3d057b15f61525f637))
+
+## [1.32.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.3...v1.32.4) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 김치프리미엄 정렬순 변경 ([e3e9adf](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e3e9adfa03022326b2a62925c73ef7cfe2a22d23))
+
+## [1.32.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.2...v1.32.3) (2025-04-07)
+
+### ♻️ REFACTORING
+
+* 코인 지표 가져오는 기준 coinId -> symbol 변경 ([0d9aa5c](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/0d9aa5c3e034a385bb4019799bf419cf61babd9c))
+
 ## [1.32.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.1...v1.32.2) (2025-04-07)
 
 ### ♻️ REFACTORING

@@ -19,26 +19,13 @@ public class TickerRepositoryImpl implements TickerRepository{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<TickerEntity> findByCoinIdOrderedByUtcDateTime(Long coinId) {
+    public List<TickerEntity> findByCoinIdOrderedByUtcDateTime(String symbol) {
         QTickerEntity ticker = QTickerEntity.tickerEntity;
-        QCoinEntity coin = QCoinEntity.coinEntity;
-
-        // 코인 정보 먼저 조회
-        CoinEntity coinEntity = queryFactory
-                .selectFrom(coin)
-                .where(coin.id.eq(coinId))
-                .fetchOne();
-
-        if (coinEntity == null) {
-            return Collections.emptyList();
-        }
-
-        String coinSymbol = coinEntity.getSymbol();
 
         // 명확한 형태로 검색
         return queryFactory
                 .selectFrom(ticker)
-                .where(ticker.id.baseSymbol.eq(coinSymbol))
+                .where(ticker.id.baseSymbol.eq(symbol))
                 .orderBy(ticker.id.timestamp.asc())
                 .limit(100)
                 .fetch();

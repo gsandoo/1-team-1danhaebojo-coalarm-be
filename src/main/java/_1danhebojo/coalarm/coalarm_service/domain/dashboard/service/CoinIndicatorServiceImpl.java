@@ -36,15 +36,14 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String BINANCE_BASE_URL = "https://fapi.binance.com";
 
-    public CoinIndicatorResponse getDashboardIndicators(Long coinId) {
-        Optional<CoinIndicatorEntity> latestIndicator = coinIndicatorJpaRepository.findTopByCoinIdOrderByRegDtDesc(coinId);
-        Optional<CoinEntity> coinEntity = coinJpaRepository.findById(coinId);
-
-        if(latestIndicator.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
+    public CoinIndicatorResponse getDashboardIndicators(String symbol) {
+        Optional<CoinEntity> coinEntity = coinJpaRepository.findBySymbol(symbol);
         if(coinEntity.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
-
-        CoinIndicatorEntity indicator = latestIndicator.get();
         CoinEntity coin = coinEntity.get();
+
+        Optional<CoinIndicatorEntity> latestIndicator = coinIndicatorJpaRepository.findTopByCoinIdOrderByRegDtDesc(coin.getId());
+        if(latestIndicator.isEmpty()) throw new ApiException(AppHttpStatus.NOT_FOUND);
+        CoinIndicatorEntity indicator = latestIndicator.get();
 
         CoinDTO coinDTO = new CoinDTO(coin);
         MacdDTO macdDTO = new MacdDTO(
@@ -94,8 +93,8 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         return new CoinIndicatorResponse(macdDTO, rsiDTO, longShortStrengthDTO, coinDTO);
     }
 
-    private List<BigDecimal> getClosingPrices(Long coinId) {
-        List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(coinId);
+    private List<BigDecimal> getClosingPrices(String symbol) {
+        List<TickerEntity> tickers = tickerRepository.findByCoinIdOrderedByUtcDateTime(symbol);
         return tickers.stream()
                 .map(TickerEntity::getClose)
                 .collect(Collectors.toList());
@@ -269,13 +268,13 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         }
     }
 
-    public void saveIndicators(Long coinId) {
+    public void saveIndicators(String symbol) {
         // 1. 코인 엔티티 조회
-        CoinEntity coinEntity = coinJpaRepository.findById(coinId)
+        CoinEntity coinEntity = coinJpaRepository.findBySymbol(symbol)
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
 
         // 2. 가격 데이터 조회
-        List<BigDecimal> prices = getClosingPrices(coinId);
+        List<BigDecimal> prices = getClosingPrices(symbol);
 
         if (prices.size() < 26) {
             throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
