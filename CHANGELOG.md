@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.32.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.5...v1.32.6) (2025-04-09)
+
+### ♻️ REFACTORING
+
+* ALREADY_EXISTS_ALERT 내용 수정 ([3df7e4f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3df7e4f4097a6ebbbf0c3adf9fada3bc251c8ad5))
+* 알람 갯수 제한 추가 ([e1938ed](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/e1938edc335b09d213472e953f001e1c51449559))
+
 ## [1.32.5](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.4...v1.32.5) (2025-04-07)
 
 ### ♻️ REFACTORING
