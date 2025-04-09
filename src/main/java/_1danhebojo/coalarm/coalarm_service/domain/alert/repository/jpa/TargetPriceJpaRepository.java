@@ -15,13 +15,4 @@ public interface TargetPriceJpaRepository extends JpaRepository<TargetPriceEntit
     @Modifying
     @Query("DELETE FROM TargetPriceEntity t WHERE t.alert.id IN :alertIds")
     void deleteByAlertIdIn(@Param("alertIds") List<Long> alertIds);
-
-    // 지정가 알람이 있는 경우 target_price 정보 포함 조회
-    @Query("    SELECT t" +
-            "    FROM TargetPriceEntity t" +
-            "    JOIN FETCH t.alert a" +
-            "    JOIN FETCH a.user u " +
-            "    JOIN FETCH a.coin c" +
-            "    WHERE a.isTargetPrice = true AND a.id = :alertId")
-    Optional<TargetPriceEntity> findTargetPriceAlertsByAlertId(Long alertId);
 }
