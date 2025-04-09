@@ -26,9 +26,9 @@ public class DashboardController {
     private final CoinIndicatorService coinIndicatorService;
     private final KimchiPremiumService kimchiPremiumService;
 
-    @GetMapping("/{coinId}/index")
-    public ResponseEntity<BaseResponse<CoinIndicatorResponse>> getDashboardIndicators(@PathVariable("coinId") Long coinId) {
-        CoinIndicatorResponse response = coinIndicatorService.getDashboardIndicators(coinId);
+    @GetMapping("/{symbol}/index")
+    public ResponseEntity<BaseResponse<CoinIndicatorResponse>> getDashboardIndicators(@PathVariable("symbol") String symbol) {
+        CoinIndicatorResponse response = coinIndicatorService.getDashboardIndicators(symbol);
         return ResponseEntity.ok(BaseResponse.success(response));
     }
 
