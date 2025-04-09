@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface CandleRepository {
     List<CandleEntity> findRecentCandles(String symbol, int limit);
+
+    List<CandleEntity> findDailyCandles(String symbol, int limit);
 }

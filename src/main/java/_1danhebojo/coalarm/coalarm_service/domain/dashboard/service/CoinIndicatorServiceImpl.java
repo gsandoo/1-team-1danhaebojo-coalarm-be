@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CoinIndicatorServiceImpl implements CoinIndicatorService {
 
@@ -93,7 +95,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         return new CoinIndicatorResponse(macdDTO, rsiDTO, longShortStrengthDTO, coinDTO);
     }
 
-    private List<BigDecimal> getClosingPrices(String symbol) {
+    private List<BigDecimal> getClosingPricesMinutes(String symbol) {
         List<CandleEntity> candles = candleRepository.findRecentCandles(symbol, 200);
         List<BigDecimal> prices = candles.stream()
                 .map(CandleEntity::getClose)
@@ -102,14 +104,26 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         return prices;
     }
 
-    private MacdDTO calculateMACD(List<BigDecimal> prices) {
+    private List<BigDecimal> getClosingPricesDay(String symbol){
+        List<CandleEntity> candles = candleRepository.findDailyCandles(symbol,35);
+        List<BigDecimal> prices =  candles.stream()
+                .map(CandleEntity::getClose)
+                .collect(Collectors.toList());
         Collections.reverse(prices);
+        return prices;
+    }
+
+    private MacdDTO calculateMACD(List<BigDecimal> prices) {
+        // 가격 데이터 정규화
+        List<BigDecimal> normalizedPrices = prices.stream()
+                .map(price -> price.divide(BigDecimal.valueOf(10), 8, RoundingMode.HALF_UP))
+                .toList();
 
         // 12일 EMA 계산
-        List<BigDecimal> ema12 = calculateEMAList(prices, 12);
+        List<BigDecimal> ema12 = calculateEMAList(normalizedPrices, 12);
 
         // 26일 EMA 계산
-        List<BigDecimal> ema26 = calculateEMAList(prices, 26);
+        List<BigDecimal> ema26 = calculateEMAList(normalizedPrices, 26);
 
         // MACD Line 계산 (12일 EMA - 26일 EMA)
         List<BigDecimal> macdLine = new ArrayList<>();
@@ -216,7 +230,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             // 1. 롱/숏 비율 데이터 가져오기
             JsonNode longShortData = getLongShortRatioData(symbol);
             if (longShortData == null || longShortData.isEmpty()) {
-                System.out.println("롱/숏 비율 데이터를 가져오는데 실패했습니다.");
+                log.error("롱/숏 비율 데이터를 가져오는데 실패했습니다.");
                 return BigDecimal.valueOf(0); // 기본값 0 (롱/숏 비율 1:1)
             }
 
@@ -227,7 +241,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             // 2. 미결제약정 데이터 가져오기
             JsonNode openInterestData = getOpenInterestData(symbol);
             if (openInterestData == null) {
-                System.out.println("미결제약정 데이터를 가져오는데 실패했습니다.");
+                log.error("미결제약정 데이터를 가져오는데 실패했습니다.");
                 return BigDecimal.valueOf(0);
             }
 
@@ -236,7 +250,7 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
             // 3. 펀딩 비율 데이터 가져오기
             JsonNode fundingRateData = getFundingRateData(symbol);
             if (fundingRateData == null || fundingRateData.isEmpty()) {
-                System.out.println("펀딩 비율 데이터를 가져오는데 실패했습니다.");
+                log.error("펀딩 비율 데이터를 가져오는데 실패했습니다.");
                 return BigDecimal.valueOf(0);
             }
 
@@ -276,17 +290,18 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
                 .orElseThrow(() -> new ApiException(AppHttpStatus.NOT_FOUND));
 
         // 2. 가격 데이터 조회
-        List<BigDecimal> prices = getClosingPrices(symbol);
+        List<BigDecimal> pricesMinutes = getClosingPricesMinutes(symbol);
+        List<BigDecimal> pricesDay = getClosingPricesDay(symbol);
 
-        if (prices.size() < 26) {
+        if (pricesDay.size() < 26 && pricesMinutes.size() <14) {
             throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // 3. MACD 계산
-        MacdDTO macdDTO = calculateMACD(prices);
+        MacdDTO macdDTO = calculateMACD(pricesDay);
 
         // 4. RSI 계산
-        RsiDTO rsiDTO = calculateRSI(prices, 14);
+        RsiDTO rsiDTO = calculateRSI(pricesMinutes, 14);
 
         // 5. 롱 강도 계산
         BigDecimal longStrength = calculateLongStrength("BTCUSDT");
