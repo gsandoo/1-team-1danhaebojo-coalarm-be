@@ -13,6 +13,8 @@ import _1danhebojo.coalarm.coalarm_service.global.api.ApiException;
 import _1danhebojo.coalarm.coalarm_service.global.api.AppHttpStatus;
 import _1danhebojo.coalarm.coalarm_service.global.api.OffsetResponse;
 import _1danhebojo.coalarm.coalarm_service.domain.user.repository.entity.UserEntity;
+import _1danhebojo.coalarm.coalarm_service.global.config.RateLimitProperties;
+import _1danhebojo.coalarm.coalarm_service.global.properties.AlarmProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -35,11 +37,14 @@ public class AlertService {
     @Autowired
     private final AlertSSEService alertSSEService;
     private final UserRepository userRepository;
+    private final AlarmProperties alarmProperties;
+
 
     // 알람 추가
     public AlertResponse addAlert(BaseAlertRequest request) {
         // 해당 알람의 코인을 등록한 적이 있는지 체크
-        boolean checkAlerts = alertRepository.findAlertsByUserIdAndSymbolAndAlertType(request.getUserId(), request.getSymbol(), request.getType());
+        Long alarmCountLimit = alarmProperties.getAlarmCountLimit();
+        boolean checkAlerts = alertRepository.findAlertsByUserIdAndSymbolAndAlertType(request.getUserId(), request.getSymbol(), request.getType(), alarmCountLimit);
         if (checkAlerts) {
             throw new ApiException(AppHttpStatus.ALREADY_EXISTS_ALERT);
         }

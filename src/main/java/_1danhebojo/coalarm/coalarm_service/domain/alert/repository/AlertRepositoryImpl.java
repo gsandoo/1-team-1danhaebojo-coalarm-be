@@ -164,8 +164,47 @@ public class AlertRepositoryImpl implements AlertRepository {
         return alertJpaRepository.findCoinBySymbol(symbol);
     }
 
-    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType) {
-        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType);
+    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType, Long alarmCountLimit) {
+        QAlertEntity alert = QAlertEntity.alertEntity;
+
+        switch (alertType) {
+            case "GOLDEN_CROSS":
+                return query.selectOne()
+                        .from(alert)
+                        .where(
+                                alert.user.id.eq(userId),
+                                alert.coin.symbol.eq(symbol),
+                                alert.isGoldenCross.isTrue()
+                        )
+                        .fetchFirst() != null;
+
+            case "VOLUME_SPIKE":
+                return query.selectOne()
+                        .from(alert)
+                        .where(
+                                alert.user.id.eq(userId),
+                                alert.coin.symbol.eq(symbol),
+                                alert.isVolumeSpike.isTrue()
+                        )
+                        .fetchFirst() != null;
+
+            case "TARGET_PRICE":
+                List<Long> dummyList = query.select(alert.id)
+                        .from(alert)
+                        .where(
+                                alert.user.id.eq(userId),
+                                alert.coin.symbol.eq(symbol),
+                                alert.isTargetPrice.isTrue()
+                        )
+                        .limit(alarmCountLimit + 1)
+                        .fetch();
+
+                return dummyList.size() >= alarmCountLimit;
+        }
+
+        return false;
+
+//        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType, alarmCountLimit);
     }
 
     public List<TickerEntity> findLatestTickersBySymbolList(List<String> symbolList) {
