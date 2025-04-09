@@ -51,14 +51,6 @@ public interface AlertJpaRepository extends JpaRepository<AlertEntity, Long> {
             "WHERE c.symbol = :symbol")
     Optional<CoinEntity> findCoinBySymbol(String symbol);
 
-    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END " +
-            "FROM AlertEntity a " +
-            "WHERE a.user.id = :userId " +
-            "AND a.coin.symbol = :symbol " +
-            "      AND ((:alertType = 'GOLDEN_CROSS' AND a.isGoldenCross = true) " +
-            "        OR (:alertType = 'VOLUME_SPIKE' AND a.isVolumeSpike = true))")
-    boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
-
     @Query("SELECT a FROM AlertEntity a JOIN FETCH a.coin WHERE a.id = :alertId")
     Optional<AlertEntity> findByIdWithCoin(Long alertId);
 }

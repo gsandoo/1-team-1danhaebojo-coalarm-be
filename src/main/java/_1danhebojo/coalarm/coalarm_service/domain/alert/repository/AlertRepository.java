@@ -29,6 +29,6 @@ public interface AlertRepository {
     List<AlertEntity> findAllActiveAlerts();
     Page<AlertEntity> findAllUserAlerts(Long userId, String symbol, Boolean active, String sort, int offset, int limit);
     Optional<CoinEntity> findCoinBySymbol(String symbol);
-    boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType);
+    boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType, Long alarmCountLimit);
     List<TickerEntity> findLatestTickersBySymbolList(List<String> symbolList);
 }
