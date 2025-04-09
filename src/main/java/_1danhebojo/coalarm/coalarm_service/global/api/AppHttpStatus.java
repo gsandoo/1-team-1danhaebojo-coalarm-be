@@ -63,7 +63,7 @@ public enum AppHttpStatus {
     /**
      * 409 : 현재 상태와 충돌되는 요청
      */
-    ALREADY_EXISTS_ALERT(HttpStatus.CONFLICT, "이미 동일한 알림이 존재합니다."),
+    ALREADY_EXISTS_ALERT(HttpStatus.CONFLICT, "등록할 수 있는 알람의 갯수를 초과했습니다."),
 
     /**
      * 500 : 서버 내부에서 에러가 발생함
