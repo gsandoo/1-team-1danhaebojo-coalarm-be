@@ -125,12 +125,12 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
         BigDecimal krwPrice = krwTicker.get().getClose();
         BigDecimal usdtPrice = usdtTicker.get().getClose();
 
-        log.info("{} KRW 가격: {}", coinSymbol, krwPrice);
-        log.info("{} USDT 가격: {}", coinSymbol, usdtPrice);
+//        log.info("{} KRW 가격: {}", coinSymbol, krwPrice);
+//        log.info("{} USDT 가격: {}", coinSymbol, usdtPrice);
 
         // 김치 프리미엄 계산 (정확도를 위해 높은 스케일 사용)
         BigDecimal globalPriceInKrw = usdtPrice.multiply(exchangeRate).setScale(CALCULATION_SCALE, RoundingMode.HALF_UP);
-        log.info("{} 글로벌 가격(KRW 환산): {}", coinSymbol, globalPriceInKrw);
+//        log.info("{} 글로벌 가격(KRW 환산): {}", coinSymbol, globalPriceInKrw);
 
         // 김치프리미엄 = ((한국가격 - 글로벌가격) / 글로벌가격) * 100
         BigDecimal priceDifference = krwPrice.subtract(globalPriceInKrw);
@@ -147,7 +147,7 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
                     .setScale(DISPLAY_SCALE, RoundingMode.HALF_UP);
         }
 
-        log.info("{} 김치프리미엄 계산 결과: {}%", coinSymbol, kimchiPremium);
+//        log.info("{} 김치프리미엄 계산 결과: {}%", coinSymbol, kimchiPremium);
 
         // 코인 엔티티 가져오기
         Optional<CoinEntity> coinEntity = coinJpaRepository.findBySymbol(coinSymbol);
@@ -181,7 +181,7 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
                 .build();
 
         kimchiPreminumJpaRepository.save(kimchiPremiumEntity);
-        log.info("{} 김치 프리미엄 저장 완료: {}%, 일별 변동률: {}%", coinSymbol, kimchiPremium, dailyChange);
+//        log.info("{} 김치 프리미엄 저장 완료: {}%, 일별 변동률: {}%", coinSymbol, kimchiPremium, dailyChange);
     }
 
     private BigDecimal calculateDailyChange(BigDecimal currentValue, Optional<KimchiPremiumEntity> yesterdayPremium) {
@@ -190,7 +190,7 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
         }
 
         BigDecimal yesterdayValue = yesterdayPremium.get().getKimchiPremium();
-        log.info("어제의 김치프리미엄: {}", yesterdayValue);
+//        log.info("어제의 김치프리미엄: {}", yesterdayValue);
 
         // 변동률 계산: (오늘값 - 어제값) / |어제값| * 100
         // 분모가 0인 경우를 방지하기 위한 처리
