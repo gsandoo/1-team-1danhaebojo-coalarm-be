@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [1.33.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.6...v1.33.0) (2025-04-09)
+
+### 🚀 NEW FEATURES
+
+* CandleEntity에 빌더 추가 ([ad774b6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/ad774b651e6bb2c414b388dc0ad3267414951671))
+* MACD 캔들 데이터 전환 ([8b48bb6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/8b48bb63a9c0be88d55cabb5a006f824e8963218))
+* RSI 계산을 위한 CandleRepository 구현 및 서비스 적용 ([aac9385](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/aac9385ded3ccef5d5c2b27c5ff6ce025642eac0))
+* 캔들 기반 지표 계산을 위한 엔티티 및 레포지토리 추가 ([5f3b72a](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/5f3b72a5127b7c5157c2d77ed74d04180606cc3c)), closes [#7](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/issues/7)
+
+### ♻️ REFACTORING
+
+* 스케쥴러 분리 ([3795b5d](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/3795b5d8201dec273eca0807772f7cf1c9ee0bfc))
+
 ## [1.32.6](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.5...v1.32.6) (2025-04-09)
 
 ### ♻️ REFACTORING
