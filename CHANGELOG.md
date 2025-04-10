@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.33.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.0...v1.33.1) (2025-04-10)
+
+### ♻️ REFACTORING
+
+* 사용하지 않는 코드 제거 ([4619893](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/46198939f6717f85d81dfccce7022c02c793963d))
+
 ## [1.33.0](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.32.6...v1.33.0) (2025-04-09)
 
 ### 🚀 NEW FEATURES
