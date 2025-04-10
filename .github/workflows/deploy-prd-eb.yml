@@ -1,4 +1,4 @@
-name: deploy on prd env.
+name: deploy with kubernetes
 
 on:
   push:
@@ -12,129 +12,67 @@ on:
 jobs:
   deploy:
     if: github.repository == '100-hours-a-week/1-team-1danhaebojo-coalarm-be'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: gsandoo/coalarm
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - name: ✅ Checkout source code
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      - name: 📁 Ensure resources directory exists
+        run: mkdir -p src/main/resources
+
+      - name: 📄 Restore application-prd.yml from secret
+        run: |
+          echo "${{ secrets.APP_PRD_YML }}" > src/main/resources/application-prd.yml
+
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Create folder
-        run: |
-          mkdir -p src/main/resources
+      - name: 🧱 Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
 
-      - name: Create application yml File
-        run: |
-          echo '${{ secrets.AWS_PRD_PROPERTIES }}' > src/main/resources/application.yml
-
-      - name: Create prd yml File
-        run: |
-          echo '${{ secrets.APP_PRD_YML }}' > src/main/resources/application-prd.yml
-
-      - name: Build with Gradle
+      - name: ⚙️ Build JAR with Gradle
         run: ./gradlew build -x test
 
-      - name: Define Version
-        run: echo "VERSION=v-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+      - name: 🔐 Docker login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Debug Environment Variables
-        run: |
-          echo "AWS_S3_DEV_BUCKET_NAME is: $AWS_S3_PRD_BUCKET_NAME"
-        env:
-          AWS_S3_DEV_BUCKET_NAME: "coalarm-prd-deploy-bucket"
+      - name: 🐳 Build Docker image with Git SHA tag
+        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
-      - name: Upload JAR to S3 (with versioning)
-        run: |
-          aws s3 cp build/libs/coalarm-service.jar s3://coalarm-prd-deploy-bucket/app-${{ env.VERSION }}.jar
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: 📤 Push Docker image to Docker Hub
+        run: docker push $IMAGE_NAME:$IMAGE_TAG
 
-      - name: Generate Dockerrun.aws.json
+      - name: ☸️ Set up kubectl
         run: |
-          cat <<EOF > Dockerrun.aws.json
-          {
-            "AWSEBDockerrunVersion": "1",
-            "Image": {
-              "Name": "openjdk:17-jdk-slim",
-              "Update": "true"
-            },
-            "Ports": [
-              {
-                "ContainerPort": "8080"
-              }
-            ],
-            "Logging": "/var/log/nginx",
-            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && while ! aws s3 cp s3://coalarm-prd-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Dspring.profiles.active=prd -Duser.timezone=Asia/Seoul -jar /app/app.jar'",
-            "Environment": [
-              {
-                "Name": "SPRING_PROFILES_ACTIVE",
-                "Value": "prd"
-              },
-              {
-                "Name": "TZ",
-                "Value": "Asia/Seoul"
-              },
-              {
-                "Name": "AWS_REGION",
-                "Value": "$AWS_REGION"
-              },
-              {
-                "Name": "AWS_ACCESS_KEY_ID",
-                "Value": "$AWS_ACCESS_KEY_ID"
-              },
-              {
-                "Name": "AWS_SECRET_ACCESS_KEY",
-                "Value": "$AWS_SECRET_ACCESS_KEY"
-              }
-            ]
-          }
-          EOF
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
 
-      - name: Package Dockerrun.aws.json into a ZIP file
+      - name: 🚀 Deploy to Kubernetes with Git SHA image
         run: |
-          mkdir -p deploy
-          cp Dockerrun.aws.json deploy/
-          cd deploy
-          zip -r ../deploy-${{ env.VERSION }}.zip .
+          FULL_IMAGE="$IMAGE_NAME:$IMAGE_TAG"
+          sed "s|__IMAGE__|$FULL_IMAGE|g" k8s/deployment.yaml | kubectl apply --insecure-skip-tls-verify -f -
 
-      - name: Upload ZIP file to S3
+      - name: 📣 Notify to Discord
+        if: success()
         run: |
-          aws s3 cp deploy-${{ env.VERSION }}.zip s3://coalarm-prd-deploy-bucket/deploy-${{ env.VERSION }}.zip
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-
-      - name: Check if ZIP file exists in S3
-        run: |
-          echo "Checking if ZIP file exists in S3..."
-          aws s3 ls s3://$AWS_S3_PRD_BUCKET_NAME/deploy-${{ env.VERSION }}.zip || { echo "ZIP file not found! Exiting..."; exit 1; }
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_S3_DEV_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
-
-      - name: Wait for Elastic Beanstalk to Process Application Version
-        run: |
-          echo "Waiting for Elastic Beanstalk to process the new application version..."
-          sleep 30
-
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk create-application-version --application-name $EB_APP_NAME --version-label ${{ env.VERSION }} --source-bundle S3Bucket=$AWS_S3_PRD_BUCKET_NAME,S3Key=deploy-${{ env.VERSION }}.zip
-          aws elasticbeanstalk update-environment --environment-name $EB_PRD_ENV_NAME --version-label ${{ env.VERSION }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
-          EB_PRD_ENV_NAME: ${{ secrets.EB_PRD_ENV_NAME }}
-          AWS_S3_PRD_BUCKET_NAME: ${{ secrets.AWS_S3_PRD_BUCKET_NAME }}
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+                "content": "@everyone ✅ 운영 환경에 배포가 정상적으로 이루어졌습니다. \n\n📦 이미지: '"$IMAGE_NAME:$IMAGE_TAG"'\n🚀 배포 완료 시간: '"$(date +'%Y-%m-%d %H:%M:%S')"'\n🔗 GitHub: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+              }' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
