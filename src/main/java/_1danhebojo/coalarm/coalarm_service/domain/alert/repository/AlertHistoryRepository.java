@@ -12,9 +12,7 @@ public interface AlertHistoryRepository {
     Page<AlertHistoryEntity> findAlertHistoryByFilter(Long userId, Pageable pageable);
     void save(AlertHistoryEntity alertHistory);
     Optional<AlertHistoryEntity> findById(Long alertHistoryId);
-    boolean findRecentHistory(Long userId, Long alertId, LocalDateTime minutesAgo);
     List<Long> findRecentHistories(LocalDateTime minutesAgo);
-    List<Long> findRecentAlertIdsByUser(Long userId, LocalDateTime since);
 
     void deleteByUserId(Long userId);
 }

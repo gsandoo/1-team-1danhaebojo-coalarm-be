@@ -15,12 +15,4 @@ public interface GoldenCrossJpaRepository extends JpaRepository<GoldenCrossEntit
     @Modifying
     @Query("DELETE FROM GoldenCrossEntity g WHERE g.alert.id IN :alertIds")
     void deleteByAlertIdIn(@Param("alertIds") List<Long> alertIds);
-    // 골든 크로스 감지가 있는 경우 golden_cross 정보 포함 조회
-    @Query("    SELECT t" +
-            "    FROM GoldenCrossEntity t" +
-            "    JOIN FETCH t.alert a" +
-//            "    JOIN FETCH a.user u " +
-            "    JOIN FETCH a.coin c" +
-            "    WHERE a.isGoldenCross = true AND a.id = :alertId")
-    Optional<GoldenCrossEntity> findGoldenCrossAlertsByAlertId(Long alertId);
 }
