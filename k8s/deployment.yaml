@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: spring-app
-          image: __IMAGE___
+          image: gsandoo/coalarm:__IMAGE_TAG__
           ports:
             - containerPort: 8080
           envFrom:
