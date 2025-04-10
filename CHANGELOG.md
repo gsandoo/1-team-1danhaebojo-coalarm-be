@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.33.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.2...v1.33.3) (2025-04-10)
+
+### 🐛 BUG FIXES
+
+* UpbitSseController SSE에 MediaType.TEXT_EVENT_STREAM_VALUE 지정 ([6c7a58f](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/6c7a58fe93c681ce8c64460563784b995a86899d))
+
 ## [1.33.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.1...v1.33.2) (2025-04-10)
 
 ### 🐛 BUG FIXES
