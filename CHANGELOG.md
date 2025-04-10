@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.33.2](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.1...v1.33.2) (2025-04-10)
+
+### 🐛 BUG FIXES
+
+* 티커 데이터 조회 시 상관쿼리 최적화 ([c89e7e8](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c89e7e8170a4d20e9be40d4822df369d15c8b632))
+
 ## [1.33.1](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.0...v1.33.1) (2025-04-10)
 
 ### ♻️ REFACTORING
