@@ -28,4 +28,10 @@ spec:
                 name: aws-secret
             - secretRef:
                 name: jwt-secret
+          command: ["java"]
+          args:
+            - "-Duser.timezone=Asia/Seoul"
+            - "-Dspring.profiles.active=prd"
+            - "-jar"
+            - "coalarm-service.jar"
       restartPolicy: Always
