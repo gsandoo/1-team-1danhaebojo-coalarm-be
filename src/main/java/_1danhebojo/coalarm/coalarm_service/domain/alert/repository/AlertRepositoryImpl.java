@@ -9,6 +9,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.VolumeSpi
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.QTickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
@@ -211,18 +214,32 @@ public class AlertRepositoryImpl implements AlertRepository {
         QTickerEntity ticker = QTickerEntity.tickerEntity;
         QTickerEntity tickerSub = new QTickerEntity("tickerSub");
 
-        return query.selectFrom(ticker)
-                .where(
-                        ticker.id.baseSymbol.in(symbolList),
-                        ticker.id.timestamp.in(
-                                JPAExpressions
-                                        .select(tickerSub.id.timestamp.max())
-                                        .from(tickerSub)
-                                        .where(tickerSub.id.baseSymbol.eq(ticker.id.baseSymbol))
-                                        .where(tickerSub.id.quoteSymbol.eq("KRW")
-                                        )
-                        )
-                )
+        // 가장 최신 시간 먼저 조회
+        List<Tuple> latestList = query
+                .select(tickerSub.id.baseSymbol, tickerSub.id.timestamp.max())
+                .from(tickerSub)
+                .where(tickerSub.id.quoteSymbol.eq("KRW"),
+                        tickerSub.id.baseSymbol.in(symbolList))
+                .groupBy(tickerSub.id.baseSymbol)
+                .fetch();
+
+        // 해당 ID로 실제 데이터 조회
+        BooleanBuilder condition = new BooleanBuilder();
+        for (Tuple tuple : latestList) {
+            String baseSymbol = tuple.get(tickerSub.id.baseSymbol);
+            Instant timestamp = tuple.get(tickerSub.id.timestamp);
+            if (baseSymbol != null && timestamp != null) {
+                condition.or(
+                        ticker.id.baseSymbol.eq(baseSymbol)
+                                .and(ticker.id.timestamp.eq(timestamp))
+                );
+            }
+        }
+
+        // ticker 테이블에서 최신 ticker만 조회
+        return query
+                .selectFrom(ticker)
+                .where(condition)
                 .fetch();
     }
 }
