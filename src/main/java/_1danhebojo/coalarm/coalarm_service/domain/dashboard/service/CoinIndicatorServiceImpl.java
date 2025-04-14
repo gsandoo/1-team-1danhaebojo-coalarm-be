@@ -293,7 +293,9 @@ public class CoinIndicatorServiceImpl implements CoinIndicatorService {
         List<BigDecimal> pricesMinutes = getClosingPricesMinutes(symbol);
         List<BigDecimal> pricesDay = getClosingPricesDay(symbol);
 
-        if (pricesDay.size() < 26 && pricesMinutes.size() <14) {
+        if (pricesDay.size() < 26 || pricesMinutes.size() <14) {
+            log.error("충분한 가격 데이터가 없습니다. pricesDay 크기: {}, pricesMinutes 크기: {}",
+                    pricesDay.size(), pricesMinutes.size());
             throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
         }
 

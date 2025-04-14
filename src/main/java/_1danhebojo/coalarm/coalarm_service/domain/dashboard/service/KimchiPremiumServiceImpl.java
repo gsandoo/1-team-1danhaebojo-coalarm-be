@@ -102,8 +102,7 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
             try {
                 calculateAndSaveKimchiPremiumForCoin(coinSymbol, exchangeRate);
             } catch (Exception e) {
-                log.error("{} 코인의 김치 프리미엄 계산 중 오류 발생: {}", coinSymbol, e.getMessage());
-                // 한 코인에서 오류가 발생해도 다른 코인은 계속 진행
+                log.warn("{} 코인의 김치프리미엄 계산 중 오류 발생: {}", coinSymbol, e.getMessage());
             }
         }
     }
@@ -125,12 +124,8 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
         BigDecimal krwPrice = krwTicker.get().getClose();
         BigDecimal usdtPrice = usdtTicker.get().getClose();
 
-//        log.info("{} KRW 가격: {}", coinSymbol, krwPrice);
-//        log.info("{} USDT 가격: {}", coinSymbol, usdtPrice);
-
         // 김치 프리미엄 계산 (정확도를 위해 높은 스케일 사용)
         BigDecimal globalPriceInKrw = usdtPrice.multiply(exchangeRate).setScale(CALCULATION_SCALE, RoundingMode.HALF_UP);
-//        log.info("{} 글로벌 가격(KRW 환산): {}", coinSymbol, globalPriceInKrw);
 
         // 김치프리미엄 = ((한국가격 - 글로벌가격) / 글로벌가격) * 100
         BigDecimal priceDifference = krwPrice.subtract(globalPriceInKrw);
@@ -146,8 +141,6 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
                     .multiply(BigDecimal.valueOf(100))
                     .setScale(DISPLAY_SCALE, RoundingMode.HALF_UP);
         }
-
-//        log.info("{} 김치프리미엄 계산 결과: {}%", coinSymbol, kimchiPremium);
 
         // 코인 엔티티 가져오기
         Optional<CoinEntity> coinEntity = coinJpaRepository.findBySymbol(coinSymbol);
@@ -180,8 +173,12 @@ public class KimchiPremiumServiceImpl implements KimchiPremiumService{
                 .dailyChange(dailyChange)
                 .build();
 
-        kimchiPreminumJpaRepository.save(kimchiPremiumEntity);
-//        log.info("{} 김치 프리미엄 저장 완료: {}%, 일별 변동률: {}%", coinSymbol, kimchiPremium, dailyChange);
+        try{
+            kimchiPreminumJpaRepository.save(kimchiPremiumEntity);
+        }catch(Exception e){
+            log.warn("김치프리미엄 데이터 저장중 에러가 발생했습니다. ->"+e);
+            throw new ApiException(AppHttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private BigDecimal calculateDailyChange(BigDecimal currentValue, Optional<KimchiPremiumEntity> yesterdayPremium) {
