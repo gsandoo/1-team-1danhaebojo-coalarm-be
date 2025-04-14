@@ -7,5 +7,5 @@ public interface JwtBlacklistService {
 
     boolean isBlacklisted(String token);
 
-    void removeExpiredTokens();
+    //void removeExpiredTokens();
 }
