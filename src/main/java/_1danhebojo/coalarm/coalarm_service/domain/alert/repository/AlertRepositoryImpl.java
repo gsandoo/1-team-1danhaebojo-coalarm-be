@@ -215,32 +215,18 @@ public class AlertRepositoryImpl implements AlertRepository {
         QTickerEntity ticker = QTickerEntity.tickerEntity;
         QTickerEntity tickerSub = new QTickerEntity("tickerSub");
 
-        // 1. 최신 timestamp 조회
-        List<Tuple> latestList = query
-                .select(tickerSub.id.baseSymbol, tickerSub.id.timestamp.max())
-                .from(tickerSub)
-                .where(tickerSub.id.quoteSymbol.eq("KRW"),
-                        tickerSub.id.baseSymbol.in(symbolList))
-                .groupBy(tickerSub.id.baseSymbol)
-                .fetch();
-
-        // 2. 복합키 리스트 생성
-        List<Tuple> keyList = latestList.stream()
-                .filter(tuple -> tuple.get(tickerSub.id.baseSymbol) != null && tuple.get(tickerSub.id.timestamp) != null)
-                .collect(Collectors.toList());
-
-        // 3. 복합키 in 조건으로 재조회
-        BooleanBuilder condition = new BooleanBuilder();
-        for (Tuple tuple : keyList) {
-            condition.or(
-                    ticker.id.baseSymbol.eq(tuple.get(tickerSub.id.baseSymbol))
-                            .and(ticker.id.timestamp.eq(tuple.get(tickerSub.id.timestamp)))
-            );
-        }
-
-        return query
-                .selectFrom(ticker)
-                .where(condition)
+        return query.selectFrom(ticker)
+                .where(
+                        ticker.id.baseSymbol.in(symbolList),
+                        ticker.id.timestamp.in(
+                                JPAExpressions
+                                        .select(tickerSub.id.timestamp.max())
+                                        .from(tickerSub)
+                                        .where(tickerSub.id.baseSymbol.eq(ticker.id.baseSymbol))
+                                        .where(tickerSub.id.quoteSymbol.eq("KRW")
+                                        )
+                        )
+                )
                 .fetch();
     }
 }
