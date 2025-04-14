@@ -31,6 +31,7 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.QAlertEntity.alertEntity;
 import static _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.QCoinEntity.coinEntity;
@@ -214,7 +215,7 @@ public class AlertRepositoryImpl implements AlertRepository {
         QTickerEntity ticker = QTickerEntity.tickerEntity;
         QTickerEntity tickerSub = new QTickerEntity("tickerSub");
 
-        // 가장 최신 시간 먼저 조회
+        // 1. 최신 timestamp 조회
         List<Tuple> latestList = query
                 .select(tickerSub.id.baseSymbol, tickerSub.id.timestamp.max())
                 .from(tickerSub)
@@ -223,20 +224,20 @@ public class AlertRepositoryImpl implements AlertRepository {
                 .groupBy(tickerSub.id.baseSymbol)
                 .fetch();
 
-        // 해당 ID로 실제 데이터 조회
+        // 2. 복합키 리스트 생성
+        List<Tuple> keyList = latestList.stream()
+                .filter(tuple -> tuple.get(tickerSub.id.baseSymbol) != null && tuple.get(tickerSub.id.timestamp) != null)
+                .collect(Collectors.toList());
+
+        // 3. 복합키 in 조건으로 재조회
         BooleanBuilder condition = new BooleanBuilder();
-        for (Tuple tuple : latestList) {
-            String baseSymbol = tuple.get(tickerSub.id.baseSymbol);
-            Instant timestamp = tuple.get(tickerSub.id.timestamp);
-            if (baseSymbol != null && timestamp != null) {
-                condition.or(
-                        ticker.id.baseSymbol.eq(baseSymbol)
-                                .and(ticker.id.timestamp.eq(timestamp))
-                );
-            }
+        for (Tuple tuple : keyList) {
+            condition.or(
+                    ticker.id.baseSymbol.eq(tuple.get(tickerSub.id.baseSymbol))
+                            .and(ticker.id.timestamp.eq(tuple.get(tickerSub.id.timestamp)))
+            );
         }
 
-        // ticker 테이블에서 최신 ticker만 조회
         return query
                 .selectFrom(ticker)
                 .where(condition)
