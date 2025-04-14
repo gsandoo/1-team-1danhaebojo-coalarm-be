@@ -18,7 +18,7 @@ class UpbitSseController {
 
     private final UpbitSseService upbitService;
 
-    @GetMapping(value = "/{symbol}")
+    @GetMapping(value = "/{symbol}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@PathVariable String symbol) {
         upbitService.subscribeSymbol(symbol);
         return upbitService.addEmitter(symbol);

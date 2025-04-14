@@ -17,14 +17,6 @@ public interface VolumeSpikeJpaRepository extends JpaRepository<VolumeSpikeEntit
     @Query("DELETE FROM VolumeSpikeEntity v WHERE v.alert.id IN :alertIds")
     void deleteByAlertIdIn(@Param("alertIds") List<Long> alertIds);
 
-    // 거래량 급등 감지가 있는 경우 volume_spike 정보 포함 조회
-    @Query("    SELECT t" +
-            "    FROM VolumeSpikeEntity t" +
-            "    JOIN FETCH t.alert a" +
-            "    JOIN FETCH a.coin c" +
-            "    WHERE a.isVolumeSpike = true AND a.id = :alertId")
-    Optional<VolumeSpikeEntity> findVolumeSpikeAlertByAlertId(Long alertId);
-
     @Query("    SELECT a" +
             "    FROM AlertEntity a" +
             "    JOIN FETCH a.volumeSpike v" +

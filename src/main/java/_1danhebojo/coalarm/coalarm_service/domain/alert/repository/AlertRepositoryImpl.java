@@ -9,6 +9,8 @@ import _1danhebojo.coalarm.coalarm_service.domain.alert.repository.jpa.VolumeSpi
 import _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.CoinEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.QTickerEntity;
 import _1danhebojo.coalarm.coalarm_service.domain.dashboard.repository.entity.TickerEntity;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
@@ -28,6 +31,7 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static _1danhebojo.coalarm.coalarm_service.domain.alert.repository.entity.QAlertEntity.alertEntity;
 import static _1danhebojo.coalarm.coalarm_service.domain.coin.repository.entity.QCoinEntity.coinEntity;
@@ -164,8 +168,47 @@ public class AlertRepositoryImpl implements AlertRepository {
         return alertJpaRepository.findCoinBySymbol(symbol);
     }
 
-    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType) {
-        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType);
+    public boolean findAlertsByUserIdAndSymbolAndAlertType(Long userId, String symbol, String alertType, Long alarmCountLimit) {
+        QAlertEntity alert = QAlertEntity.alertEntity;
+
+        switch (alertType) {
+            case "GOLDEN_CROSS":
+                return query.selectOne()
+                        .from(alert)
+                        .where(
+                                alert.user.id.eq(userId),
+                                alert.coin.symbol.eq(symbol),
+                                alert.isGoldenCross.isTrue()
+                        )
+                        .fetchFirst() != null;
+
+            case "VOLUME_SPIKE":
+                return query.selectOne()
+                        .from(alert)
+                        .where(
+                                alert.user.id.eq(userId),
+                                alert.coin.symbol.eq(symbol),
+                                alert.isVolumeSpike.isTrue()
+                        )
+                        .fetchFirst() != null;
+
+            case "TARGET_PRICE":
+                List<Long> dummyList = query.select(alert.id)
+                        .from(alert)
+                        .where(
+                                alert.user.id.eq(userId),
+                                alert.coin.symbol.eq(symbol),
+                                alert.isTargetPrice.isTrue()
+                        )
+                        .limit(alarmCountLimit + 1)
+                        .fetch();
+
+                return dummyList.size() >= alarmCountLimit;
+        }
+
+        return false;
+
+//        return alertJpaRepository.findAlertsByUserIdAndSymbolAndAlertType(userId, symbol, alertType, alarmCountLimit);
     }
 
     public List<TickerEntity> findLatestTickersBySymbolList(List<String> symbolList) {

@@ -27,9 +27,9 @@ public class JwtBlacklistServiceImpl implements JwtBlacklistService {
         return jwtBlacklistJpaRepository.findByToken(token).isPresent();
     }
 
-    @Override
-    @Scheduled(cron = "0 0 * * * ?") // 만료된 토큰을 매 시간 디비에서 삭제
-    public void removeExpiredTokens() {
-        jwtBlacklistJpaRepository.deleteByExpiryDateBefore(Instant.now());
-    }
+//    @Override
+//    @Scheduled(cron = "0 0 * * * ?") // 만료된 토큰을 매 시간 디비에서 삭제
+//    public void removeExpiredTokens() {
+//        jwtBlacklistJpaRepository.deleteByExpiryDateBefore(Instant.now());
+//    }
 }
