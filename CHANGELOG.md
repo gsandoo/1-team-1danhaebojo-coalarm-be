@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.33.4](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.3...v1.33.4) (2025-04-14)
+
+### 🐛 BUG FIXES
+
+* JWT 블랙리스트 관련 스케줄러 주석 ([5227714](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/522771411ba590ec199661f29e6334116a7a9efe))
+* 예외처리 수정 ([c7ea818](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/commit/c7ea8188b2d2879e98c753c2d5f18a327412d1cf))
+
 ## [1.33.3](https://github.com/100-hours-a-week/1-team-1danhaebojo-coalarm-be/compare/v1.33.2...v1.33.3) (2025-04-10)
 
 ### 🐛 BUG FIXES
