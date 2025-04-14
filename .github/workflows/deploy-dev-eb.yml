@@ -71,7 +71,15 @@ jobs:
               }
             ],
             "Logging": "/var/log/nginx",
-            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo \"Asia/Seoul\" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && while ! aws s3 cp s3://coalarm-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do echo \"Retrying S3 download...\"; sleep 5; done && java -Xms512m -Xmx2g -Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul -jar /app/app.jar'"
+            "Command": "sh -c 'apt-get update && apt-get install -y awscli tzdata && \
+              ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+              echo \"Asia/Seoul\" > /etc/timezone && \
+              dpkg-reconfigure -f noninteractive tzdata && \
+              mkdir -p /app && \
+              while ! aws s3 cp s3://coalarm-deploy-bucket/app-${{ env.VERSION }}.jar /app/app.jar; do \
+                echo \"Retrying S3 download...\"; sleep 5; done && \
+              java \$JAVA_OPTS -Dspring.profiles.active=dev -Duser.timezone=Asia/Seoul -jar /app/app.jar'"
+            ,
             "Environment": [
               {
                 "Name": "SPRING_PROFILES_ACTIVE",
@@ -92,6 +100,10 @@ jobs:
               {
                 "Name": "AWS_SECRET_ACCESS_KEY",
                 "Value": "$AWS_SECRET_ACCESS_KEY"
+              },
+              {
+                "Name": "JAVA_OPTS",
+                "Value": "-Xms512m -Xmx2g"
               }
             ]
           }
