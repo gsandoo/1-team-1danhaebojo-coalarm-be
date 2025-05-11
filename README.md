@@ -4,6 +4,10 @@
 
 ## <div><img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=Coalarm&fontSize=90" /></div>
 
+
+![image](https://github.com/user-attachments/assets/b0871fa1-3e90-4d6f-accd-c0642576d18d)
+
+
 - - - - - - - - - - - - - - - -
 
 
@@ -21,6 +25,7 @@
 
 ## [시연 영상(클릭)](https://drive.google.com/file/d/1mQ_nXAVRtvIQkPvBWAbGCMkQP7GTO2Ra/view?usp=drive_link)
 
+- - - - - - - - - - - - - - - -
 
 ## FrameWork
 <div>
@@ -44,6 +49,7 @@
     <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" />
     <img src="https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white" />
 </div> 
+- - - - - - - - - - - - - - - -
 
 ### Backend
 <div>
@@ -54,6 +60,7 @@
     <img src="https://img.shields.io/badge/SSE-00B2FF?style=for-the-badge&logo=messenger&logoColor=white" />
     <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white" /> 
 </div> 
+- - - - - - - - - - - - - - - -
 
 ### AI
 <div>
@@ -65,6 +72,7 @@
 </div> 
 
 
+- - - - - - - - - - - - - - - -
 
 
 ## 1. 프로젝트 주제
