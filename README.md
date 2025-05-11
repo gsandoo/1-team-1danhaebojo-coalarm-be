@@ -49,7 +49,6 @@
     <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" />
     <img src="https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white" />
 </div> 
-- - - - - - - - - - - - - - - -
 
 ### Backend
 <div>
@@ -60,7 +59,6 @@
     <img src="https://img.shields.io/badge/SSE-00B2FF?style=for-the-badge&logo=messenger&logoColor=white" />
     <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white" /> 
 </div> 
-- - - - - - - - - - - - - - - -
 
 ### AI
 <div>
